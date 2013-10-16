@@ -1,0 +1,694 @@
+package eu.socialsensor.framework.client.search.solr;
+
+import com.google.gson.Gson;
+import eu.socialsensor.framework.client.dao.StreamUserDAO;
+import eu.socialsensor.framework.client.dao.impl.StreamUserDAOImpl;
+import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.domain.MediaItemLight;
+import eu.socialsensor.framework.common.domain.StreamUser;
+import eu.socialsensor.framework.common.factories.ItemFactory;
+//import gr.atc.alethiometer.domain.Score;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.solr.client.solrj.beans.Field;
+
+/**
+ *
+ * @author etzoannos - e.tzoannos@atc.gr
+ */
+public class SolrItem {
+
+    public SolrItem() {
+    }
+
+    public SolrItem(Item item) {
+
+        positiveVotes = item.getPositiveVotes();
+        negativeVotes = item.getNegativeVotes();
+        id = item.getId();
+        streamId = item.getStreamId();
+        source = item.getSource();
+        title = item.getTitle();
+        description = item.getDescription();
+        tags = item.getTags();
+        categories = item.getCategories();
+        author = item.getAuthor();
+        links = new ArrayList<String>();
+        if (item.getLinks() != null) {
+            for (URL link : item.getLinks()) {
+                links.add(link.toString());
+            }
+        }
+        mediaLinks = new ArrayList<String>();
+        if (item.getMediaLinks() != null) {
+            for (MediaItemLight mediaLink : item.getMediaLinks()) {
+                mediaLinks.add(mediaLink.getMediaLink() + "%%" + mediaLink.getThumbnailLink());
+            }
+        }
+
+        //this is long
+
+        publicationTime = item.getPublicationTime();
+        List<String> peopleTemp = extractPeople(item.getTitle());
+        peopleTemp.add("@" + item.getAuthorScreenName());
+        people = peopleTemp;
+
+        //this is an enumeration
+
+        operation = item.getOperation().name();
+        comments = item.getComments();
+        latitude = item.getLatitude();
+        longitude = item.getLongitude();
+        location = item.getLocationName();
+//        text = item.getText();
+        dyscoId = item.getDyscoId();
+        sentiment = item.getSentiment();
+        language = item.getLang();
+
+        //this is a map
+        popularity = new ArrayList<String>();
+        if (item.getPopularity() != null) {
+            for (String popularityKey : item.getPopularity().keySet()) {
+                popularity.add(popularityKey + "%%" + item.getPopularity().get(popularityKey));
+            }
+        }
+
+        //this is a map
+
+        mediaIds = new ArrayList<String>();
+        if (item.getMediaItems() != null) {
+            for (Entry<URL, MediaItem> mediaEntry : item.getMediaItems().entrySet()) {
+                URL url = mediaEntry.getKey();
+                MediaItem mediaItem = mediaEntry.getValue();
+                mediaIds.add(url.toString() + "%%" + mediaItem.getId());
+            }
+        }
+
+        Map<String, Integer> _popularity = item.getPopularity();
+        if (_popularity != null) {
+            if (_popularity.containsKey("retweetCount")) {
+                retweetsCount = _popularity.get("retweetCount");
+            }
+        }
+        //the following derive from alethiometer
+//        Score fullScore = item.getFullScore();
+//        if (fullScore != null) {
+//            alethiometerScore = fullScore.getScore();
+//            alethiometerUserScore = fullScore.getTotalContributorScore();
+//        } else {
+//            alethiometerScore = -1;
+//            alethiometerUserScore = -1;
+//        }
+        alethiometerScore = item.getAlethiometerScore();
+        alethiometerUserScore = item.getAlethiometerUserScore();
+        alethiometerUserStatus = item.getAlethiometerUserStatus();
+        userRole = item.getUserRole();
+        original = item.isOriginal();
+
+
+        StreamUserDAO userDAO = new StreamUserDAOImpl();
+        StreamUser user = userDAO.getStreamUser(item.getAuthor());
+        if (user != null) {
+            authorFullName = user.getName();
+            authorScreenName = user.getUsername();
+            avatarImage = user.getImageUrl();
+            avatarImageSmall = user.getProfileImage();
+            if (user.getCategory() != null) {
+                category = user.getCategory().name();
+            }
+
+            Map<String, Long> _userPopularity = user.getPopularity();
+            if (_userPopularity != null) {
+                if (_userPopularity.containsKey("followers")) {
+                    followersCount = _userPopularity.get("followers").intValue();
+                }
+                if (_userPopularity.containsKey("friends")) {
+                    friendsCount = _userPopularity.get("friends").intValue();
+                }
+            }
+
+        }
+
+        validityScore = item.getValidityScore();
+
+        //convert votes to JSONString and put it to SolrItem
+        String itemVotes = new Gson().toJson(item.getVotes());
+        validityVotes = itemVotes;
+
+    }
+
+    public Item toItem() throws MalformedURLException {
+
+        Item item = new Item();
+
+        item.setValidityScore(validityScore);
+        item.setVotes(ItemFactory.createVoteList(validityVotes));
+        item.setPositiveVotes(positiveVotes);
+        item.setNegativeVotes(negativeVotes);
+        
+        item.setId(id);
+        item.setStreamId(streamId);
+        item.setSource(source);
+        item.setTitle(title);
+        item.setDescription(description);
+        item.setTags(tags);
+        item.setCategories(categories);
+        item.setAuthor(author);
+        item.setOriginal(original);
+        item.setPeople(people);
+
+        if (links != null) {
+            URL[] _links = new URL[links.size()];
+            for (int i = 0; i < links.size(); i++) {
+                _links[i] = new URL(links.get(i));
+            }
+            item.setLinks(_links);
+        }
+
+        if (mediaLinks != null) {
+
+            List<MediaItemLight> _mediaLinks = new ArrayList<MediaItemLight>();
+
+            for (String mediaLink : mediaLinks) {
+                String[] mediaLinksPair = mediaLink.split("%%");
+                if (mediaLinksPair.length == 2) {
+                    _mediaLinks.add(new MediaItemLight(mediaLinksPair[0], mediaLinksPair[1]));
+                }
+
+                item.setMediaLinks(_mediaLinks);
+            }
+        }
+
+        item.setPublicationTime(publicationTime);
+
+        //this is an enumeration
+        item.setOperation(Item.Operation.valueOf(operation));
+        item.setComments(comments);
+        item.setLocation(latitude, longitude, location);
+//        item.setText(text);
+        item.setDyscoId(dyscoId);
+
+        //this is a Map<String, Long>
+        if (popularity != null) {
+            Map _popularity = new HashMap<String, Integer>();
+            for (String popularityEntry : popularity) {
+                String[] popularityPair = popularityEntry.split("%%");
+                if (popularityPair.length == 2) {
+                    _popularity.put(popularityPair[0], new Integer(popularityPair[1]));
+                }
+            }
+            item.setPopularity(_popularity);
+        }
+
+        //this is a Map<URL, String>
+        if (mediaIds != null) {
+            Map _mediaItems = new HashMap<String, MediaItem>();
+            for (String mediaId : mediaIds) {
+                String[] mediaIdPair = mediaId.split("%%");
+                if (mediaIdPair.length == 2) {
+                    URL url = new URL(mediaIdPair[0]);
+                    MediaItem mediaItem = new MediaItem(url);
+                    mediaItem.setId(mediaIdPair[1]);
+
+                    _mediaItems.put(url, mediaItem);
+                }
+            }
+            item.setMediaItems(_mediaItems);
+        }
+
+        //new fields conversion: 
+
+        item.setRetweetsCount(retweetsCount);
+        item.setAlethiometerScore(alethiometerScore);
+        item.setAlethiometerUserScore(alethiometerUserScore);
+        item.setUserRole(userRole);
+        item.setAuthorFullName(authorFullName);
+        item.setFollowersCount(followersCount);
+        item.setFriendsCount(friendsCount);
+        item.setAvatarImage(avatarImage);
+        item.setAvatarImageSmall(avatarImageSmall);
+        item.setAuthorScreenName(authorScreenName);
+        item.setLang(language);
+        item.setCategory(category);
+        item.setAlethiometerUserStatus(alethiometerUserStatus);
+
+        return item;
+    }
+    @Field(value = "id")
+    private String id;
+    @Field(value = "streamId")
+    private String streamId;
+    @Field(value = "source")
+    private String source;
+    @Field(value = "title")
+    private String title;
+    @Field(value = "description")
+    private String description;
+    @Field(value = "tags")
+    private String[] tags;
+    @Field(value = "categories")
+    private String[] categories;
+    @Field(value = "author")
+    private String author;
+    @Field(value = "popularity")
+    private List<String> popularity;
+    @Field(value = "people")
+    private List<String> people;
+    @Field(value = "links")
+    private List<String> links;
+    @Field(value = "mediaLinks")
+    private List<String> mediaLinks;
+    @Field(value = "publicationTime")
+    private long publicationTime;
+    @Field(value = "operation")
+    private String operation;
+    @Field(value = "comments")
+    private String[] comments;
+    @Field(value = "latitude")
+    private Double latitude;
+    @Field(value = "longitude")
+    private Double longitude;
+    @Field(value = "location")
+    private String location;
+//    @Field(value = "text")
+//    private String text;
+    @Field(value = "mediaIds")
+    private List<String> mediaIds;
+    @Field(value = "dyscoId")
+    private String dyscoId;
+    // new fields added:27.3.2013
+    @Field(value = "sentiment")
+    private String sentiment;
+    @Field(value = "retweetsCount")
+    private Integer retweetsCount = 0;
+    // the following fields are added for the UI purposes (after retrieval from Solr)
+    // no need to be populated at crawling time
+    @Field(value = "alethiometerScore")
+    private int alethiometerScore = -1;
+    @Field(value = "alethiometerUserScore")
+    private int alethiometerUserScore = -1;
+    @Field(value = "authorFullName")
+    private String authorFullName;
+    @Field(value = "userRole")
+    private String userRole;
+    @Field(value = "followersCount")
+    private int followersCount = 0;
+    @Field(value = "friendsCount")
+    private int friendsCount = 0;
+    @Field(value = "avatarImage")
+    private String avatarImage;
+    @Field(value = "avatarImageSmall")
+    private String avatarImageSmall;
+    @Field(value = "authorScreenName")
+    private String authorScreenName;
+    @Field(value = "language")
+    private String language;
+    @Field(value = "category")
+    private String category;
+    @Field(value = "original")
+    private boolean original;
+    @Field(value = "alethiometerUserStatus")
+    private String alethiometerUserStatus;
+    @Field(value = "validityScore")
+    private int validityScore;
+    @Field(value = "validityVotes")
+    private String validityVotes;
+    @Field(value = "positiveVotes")
+    private int positiveVotes;
+    @Field(value = "negativeVotes")
+    private int negativeVotes;
+
+    public int getPositiveVotes() {
+        return positiveVotes;
+    }
+
+    public void setPositiveVotes(int positiveVotes) {
+        this.positiveVotes = positiveVotes;
+    }
+
+    public int getNegativeVotes() {
+        return negativeVotes;
+    }
+
+    public void setNegativeVotes(int negativeVotes) {
+        this.negativeVotes = negativeVotes;
+    }
+       
+
+    public String getAlethiometerUserStatus() {
+        return alethiometerUserStatus;
+    }
+
+    public void setAlethiometerUserStatus(String alethiometerUserStatus) {
+        this.alethiometerUserStatus = alethiometerUserStatus;
+    }
+
+    public Integer getRetweetsCount() {
+        return retweetsCount;
+    }
+
+    public void setRetweetsCount(Integer retweetsCount) {
+        this.retweetsCount = retweetsCount;
+    }
+
+    public boolean isOriginal() {
+        return original;
+    }
+
+    public void setOriginal(boolean original) {
+        this.original = original;
+    }
+
+//    public boolean getOriginal() {
+//        return original;
+//    }
+//
+//    public void setOriginal(boolean original) {
+//        this.original = original;
+//    }
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getAuthorScreenName() {
+        return authorScreenName;
+    }
+
+    public void setAuthorScreenName(String authorScreenName) {
+        this.authorScreenName = authorScreenName;
+    }
+
+    public int getAlethiometerScore() {
+        return alethiometerScore;
+    }
+
+    public void setAlethiometerScore(int alethiometerScore) {
+        this.alethiometerScore = alethiometerScore;
+    }
+
+    public int getAlethiometerUserScore() {
+        return alethiometerUserScore;
+    }
+
+    public void setAlethiometerUserScore(int alethiometerUserScore) {
+        this.alethiometerUserScore = alethiometerUserScore;
+    }
+
+    public String getAuthorFullName() {
+        return authorFullName;
+    }
+
+    public void setAuthorFullName(String authorFullName) {
+        this.authorFullName = authorFullName;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(int followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public int getFriendsCount() {
+        return friendsCount;
+    }
+
+    public void setFriendsCount(int friendsCount) {
+        this.friendsCount = friendsCount;
+    }
+
+    public String getAvatarImage() {
+        return avatarImage;
+    }
+
+    public void setAvatarImage(String avatarImage) {
+        this.avatarImage = avatarImage;
+    }
+
+    public String getAvatarImageSmall() {
+        return avatarImageSmall;
+    }
+
+    public void setAvatarImageSmall(String avatarImageSmall) {
+        this.avatarImageSmall = avatarImageSmall;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getStreamId() {
+        return streamId;
+    }
+
+    public void setStreamId(String streamId) {
+        this.streamId = streamId;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getPeople() {
+        return people;
+    }
+
+    public void setPeople(List<String> people) {
+        this.people = people;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+
+    public String[] getCategories() {
+        return categories;
+    }
+
+    public void setCategories(String[] categories) {
+        this.categories = categories;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public List<String> getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(List<String> popularity) {
+        this.popularity = popularity;
+    }
+
+    public List<String> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<String> links) {
+        this.links = links;
+    }
+
+    public List<String> getMediaLinks() {
+        return mediaLinks;
+    }
+
+    public void setMediaLinks(List<String> mediaLinks) {
+        this.mediaLinks = mediaLinks;
+    }
+
+    public Long getPublicationTime() {
+        return publicationTime;
+    }
+
+    public void setPublicationTime(Long publicationTime) {
+        this.publicationTime = publicationTime;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
+
+    public String[] getComments() {
+        return comments;
+    }
+
+    public void setComments(String[] comments) {
+        this.comments = comments;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+//    public String getText() {
+//        return text;
+//    }
+//
+//    public void setText(String text) {
+//        this.text = text;
+//    }
+    public List<String> getMediaIds() {
+        return mediaIds;
+    }
+
+    public void setMediaIds(List<String> mediaIds) {
+        this.mediaIds = mediaIds;
+    }
+
+    public String getDyscoId() {
+        return dyscoId;
+    }
+
+    public void setDyscoId(String dyscoId) {
+        this.dyscoId = dyscoId;
+    }
+
+    public String getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(String sentiment) {
+        this.sentiment = sentiment;
+    }
+
+    public int getValidityScore() {
+        return validityScore;
+    }
+
+    public void setValidityScore(int validityScore) {
+        this.validityScore = validityScore;
+    }
+
+    public String getValidityVotes() {
+        return validityVotes;
+    }
+
+    public void setValidityVotes(String validityVotes) {
+        this.validityVotes = validityVotes;
+    }
+
+    private List<String> extractPeople(String input) {
+
+        // String to be scanned to find the pattern.
+        String pattern = "(?:\\s|\\A)[@]+([A-Za-z0-9-_]+)";
+
+        // Create a Pattern object
+        Pattern r = Pattern.compile(pattern);
+
+        // Now create matcher object.
+        Matcher m = r.matcher(input);
+
+        List<String> out = new ArrayList<String>();
+        while (m.find()) {
+            out.add(m.group());
+        }
+        return out;
+    }
+
+    public static void main(String args[]) {
+
+        // String to be scanned to find the pattern.
+        String line = "@user user 1, asdfasf ,  @safas ,saf asdf@ sfdasf@asdfas  asfasf asfas asfsd";
+        String pattern = "(?:\\s|\\A)[@]+([A-Za-z0-9-_]+)";
+
+        // Create a Pattern object
+        Pattern r = Pattern.compile(pattern);
+
+        // Now create matcher object.
+        Matcher m = r.matcher(line);
+
+        while (m.find()) {
+
+            System.out.println("Found value: " + m.group());
+
+        }
+    }
+}
