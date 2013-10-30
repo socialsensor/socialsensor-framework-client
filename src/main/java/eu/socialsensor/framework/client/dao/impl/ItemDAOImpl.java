@@ -9,7 +9,10 @@ import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.DyscoRequest;
 import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.Topic;
 import eu.socialsensor.framework.common.factories.ItemFactory;
+import eu.socialsensor.framework.common.factories.ObjectFactory;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +67,11 @@ public class ItemDAOImpl implements ItemDAO {
     @Override
     public void updateItem(Item item) {
         mongoHandler.update("id", item.getId(), item);
+    }
+    
+    @Override
+    public void updateTopic(Topic topic) {
+        mongoHandler.update("id", topic.getId(), topic);
     }
 
     @Override
@@ -167,7 +175,7 @@ public class ItemDAOImpl implements ItemDAO {
 
         return results;
     }
-    
+    @Override
     public List<Item> readItems() {
     	List<String> jsonItems = mongoHandler.findMany(-1);
     	System.out.println("I have read "+jsonItems.size()+" jsonItems");
@@ -186,7 +194,30 @@ public class ItemDAOImpl implements ItemDAO {
 		}
 		return items;
     }
+    @Override
+    public List<Topic> readTopicsByStatus() {
+    	Selector query = new Selector();
+    	query.select("isRead", Boolean.FALSE);
+    	List<String> jsonItems = mongoHandler.findMany(query, -1);
+    	
+    	System.out.println("I have read "+jsonItems.size()+" jsonItems");
+    	List<Topic> topics = new ArrayList<Topic>();
+    	
+		Gson gson = new GsonBuilder()
+    	.excludeFieldsWithoutExposeAnnotation()
+    	.create();
+		
+		for(String json : jsonItems){
+			
+			Topic topic = ObjectFactory.createTopic(json);
+			
+			topics.add(topic);
+			
+		}
+		return topics;
+    }
     
+    @Override
     public List<Item> readItemsByStatus(){
     	 Selector query = new Selector();
          query.select("isSearched", Boolean.FALSE);

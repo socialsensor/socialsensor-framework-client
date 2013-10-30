@@ -35,9 +35,10 @@ public class SolrDyscoHandler {
     private SolrDyscoHandler() {
         try {
 
-        	server = new HttpSolrServer("server/solr/dyscos");
+        	server = new HttpSolrServer("http://social1.atc.gr:8080/solr/dyscos");
         	
         } catch (Exception e) {
+        	
             Logger.getRootLogger().info(e.getMessage());
         }
     }
@@ -97,6 +98,7 @@ public class SolrDyscoHandler {
 
         SolrQuery solrQuery = new SolrQuery("id:" + dyscoId);
         SearchEngineResponse<Dysco> response = findDyscosLight(solrQuery);
+       
         List<Dysco> dyscos = response.getResults();
         Dysco dysco = null;
         if (dyscos != null) {

@@ -1,6 +1,8 @@
 package eu.socialsensor.framework.client.dao;
 
 import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.Topic;
+
 import java.util.List;
 
 /**
@@ -13,6 +15,8 @@ public interface ItemDAO {
     public void insertItem(Item item);
 
     public void updateItem(Item item);
+    
+    public void updateTopic(Topic topic);
 
     public void updateItemCommentsAndPopularity(Item item);
 
@@ -33,5 +37,7 @@ public interface ItemDAO {
 	public List<Item> readItems();
 	
 	public List<Item> readItemsByStatus();
+	
+	public List<Topic> readTopicsByStatus();
     
 }
