@@ -377,6 +377,12 @@ public class MongoHandler {
         }
         return false;
     }
+    
+    public boolean delete(){
+    	db.dropDatabase();
+    	
+    	return true;
+    }
 
     public void update(String fieldName, String fieldValue, JSONable jsonObject) {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);

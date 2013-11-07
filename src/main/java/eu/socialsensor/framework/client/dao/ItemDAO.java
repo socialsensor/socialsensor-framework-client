@@ -15,12 +15,12 @@ public interface ItemDAO {
     public void insertItem(Item item);
 
     public void updateItem(Item item);
-    
-    public void updateTopic(Topic topic);
 
     public void updateItemCommentsAndPopularity(Item item);
 
     public boolean deleteItem(String id);
+    
+    public boolean deleteDB();
 
     public Item getItem(String id);
     
@@ -37,7 +37,6 @@ public interface ItemDAO {
 	public List<Item> readItems();
 	
 	public List<Item> readItemsByStatus();
-	
-	public List<Topic> readTopicsByStatus();
+
     
 }

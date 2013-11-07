@@ -19,7 +19,7 @@ public class TimeslotDAOImpl implements TimeslotDAO {
 	private List<String> indexes = new ArrayList<String>();
 
 	public TimeslotDAOImpl() {
-		this("social1.atc.gr", "Streams");
+		this("160.40.50.230", "Streams");
 	}
 
 	public TimeslotDAOImpl(String hostname, String dbName) {

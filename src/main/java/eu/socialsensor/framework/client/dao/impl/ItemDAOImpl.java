@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 public class ItemDAOImpl implements ItemDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host = "";
+    private static String host = "160.40.50.230";
     private static String db = "Streams";
     private static String collection = "Items";
     private MongoHandler mongoHandler;
@@ -46,6 +46,7 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     public ItemDAOImpl(String host, String db, String collection) {
+    	
         indexes.add("id");
         indexes.add("publicationTime");
         //indexes.add("title");
@@ -53,7 +54,7 @@ public class ItemDAOImpl implements ItemDAO {
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
-            System.out.println("List time2: Connect");
+            
         } catch (UnknownHostException ex) {
             Logger.getRootLogger().error(ex.getMessage());
         }
@@ -68,12 +69,7 @@ public class ItemDAOImpl implements ItemDAO {
     public void updateItem(Item item) {
         mongoHandler.update("id", item.getId(), item);
     }
-    
-    @Override
-    public void updateTopic(Topic topic) {
-        mongoHandler.update("id", topic.getId(), topic);
-    }
-
+  
     @Override
     public void updateItemCommentsAndPopularity(Item item) {
         UpdateItem changes = new UpdateItem();
@@ -94,6 +90,10 @@ public class ItemDAOImpl implements ItemDAO {
     @Override
     public boolean deleteItem(String id) {
         return mongoHandler.delete("id", id);
+    }
+    @Override
+    public boolean deleteDB(){
+    	return mongoHandler.delete();
     }
 
     @Override
@@ -194,29 +194,7 @@ public class ItemDAOImpl implements ItemDAO {
 		}
 		return items;
     }
-    @Override
-    public List<Topic> readTopicsByStatus() {
-    	Selector query = new Selector();
-    	query.select("isRead", Boolean.FALSE);
-    	List<String> jsonItems = mongoHandler.findMany(query, -1);
-    	
-    	System.out.println("I have read "+jsonItems.size()+" jsonItems");
-    	List<Topic> topics = new ArrayList<Topic>();
-    	
-		Gson gson = new GsonBuilder()
-    	.excludeFieldsWithoutExposeAnnotation()
-    	.create();
-		
-		for(String json : jsonItems){
-			
-			Topic topic = ObjectFactory.createTopic(json);
-			
-			topics.add(topic);
-			
-		}
-		return topics;
-    }
-    
+  
     @Override
     public List<Item> readItemsByStatus(){
     	 Selector query = new Selector();
@@ -229,9 +207,11 @@ public class ItemDAOImpl implements ItemDAO {
 
          for (String json : jsonItems) {
              Item item = gson.fromJson(json, Item.class);
+            
              items.add(item);
          }
-
+         
+      
          return items;
     }
     
