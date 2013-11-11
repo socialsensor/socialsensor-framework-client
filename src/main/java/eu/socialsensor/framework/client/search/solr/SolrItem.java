@@ -115,9 +115,11 @@ public class SolrItem {
         userRole = item.getUserRole();
         original = item.isOriginal();
 
-
-        StreamUserDAO userDAO = new StreamUserDAOImpl();
-        StreamUser user = userDAO.getStreamUser(item.getAuthor());
+        StreamUser user = item.getStreamUser();
+        if(user == null) {
+        	StreamUserDAO userDAO = new StreamUserDAOImpl();
+        	user = userDAO.getStreamUser(item.getAuthor());
+        }
         if (user != null) {
             authorFullName = user.getName();
             authorScreenName = user.getUsername();
