@@ -83,14 +83,12 @@ public class SolrItemHandler {
         return INSTANCE;
     }
 
-    public boolean insertItem(Item item, String dyscoId) {
+    public boolean insertItem(Item item) {
 
         boolean status = false;
         try {
             SolrItem solrItem = new SolrItem(item);
-            if (dyscoId != null) {
-                solrItem.setDyscoId(dyscoId);
-            }
+
             server.addBean(solrItem);
             UpdateResponse response = server.commit();
             int statusId = response.getStatus();
@@ -107,14 +105,13 @@ public class SolrItemHandler {
         }
     }
 
-    public boolean insertItems(List<Item> items, String dyscoId) {
+    public boolean insertItems(List<Item> items) {
 
         boolean status = false;
         try {
             List<SolrItem> solrItems = new ArrayList<SolrItem>();
             for (Item item : items) {
                 SolrItem solrItem = new SolrItem(item);
-                solrItem.setDyscoId(dyscoId);
                 solrItems.add(solrItem);
             }
 

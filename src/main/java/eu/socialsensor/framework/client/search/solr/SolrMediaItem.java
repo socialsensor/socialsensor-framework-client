@@ -28,7 +28,6 @@ public class SolrMediaItem {
         title = mediaItem.getTitle();
         description = mediaItem.getDescription();
         tags = mediaItem.getTags();
-        author = mediaItem.getAuthor();
         
         url = mediaItem.getUrl();
         thumbnail = mediaItem.getThumbnail();
@@ -38,15 +37,6 @@ public class SolrMediaItem {
         longitude = mediaItem.getLongitude();
         location = mediaItem.getLocationName();
 
-        dyscoId = mediaItem.getDyscoId();
-
-        //this is a map
-        popularity = new ArrayList<String>();
-        if (mediaItem.getPopularity() != null) {
-            for (String popularityKey : mediaItem.getPopularity().keySet()) {
-                popularity.add(popularityKey + "%%" + mediaItem.getPopularity().get(popularityKey));
-            }
-        }
         
         List<String> feedKeywords = mediaItem.getFeedKeywords();
         if(feedKeywords != null) {
@@ -77,29 +67,17 @@ public class SolrMediaItem {
         mediaItem.setTitle(title);
         mediaItem.setDescription(description);
         mediaItem.setTags(tags);
-        mediaItem.setAuthor(author);
 
         mediaItem.setPublicationTime(publicationTime);
         mediaItem.setFeedKeywords(feedKeywords);
         mediaItem.setFeedKeywordsString(feedKeywordsString);
         mediaItem.setLocation(new Location(latitude, longitude, location));
-        mediaItem.setDyscoId(dyscoId);
         mediaItem.setType(type);
-        
-        //this is a Map<String, Long>
-        if (popularity != null) {
-            Map<String, Integer> _popularity = new HashMap<String, Integer>();
-            for (String popularityEntry : popularity) {
-                String[] popularityPair = popularityEntry.split("%%");
-                if (popularityPair.length == 2) {
-                    _popularity.put(popularityPair[0], new Integer(popularityPair[1]));
-                }
-            }
-            mediaItem.setPopularity(_popularity);
-        }
 
         return mediaItem;
     }
+    
+    
     @Field(value = "id")
     private String id;
     
@@ -121,9 +99,6 @@ public class SolrMediaItem {
     @Field(value = "tags")
     private String[] tags;
     
-    @Field(value = "author")
-    private String author;
-    
     @Field(value = "popularity")
     private List<String> popularity;
     
@@ -141,9 +116,6 @@ public class SolrMediaItem {
     
     @Field(value = "location")
     private String location;
-
-    @Field(value = "dyscoId")
-    private String dyscoId;
 
     @Field(value = "mentions")
     private String[] mentions;
@@ -213,14 +185,6 @@ public class SolrMediaItem {
         this.tags = tags;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public List<String> getPopularity() {
         return popularity;
     }
@@ -283,15 +247,6 @@ public class SolrMediaItem {
 
     public void setFeedKeywordsString(List<String> feedKeywordsString) {
     	this.feedKeywordsString = feedKeywordsString;
-    }
-
-
-    public String getDyscoId() {
-        return dyscoId;
-    }
-
-    public void setDyscoId(String dyscoId) {
-        this.dyscoId = dyscoId;
     }
     
     public String getType() {

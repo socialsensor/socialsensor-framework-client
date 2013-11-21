@@ -354,11 +354,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     		if(items!=null && items.size()>0) {
     			for(Item item : items) {
-    				List<MediaItemLight> temp = item.getMediaLinks();
+    				List<MediaItem> temp = item.getMediaItems();
     				if(temp!=null) {
-    					for(MediaItemLight ml : temp) {
-    						if(ml.getMediaLink()!=null)
-    						mediaLinks.add(ml.getMediaLink());
+    					for(MediaItem mItem : temp) {
+    						mediaLinks.add(mItem.getUrl());
     					}
     				}
     			}

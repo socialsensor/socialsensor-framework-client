@@ -7,11 +7,8 @@ import eu.socialsensor.framework.client.dao.ItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
-import eu.socialsensor.framework.common.domain.DyscoRequest;
 import eu.socialsensor.framework.common.domain.Item;
-import eu.socialsensor.framework.common.domain.Topic;
 import eu.socialsensor.framework.common.factories.ItemFactory;
-import eu.socialsensor.framework.common.factories.ObjectFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -49,7 +46,6 @@ public class ItemDAOImpl implements ItemDAO {
     	
         indexes.add("id");
         indexes.add("publicationTime");
-        //indexes.add("title");
         indexes.add("timeslotId");
 
         try {
@@ -77,11 +73,6 @@ public class ItemDAOImpl implements ItemDAO {
         String[] comments = item.getComments();
         if (comments != null && comments.length > 0) {
             changes.addValues("comments", comments);
-        }
-
-        Map<String, Integer> popularity = item.getPopularity();
-        if (popularity != null && popularity.size() > 0) {
-            changes.setField("popularity", popularity);
         }
 
         mongoHandler.update("id", item.getId(), changes);
@@ -180,10 +171,6 @@ public class ItemDAOImpl implements ItemDAO {
     	List<String> jsonItems = mongoHandler.findMany(-1);
     	System.out.println("I have read "+jsonItems.size()+" jsonItems");
     	List<Item> items = new ArrayList<Item>();
-    	
-		Gson gson = new GsonBuilder()
-    	.excludeFieldsWithoutExposeAnnotation()
-    	.create();
 		
 		for(String json : jsonItems){
 			

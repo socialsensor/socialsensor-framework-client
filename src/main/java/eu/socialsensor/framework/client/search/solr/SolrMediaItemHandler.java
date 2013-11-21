@@ -1,7 +1,6 @@
 package eu.socialsensor.framework.client.search.solr;
 
-import eu.socialsensor.framework.client.search.Bucket;
-import eu.socialsensor.framework.client.search.Facet;
+
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.MediaItem;
@@ -9,8 +8,7 @@ import eu.socialsensor.framework.common.domain.MediaItem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,10 +18,9 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocument;
+
 
 /**
  *
@@ -53,7 +50,7 @@ public class SolrMediaItemHandler {
     }
 
     @SuppressWarnings("finally")
-    public boolean insertMediaItem(MediaItem item, String dyscoId) {
+    public boolean insertMediaItem(MediaItem item) {
 
         boolean status = false;
         try {
@@ -61,10 +58,6 @@ public class SolrMediaItemHandler {
             item.setId(id.replaceAll("::", "%%"));
 
             SolrMediaItem solrItem = new SolrMediaItem(item);
-
-            if (dyscoId != null) {
-                solrItem.setDyscoId(dyscoId);
-            }
 
             server.addBean(solrItem);
 
@@ -83,14 +76,13 @@ public class SolrMediaItemHandler {
     }
 
     @SuppressWarnings("finally")
-    public boolean insertMediaItems(List<MediaItem> mediaItems, String dyscoId) {
+    public boolean insertMediaItems(List<MediaItem> mediaItems) {
 
         boolean status = false;
         try {
             List<SolrMediaItem> solrMediaItems = new ArrayList<SolrMediaItem>();
             for (MediaItem mediaItem : mediaItems) {
                 SolrMediaItem solrMediaItem = new SolrMediaItem(mediaItem);
-                solrMediaItem.setDyscoId(dyscoId);
                 solrMediaItems.add(solrMediaItem);
             }
 

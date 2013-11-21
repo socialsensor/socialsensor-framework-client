@@ -28,13 +28,13 @@ public class SolrHandler implements SearchEngineHandler {
     @Override
     public boolean insertItem(Item item, String dyscoId) {
 
-        return solrItemHandler.insertItem(item, dyscoId);
+        return solrItemHandler.insertItem(item);
     }
 
     @Override
     public boolean insertItems(List<Item> items, String dyscoId) {
 
-        return solrItemHandler.insertItems(items, dyscoId);
+        return solrItemHandler.insertItems(items);
     }
 
     @Override
@@ -196,8 +196,7 @@ public class SolrHandler implements SearchEngineHandler {
             status2 = true;
         }
         if (dysco.getItems().size() > 0) {
-            status2 = solrItemHandler.insertItems(dysco.getItems(),
-                    dysco.getId());
+            status2 = solrItemHandler.insertItems(dysco.getItems());
             LOGGER.log(Level.INFO, "status {0}", status2);
         }
 

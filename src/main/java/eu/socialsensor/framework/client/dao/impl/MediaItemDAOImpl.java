@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,13 +107,7 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     public void updateMediaItemPopularity(MediaItem item) {
     	boolean update = false;
     	UpdateItem changes = new UpdateItem();
-        
-        Map<String, Integer> popularity = item.getPopularity();
-        if (popularity != null && popularity.size() > 0) {
-            changes.setField("popularity", popularity);
-            update = true;
-        }
-        
+
         List<String> feedKeywords = item.getFeedKeywords();
         if (feedKeywords != null && feedKeywords.size() > 0) {
             changes.addValues("feedKeywords", feedKeywords.toArray());
