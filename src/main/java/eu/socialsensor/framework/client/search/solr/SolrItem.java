@@ -1,6 +1,7 @@
 package eu.socialsensor.framework.client.search.solr;
 
 import com.google.gson.Gson;
+
 import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.dao.impl.StreamUserDAOImpl;
 import eu.socialsensor.framework.common.domain.Item;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.solr.client.solrj.beans.Field;
 
 /**
@@ -106,15 +108,14 @@ public class SolrItem {
                 category = user.getCategory().name();
             }
 
-            Map<String, Long> _userPopularity = user.getPopularity();
-            if (_userPopularity != null) {
-                if (_userPopularity.containsKey("followers")) {
-                    followersCount = _userPopularity.get("followers").intValue();
-                }
-                if (_userPopularity.containsKey("friends")) {
-                    friendsCount = _userPopularity.get("friends").intValue();
-                }
-            }
+            Long followers = user.getFollowers();
+            if(followers != null)
+            	followersCount = followers.intValue();
+            Long friends = user.getFriends();
+            if(friends != null)
+            	friendsCount = friends.intValue();
+                
+           
 
         }
 
