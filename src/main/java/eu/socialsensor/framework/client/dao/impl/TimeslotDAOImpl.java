@@ -18,10 +18,6 @@ public class TimeslotDAOImpl implements TimeslotDAO {
 	private final String collection = "Timeslots";
 	private List<String> indexes = new ArrayList<String>();
 
-	public TimeslotDAOImpl() {
-		this("160.40.50.230", "Streams");
-	}
-
 	public TimeslotDAOImpl(String hostname, String dbName) {
 		this.host = hostname;
 		this.db = dbName;

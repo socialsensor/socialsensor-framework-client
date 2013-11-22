@@ -19,7 +19,7 @@ import eu.socialsensor.framework.common.factories.ObjectFactory;
 public class TopicDAOImpl implements TopicDAO{
 	
 	List<String> indexes = new ArrayList<String>();
-    private static String host = "160.40.50.230";
+    private static String host;
     private static String db = "";
     private static String collection = "Topics";
     private MongoHandler mongoHandler;

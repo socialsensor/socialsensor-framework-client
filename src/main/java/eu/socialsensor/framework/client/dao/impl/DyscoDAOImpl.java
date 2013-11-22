@@ -12,13 +12,11 @@ import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
-import eu.socialsensor.framework.common.domain.MediaItemLight;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

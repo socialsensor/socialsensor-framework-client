@@ -13,7 +13,6 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -25,7 +24,7 @@ import org.apache.log4j.Logger;
 public class ItemDAOImpl implements ItemDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host = "160.40.50.230";
+    private static String host;
     private static String db = "Streams";
     private static String collection = "Items";
     private MongoHandler mongoHandler;
