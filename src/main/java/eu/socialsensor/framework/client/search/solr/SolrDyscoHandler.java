@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
 /**
@@ -35,7 +36,9 @@ public class SolrDyscoHandler {
     private SolrDyscoHandler() {
         try {
 
-        	server = new HttpSolrServer("http://social1.atc.gr:8080/solr/dyscos");
+                Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/dyscos");
+        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/dyscos");
+                              
         	
         } catch (Exception e) {
         	

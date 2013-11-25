@@ -30,12 +30,12 @@
     </developers>
     
     <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
   
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -129,9 +129,9 @@
             <version>1.1.0</version>
         </dependency>
         <dependency>
-        	<groupId>redis.clients</groupId>
-        	<artifactId>jedis</artifactId>
-        	<version>2.1.0</version>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.1.0</version>
         </dependency>
     </dependencies>
            
@@ -159,7 +159,19 @@
                     </execution>
                 </executions>
             </plugin>
-            
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-resources-plugin</artifactId> 
+                <version>2.6</version> 
+                <configuration> 
+                    <encoding>UTF-8</encoding> 
+                    <executions>
+                        <execution>
+                            <goal>compile</goal>
+                        </execution>
+                    </executions>
+                </configuration> 
+            </plugin> 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -174,5 +186,12 @@
             </plugin>
             
         </plugins>
+        
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>  
 </project>

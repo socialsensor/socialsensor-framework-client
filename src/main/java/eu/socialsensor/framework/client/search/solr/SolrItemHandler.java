@@ -19,6 +19,7 @@ import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.Item;
 
 /**
@@ -42,8 +43,10 @@ public class SolrItemHandler {
     private SolrItemHandler() {
         try {
 //            ConfigReader configReader = new ConfigReader();
-//            String url = configReader.getSolrHTTP();    
-            server = new HttpSolrServer("server/solr/DyscoMediaItems");
+//            String url = configReader.getSolrHTTP();  
+              Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/items");
+        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/items");
+//            server = new HttpSolrServer("server/solr/DyscoMediaItems");
             /*
         	DefaultHttpClient httpclient = new DefaultHttpClient();
         	HttpHost proxy = new HttpHost(proxyName, port, "http");
@@ -60,7 +63,9 @@ public class SolrItemHandler {
         try {
 //            ConfigReader configReader = new ConfigReader();
 //            String url = configReader.getSolrHTTP();    
-            server = new HttpSolrServer(collection);
+//            server = new HttpSolrServer(collection);
+              Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
+        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());

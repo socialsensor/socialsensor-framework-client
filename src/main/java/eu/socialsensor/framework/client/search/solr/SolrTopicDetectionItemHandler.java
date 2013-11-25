@@ -26,6 +26,7 @@ import org.apache.solr.common.util.NamedList;
 
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.Item;
 import java.util.Date;
 import org.apache.solr.common.SolrInputDocument;
@@ -51,7 +52,9 @@ public class SolrTopicDetectionItemHandler {
     private SolrTopicDetectionItemHandler() {
         try {
    
-        	server = new HttpSolrServer("server/solr/TopicDetectionItems");
+        	    Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/TopicDetectionItems");
+        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/TopicDetectionItems");
+//            server = new HttpSolrServer("server/solr/TopicDetectionItems");
         	
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
@@ -62,7 +65,10 @@ public class SolrTopicDetectionItemHandler {
         try {
 //            ConfigReader configReader = new ConfigReader();
 //            String url = configReader.getSolrHTTP();    
-            server = new HttpSolrServer(collection);
+//            server = new HttpSolrServer(collection);
+            	    Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/TopicDetectionItems");
+        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/TopicDetectionItems");
+            
 
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());

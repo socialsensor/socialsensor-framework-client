@@ -124,6 +124,8 @@ public class SolrItem {
         //convert votes to JSONString and put it to SolrItem
         String itemVotes = new Gson().toJson(item.getVotes());
         validityVotes = itemVotes;
+        
+        retweetsCount = item.getShares();
 
     }
 
@@ -197,6 +199,7 @@ public class SolrItem {
         item.setLang(language);
         item.setCategory(category);
         item.setAlethiometerUserStatus(alethiometerUserStatus);
+        item.setShares(retweetsCount);
 
         return item;
     }
@@ -309,7 +312,11 @@ public class SolrItem {
     
     @Field(value = "negativeVotes")
     private int negativeVotes;
-
+    
+    @Field(value = "retweetsCount")
+    private Integer retweetsCount = 0;
+    
+    
     public int getPositiveVotes() {
         return positiveVotes;
     }

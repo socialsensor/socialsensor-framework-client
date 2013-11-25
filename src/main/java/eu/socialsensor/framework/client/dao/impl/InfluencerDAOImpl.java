@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -30,6 +31,17 @@ public class InfluencerDAOImpl implements InfluencerDAO {
     private final String collection = "influencers";
     private MongoHandler mongoHandler;
 
+     public InfluencerDAOImpl(String host, String db, String collection) {
+    	
+      
+        try {
+            mongoHandler = new MongoHandler(host, db, collection, indexes);
+            
+        } catch (UnknownHostException ex) {
+            Logger.getRootLogger().error(ex.getMessage());
+        }
+    }
+     
     public InfluencerDAOImpl() {
         try {
             indexes.add("keyword");

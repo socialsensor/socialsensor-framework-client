@@ -32,8 +32,8 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 public class DyscoDAOImpl implements DyscoDAO {
 
     SearchEngineHandler searchEngineHandler = new SolrHandler();
-    private static final MediaItemDAO mediaItemDAO = new MediaItemDAOImpl();
-    private static final DyscoRequestDAO dyscoRequestDAO = new DyscoRequestDAOImpl();
+    private static final MediaItemDAO mediaItemDAO = new MediaItemDAOImpl("social1.atc.gr","Streams","MediaItems");
+    private static final DyscoRequestDAO dyscoRequestDAO = new DyscoRequestDAOImpl("social1.atc.gr","Streams","Dyscos");
     private static final SolrItemHandler solrItemHandler = SolrItemHandler.getInstance();
     private static final SolrDyscoHandler handler = SolrDyscoHandler.getInstance();
     private static final SolrMediaItemHandler solrMediaItemHandler = SolrMediaItemHandler.getInstance("");
@@ -211,7 +211,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         totalQuery.setRows(1000);
         //TODO: see if we could minimize the fields returned for totalItems: 
         //links are needed for sure, maybe also sentiment which is used as facet
-        //totalQuery.setFields("links","sentiment");
+        totalQuery.setFields("links","sentiment");
+ 
         _totalItems = solrItemHandler.findItems(totalQuery).getResults();
 
         return _totalItems;

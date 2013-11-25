@@ -3,6 +3,7 @@ package eu.socialsensor.framework.client.search.solr;
 
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.MediaItem;
 
 import java.io.IOException;
@@ -35,7 +36,9 @@ public class SolrMediaItemHandler {
     // Private constructor prevents instantiation from other classes
     private SolrMediaItemHandler(String collection) {
         try {
-            server = new HttpSolrServer(collection);
+//            server = new HttpSolrServer(collection);
+              Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
+        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
         }
