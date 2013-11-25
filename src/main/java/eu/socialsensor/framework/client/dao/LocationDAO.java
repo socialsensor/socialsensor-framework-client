@@ -1,7 +1,7 @@
 package eu.socialsensor.framework.client.dao;
 
 import eu.socialsensor.framework.common.domain.Location;
-import eu.socialsensor.framework.common.domain.Source;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 
 /**
  *
@@ -10,9 +10,9 @@ import eu.socialsensor.framework.common.domain.Source;
 public interface LocationDAO {
 
     public void insertLocation(String name, double latitude, double longitude);
-    public void insertLocation(Location location, Source.Type sourceType);
+    public void insertLocation(Location location, SocialNetworkSource sourceType);
     
-    public void removeLocation(Location keyword, Source.Type sourceType);
+    public void removeLocation(Location keyword, SocialNetworkSource sourceType);
     public void removeLocation(Location keyword);
 }
 

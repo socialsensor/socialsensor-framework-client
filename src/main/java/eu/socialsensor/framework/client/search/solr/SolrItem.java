@@ -6,7 +6,6 @@ import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.dao.impl.StreamUserDAOImpl;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
-import eu.socialsensor.framework.common.domain.MediaItemLight;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
@@ -14,7 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -155,13 +154,10 @@ public class SolrItem {
         }
 
         if (mediaLinks != null) {
-
-            List<MediaItemLight> _mediaLinks = new ArrayList<MediaItemLight>();
-
             for (String mediaLink : mediaLinks) {
                 String[] mediaLinksPair = mediaLink.split("%%");
                 if (mediaLinksPair.length == 2) {
-                    _mediaLinks.add(new MediaItemLight(mediaLinksPair[0], mediaLinksPair[1]));
+                   // TODO update item with media ids
                 }
             }
         }

@@ -6,19 +6,15 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import eu.socialsensor.framework.client.dao.SourceDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.Source;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -58,10 +54,10 @@ public class SourceDAOImpl implements SourceDAO {
     }
 
     @Override
-	public void removeSource(Source source, Source.Type sourceType) {
+	public void removeSource(Source source, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", source.getName());
-        if(sourceType != Source.Type.All) {
+        if(sourceType != SocialNetworkSource.All) {
         	map.put("source", sourceType);
         }
         mongoHandler.delete(map);
@@ -70,7 +66,7 @@ public class SourceDAOImpl implements SourceDAO {
     @Override
     public void insertSource(String name, float score) {
         Map<String, Object> map = new HashMap<String, Object>();
-        String id = Source.Type.All+"::"+name;
+        String id = SocialNetworkSource.All+"::"+name;
         map.put("_id", id);
         map.put("name", name);
         map.put("score", score);
@@ -81,7 +77,7 @@ public class SourceDAOImpl implements SourceDAO {
     @Override
     public void insertSource(Source source) {
         Map<String, Object> map = new HashMap<String, Object>();
-        String id = Source.Type.All+"::"+source.getName();
+        String id = SocialNetworkSource.All+"::"+source.getName();
         map.put("_id", id);
         map.put("name", source.getName());
         map.put("score", source.getScore());
@@ -90,7 +86,7 @@ public class SourceDAOImpl implements SourceDAO {
     }
     
     @Override
-	public void insertSource(String name, float score, Source.Type snSource) {
+	public void insertSource(String name, float score, SocialNetworkSource snSource) {
     	Map<String, Object> map = new HashMap<String, Object>();
     	String id = snSource.toString()+"::"+name;
         map.put("_id", id);
@@ -102,7 +98,7 @@ public class SourceDAOImpl implements SourceDAO {
 	}
 
     @Override
-	public void insertSource(Source source, Source.Type sourceType) {
+	public void insertSource(Source source, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
     	String id = source.toString()+"::"+source.getName();
         map.put("_id", id);
@@ -134,7 +130,7 @@ public class SourceDAOImpl implements SourceDAO {
 	}
 	
 	@Override
-	public List<Source> findTopSources(int n, Source.Type sourceType) {
+	public List<Source> findTopSources(int n, SocialNetworkSource sourceType) {
 		List<Source> sources = new ArrayList<Source>();
 		
 		List<String> res = mongoHandler.findMany("source", sourceType.toString(), n);

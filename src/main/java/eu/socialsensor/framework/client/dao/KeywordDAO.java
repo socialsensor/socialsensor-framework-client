@@ -3,7 +3,7 @@ package eu.socialsensor.framework.client.dao;
 import java.util.List;
 
 import eu.socialsensor.framework.common.domain.Keyword;
-import eu.socialsensor.framework.common.domain.Source;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 
 /**
  *
@@ -13,13 +13,13 @@ public interface KeywordDAO {
 
     public void insertKeyword(String keyword, float score);
 
-    public void insertKeyword(String keyword, float score, Source.Type sourceType);
+    public void insertKeyword(String keyword, float score, SocialNetworkSource sourceType);
     
-    public void insertKeyword(Keyword keyword, Source.Type sourceType);
+    public void insertKeyword(Keyword keyword, SocialNetworkSource sourceType);
     
     public void removeKeyword(String keyword);
 
-    public void removeKeyword(String keyword, Source.Type sourceType);
+    public void removeKeyword(String keyword, SocialNetworkSource sourceType);
     
     public void instertDyscoKeyword(String dyscoId, String keyword, float score);
 

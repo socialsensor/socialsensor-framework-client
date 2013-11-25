@@ -9,6 +9,7 @@ import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.common.domain.Keyword;
 import eu.socialsensor.framework.common.domain.Location;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.Source;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
@@ -30,7 +31,7 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
 		List<Keyword> keywords = new ArrayList<Keyword>();
 		
 		keywords.add(new Keyword("champions league", 0.79f));
-		dao.setKeywords(keywords, Source.Type.Twitter);
+		dao.setKeywords(keywords, SocialNetworkSource.Twitter);
 		
 	}
 	
@@ -54,7 +55,7 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
 	}
 	
     @Override
-    public List<Keyword> getTopKeywords(int count, Source.Type sourceType) {
+    public List<Keyword> getTopKeywords(int count, SocialNetworkSource sourceType) {
     	return keywordDAO.findTopKeywords(count);
     }
     
@@ -64,7 +65,7 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
     }
     
     @Override
-    public List<Source> getTopSources(int count, Source.Type sourceType) {
+    public List<Source> getTopSources(int count, SocialNetworkSource sourceType) {
     	return sourceDAO.findTopSources(count);
     }
 
@@ -79,12 +80,12 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
     
 
     @Override
-    public List<Source.Type> getSources() {
+    public List<SocialNetworkSource> getSources() {
         return null;
     }
 
 	@Override
-	public void setKeywords(List<Keyword> keywords, Source.Type sourceType) {
+	public void setKeywords(List<Keyword> keywords, SocialNetworkSource sourceType) {
 		for(Keyword keyword : keywords) {
 			keywordDAO.insertKeyword(keyword.getName(), keyword.getScore(), sourceType);
 		}
@@ -92,35 +93,35 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
 	}
 
 	@Override
-	public void removeKeywords(List<Keyword> keywords, Source.Type sourceType) {
+	public void removeKeywords(List<Keyword> keywords, SocialNetworkSource sourceType) {
 		for(Keyword keyword : keywords) {
 			keywordDAO.removeKeyword(keyword.getName(), sourceType);
 		}
 	}
 	
 	@Override
-	public void setSources(List<Source> sources, Source.Type sourceType) {
+	public void setSources(List<Source> sources, SocialNetworkSource sourceType) {
 		for(Source source : sources) {
 			sourceDAO.insertSource(source, sourceType);
 		}
 	}
 
 	@Override
-	public void removeSources(List<Source> sources, Source.Type sourceType) {
+	public void removeSources(List<Source> sources, SocialNetworkSource sourceType) {
 		for(Source source : sources) {
 			sourceDAO.removeSource(source, sourceType);
 		}
 	}
 	
 	@Override
-	public void setLocations(List<Location> locations, Source.Type sourceType) {
+	public void setLocations(List<Location> locations, SocialNetworkSource sourceType) {
 		for(Location location : locations) {
 			locationDAO.insertLocation(location, sourceType);
 		}
 	}
 
 	@Override
-	public void removeLocations(List<Location> locations, Source.Type sourceType) {
+	public void removeLocations(List<Location> locations, SocialNetworkSource sourceType) {
 		for(Location location : locations) {
 			locationDAO.removeLocation(location,  sourceType);
 		}

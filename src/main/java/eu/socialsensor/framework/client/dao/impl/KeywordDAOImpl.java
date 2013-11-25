@@ -7,6 +7,7 @@ package eu.socialsensor.framework.client.dao.impl;
 import eu.socialsensor.framework.client.dao.KeywordDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.common.domain.Keyword;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.Source;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
@@ -53,10 +54,10 @@ public class KeywordDAOImpl implements KeywordDAO {
     }
 
     @Override
-	public void removeKeyword(String keyword, Source.Type sourceType) {
+	public void removeKeyword(String keyword, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
         map.put("keyword", keyword);
-        if(sourceType != Source.Type.All) {
+        if(sourceType != SocialNetworkSource.All) {
         	map.put("source", sourceType);
         }
         mongoHandler.delete(map);
@@ -65,7 +66,7 @@ public class KeywordDAOImpl implements KeywordDAO {
     @Override
     public void insertKeyword(String keyword, float score) {
         Map<String, Object> map = new HashMap<String, Object>();
-        String id = Source.Type.All+"::"+keyword;
+        String id = SocialNetworkSource.All+"::"+keyword;
         map.put("_id", id);
         map.put("keyword", keyword);
         map.put("score", score);
@@ -74,7 +75,7 @@ public class KeywordDAOImpl implements KeywordDAO {
     }
 
     @Override
-	public void insertKeyword(String keyword, float score, Source.Type sourceType) {
+	public void insertKeyword(String keyword, float score, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
     	String id = sourceType+"::"+keyword;
         map.put("_id", id);
@@ -86,7 +87,7 @@ public class KeywordDAOImpl implements KeywordDAO {
 	}
 
     @Override
-	public void insertKeyword(Keyword keyword, Source.Type sourceType) {
+	public void insertKeyword(Keyword keyword, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
     	String id = sourceType.toString()+"::"+keyword;
         map.put("_id", id);

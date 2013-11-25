@@ -9,6 +9,7 @@ import java.util.Map;
 import eu.socialsensor.framework.client.dao.LocationDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.common.domain.Location;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.Source;
 
 public class LocationDAOImpl implements LocationDAO {
@@ -47,7 +48,7 @@ public class LocationDAOImpl implements LocationDAO {
 	}
 
 	@Override
-	public void insertLocation(Location location, Source.Type sourceType) {
+	public void insertLocation(Location location, SocialNetworkSource sourceType) {
 		String id = sourceType+"::"+location.getName();
 		Map<String, Object> map = location.toJSONMap();
 		map.put("_id", id);
@@ -65,11 +66,11 @@ public class LocationDAOImpl implements LocationDAO {
 	}
 
 	@Override
-	public void removeLocation(Location location, Source.Type sourceType) {
+	public void removeLocation(Location location, SocialNetworkSource sourceType) {
 		
 		String name = location.getName();
 		if(name != null) {
-			if(sourceType == Source.Type.All) {
+			if(sourceType == SocialNetworkSource.All) {
 				 mongoHandler.delete("name", name);
 	        }
 			else {
