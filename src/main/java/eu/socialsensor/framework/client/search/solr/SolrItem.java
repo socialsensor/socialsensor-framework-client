@@ -314,7 +314,7 @@ public class SolrItem {
     private int negativeVotes;
     
     @Field(value = "retweetsCount")
-    private Integer retweetsCount = 0;
+    private Long retweetsCount = 0L;
     
     
     public int getPositiveVotes() {
