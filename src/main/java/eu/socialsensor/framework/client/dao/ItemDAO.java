@@ -1,7 +1,6 @@
 package eu.socialsensor.framework.client.dao;
 
 import eu.socialsensor.framework.common.domain.Item;
-import eu.socialsensor.framework.common.domain.Topic;
 
 import java.util.List;
 
