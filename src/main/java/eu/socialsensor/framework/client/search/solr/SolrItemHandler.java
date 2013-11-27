@@ -63,9 +63,9 @@ public class SolrItemHandler {
         try {
 //            ConfigReader configReader = new ConfigReader();
 //            String url = configReader.getSolrHTTP();    
-//            server = new HttpSolrServer(collection);
-              Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
-        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
+            server = new HttpSolrServer(collection);
+            //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
+        	//server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
@@ -385,12 +385,4 @@ public class SolrItemHandler {
         return response;
     }
 
-    public static void main(String... args) {
-        	SolrItemHandler handler = new SolrItemHandler();
-            
-        	
-        
-//        handler.insertItem(item, "1234");
-
-    }
 }

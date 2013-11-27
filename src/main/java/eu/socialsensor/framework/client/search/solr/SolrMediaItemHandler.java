@@ -3,7 +3,6 @@ package eu.socialsensor.framework.client.search.solr;
 
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.MediaItem;
 
 import java.io.IOException;
@@ -36,9 +35,9 @@ public class SolrMediaItemHandler {
     // Private constructor prevents instantiation from other classes
     private SolrMediaItemHandler(String collection) {
         try {
-//            server = new HttpSolrServer(collection);
-              Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
-        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
+            server = new HttpSolrServer(collection);
+            //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
+        	//server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
         }
@@ -384,22 +383,17 @@ public class SolrMediaItemHandler {
     }
 
     public MediaItem getSolrMediaItem(String id) {
-        id = id.replaceAll("::", "%%");
 
         SolrQuery solrQuery = new SolrQuery("id:" + id);
-        //SolrQuery solrQuery = new SolrQuery("publicationTime:1377775724000");
-
-
         SearchEngineResponse<MediaItem> mi = search(solrQuery);
 
         List<MediaItem> results = mi.getResults();
 
-        if (results.size() == 0) {
+        if (results==null || results.size() == 0) {
             return null;
         }
 
         MediaItem mediaItem = results.get(0);
-        id = id.replaceAll("%%", "::");
         mediaItem.setId(id);
         return mediaItem;
 
@@ -413,6 +407,7 @@ public class SolrMediaItemHandler {
         try {
             rsp = server.query(query);
         } catch (SolrServerException e) {
+        	e.printStackTrace();
             Logger.getRootLogger().info(e.getMessage());
             return null;
         }
