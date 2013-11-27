@@ -2,8 +2,6 @@ package eu.socialsensor.framework.client.search.solr;
 
 import com.google.gson.Gson;
 
-import eu.socialsensor.framework.client.dao.StreamUserDAO;
-import eu.socialsensor.framework.client.dao.impl.StreamUserDAOImpl;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
@@ -94,10 +92,6 @@ public class SolrItem {
         original = item.isOriginal();
 
         StreamUser user = item.getStreamUser();
-        if(user == null) {
-        	StreamUserDAO userDAO = new StreamUserDAOImpl();
-        	user = userDAO.getStreamUser(item.getUserId());
-        }
         if (user != null) {
             authorFullName = user.getName();
             authorScreenName = user.getUsername();

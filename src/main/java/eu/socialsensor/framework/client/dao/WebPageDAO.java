@@ -20,6 +20,8 @@ public interface WebPageDAO {
 
     public WebPage getWebPage(String webPageURL);
 
+    public boolean exists(String webPageURL);
+    
     public List<WebPage> getLastWebPages(int size);
 
     public void clearAll();

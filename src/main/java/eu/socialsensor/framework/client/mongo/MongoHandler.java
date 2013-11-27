@@ -13,24 +13,14 @@ import eu.socialsensor.framework.common.domain.JSONable;
 import java.net.UnknownHostException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.bson.types.ObjectId;
 
 /**
  *
  * @author etzoannos
- *
- * TO BE CHECKED:
- *
- * 1) performance of Jongo implementation in serialization/deserialization
- *
- * 2) Use Capped Collections instead of simple Collections to support
- * high-throughput I/O
- *
  *
  */
 public class MongoHandler {

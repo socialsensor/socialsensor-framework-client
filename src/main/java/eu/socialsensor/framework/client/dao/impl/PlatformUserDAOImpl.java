@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 public class PlatformUserDAOImpl implements PlatformUserDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host = "";
     private static String db = "Streams";
     private static String collection = "PlatformUsers";
     private MongoHandler mongoHandler;
@@ -39,10 +38,6 @@ public class PlatformUserDAOImpl implements PlatformUserDAO {
         String json = mongoHandler.findOne("name", name);
         PlatformUser user = ItemFactory.createPlatformUser(json);
         return user;
-    }
-
-    public PlatformUserDAOImpl() {
-        this(host, db, collection);
     }
 
     public PlatformUserDAOImpl(String host) {

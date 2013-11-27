@@ -13,7 +13,6 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -29,9 +28,9 @@ public class ItemDAOImpl implements ItemDAO {
     private static String collection = "Items";
     private MongoHandler mongoHandler;
 
-    public ItemDAOImpl() {
-        this(host, db, collection);
-    }
+//    public ItemDAOImpl() {
+//        this(host, db, collection);
+//    }
 
     public ItemDAOImpl(String host) {
         this(host, db, collection);
@@ -96,10 +95,10 @@ public class ItemDAOImpl implements ItemDAO {
         return results;
     }
 
-    @Override
-    public int getUserRetweets(String userName) {
-        Pattern user = Pattern.compile("^RT @" + userName);
-        return mongoHandler.findCount(user);
+    //@Override
+    //public int getUserRetweets(String userName) {
+    //    Pattern user = Pattern.compile("^RT @" + userName);
+    //    return mongoHandler.findCount(user);
 //        List<Item> results = new ArrayList<Item>();
 //
 //        for (String json : jsonItems) {
@@ -110,7 +109,7 @@ public class ItemDAOImpl implements ItemDAO {
 //            }
 //        }
 //        return results;
-    }
+    //}
 
     @Override
     public List<Item> getItemsSince(long date) {
@@ -203,11 +202,6 @@ public class ItemDAOImpl implements ItemDAO {
     
     
     public static void main(String... args) {
-        ItemDAOImpl dao = new ItemDAOImpl();
-        List<Item> items = dao.getItemsInTimeslot("cqd4epdouktv7");
-        for (Item item: items) {
-            System.out.println(item.getId());
-        }
         
     }
     

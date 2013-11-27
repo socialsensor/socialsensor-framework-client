@@ -19,7 +19,6 @@ public class SolrTopicDetectionItem {
     public SolrTopicDetectionItem(Item item) {
         id = item.getId();
         title = item.getTitle();
-        timeslotId = item.getTimeslotId();
 
         //this is long
 
@@ -32,7 +31,6 @@ public class SolrTopicDetectionItem {
 
         item.setId(id);
         item.setTitle(title);
-        item.setTimeslotId(timeslotId);
 
         item.setPublicationTime(publicationTime);
 

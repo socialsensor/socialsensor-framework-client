@@ -23,13 +23,13 @@ import java.util.Map;
 public class SourceDAOImpl implements SourceDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host = "";
+
     private static String db = "test";
     private static String collection = "sources";
     private MongoHandler mongoHandler;
 
     
-    public SourceDAOImpl() {
+    public SourceDAOImpl(String host) {
     	this(host, db, collection);
     }
 

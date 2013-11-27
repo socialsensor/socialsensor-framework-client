@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
 public class SlotInformationDAOImpl implements SlotInformationDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private final String host = "";
     private final String db = "social-sensor";
     private final String collection = "SlotInformation";
     private MongoHandler mongoHandler;
 
-    public SlotInformationDAOImpl() {
+    
+    public SlotInformationDAOImpl(String host) {
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);

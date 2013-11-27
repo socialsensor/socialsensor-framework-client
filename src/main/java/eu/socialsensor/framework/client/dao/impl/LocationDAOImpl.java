@@ -10,22 +10,16 @@ import eu.socialsensor.framework.client.dao.LocationDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.SocialNetworkSource;
-import eu.socialsensor.framework.common.domain.Source;
 
 public class LocationDAOImpl implements LocationDAO {
 
 	List<String> indexes = new ArrayList<String>();
-    private final String host = "";
-    private final String db = "test";
-    private final String collection = "	location";
+    private static String db = "Streams";
+    private static String collection = "	Locations";
     private MongoHandler mongoHandler;
 
-    public LocationDAOImpl() {
-        try {
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-        } catch (UnknownHostException ex) {
-            org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
-        }
+    public LocationDAOImpl(String host) {
+    	this(host, db, collection);
     }
     
     public LocationDAOImpl(String host, String db, String collection) {

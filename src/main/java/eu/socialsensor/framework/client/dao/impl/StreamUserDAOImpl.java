@@ -23,14 +23,13 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 public class StreamUserDAOImpl implements StreamUserDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private final static String host = "";
     private final static String db = "Streams";
     private final static String collection = "StreamUsers";
     private MongoHandler mongoHandler;
 
     Map<String, Category> experts = new HashMap<String, Category>();
     
-    public StreamUserDAOImpl() {
+    public StreamUserDAOImpl(String host) {
     	this(host, db, collection);
     }
     
@@ -111,13 +110,6 @@ public class StreamUserDAOImpl implements StreamUserDAO {
         String json = mongoHandler.findOne("username", username);
         StreamUser user = ItemFactory.createUser(json);
         return user;
-    }
-    
-    public static void main(String... args) {
-        
-        StreamUserDAO dao = new StreamUserDAOImpl();
-        StreamUser user = dao.getStreamUser("317408851529981952");
-        System.out.println("done: "+user.getId());
     }
     
     public void loadExpertsList(String file, Category category) {

@@ -35,6 +35,7 @@ public class InfluencerDAOImpl implements InfluencerDAO {
     	
       
         try {
+        	indexes.add("keyword");
             mongoHandler = new MongoHandler(host, db, collection, indexes);
             
         } catch (UnknownHostException ex) {
@@ -42,14 +43,14 @@ public class InfluencerDAOImpl implements InfluencerDAO {
         }
     }
      
-    public InfluencerDAOImpl() {
-        try {
-            indexes.add("keyword");
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-        } catch (UnknownHostException ex) {
-            org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
-        }
-    }
+//    public InfluencerDAOImpl() {
+//        try {
+//        	indexes.add("keyword");
+//            mongoHandler = new MongoHandler(host, db, collection, indexes);
+//        } catch (UnknownHostException ex) {
+//            org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
+//        }
+//    }
 
     @Override
     public void addInfluencersForKeyword(String keyword, List<Influencer> influencers) {
@@ -118,7 +119,7 @@ public class InfluencerDAOImpl implements InfluencerDAO {
         values.add("sharp");
         values.add("order");
         values.add("justin");
-        InfluencerDAO influencerDAO = new InfluencerDAOImpl();
+        InfluencerDAO influencerDAO = new InfluencerDAOImpl("", "", "");
 
         List<Influencer> influencers = influencerDAO.getInfluencersForKeywords(values);
 

@@ -20,14 +20,9 @@ public class TopicDAOImpl implements TopicDAO{
 	
 	List<String> indexes = new ArrayList<String>();
     private static String host;
-    private static String db = "";
+    private static String db = "Streams";
     private static String collection = "Topics";
     private MongoHandler mongoHandler;
-    
-    
-    public TopicDAOImpl() {
-        this(host, db, collection);
-    }
 
     public TopicDAOImpl(String host) {
         this(host, db, collection);

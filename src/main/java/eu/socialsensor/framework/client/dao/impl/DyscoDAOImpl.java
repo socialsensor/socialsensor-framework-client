@@ -40,9 +40,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     @Override
     public boolean insertDysco(Dysco dysco) {
-
         return searchEngineHandler.insertDysco(dysco);
-
     }
 
     @Override

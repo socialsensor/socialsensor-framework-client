@@ -8,7 +8,6 @@ import eu.socialsensor.framework.client.dao.KeywordDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.common.domain.Keyword;
 import eu.socialsensor.framework.common.domain.SocialNetworkSource;
-import eu.socialsensor.framework.common.domain.Source;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
@@ -24,15 +23,14 @@ import java.util.Map;
 public class KeywordDAOImpl implements KeywordDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host = "";
-    private static String db = "test";
+    private static String db = "Streams";
     private static String collection = "keywords";
     private MongoHandler mongoHandler;
 
-    public KeywordDAOImpl() {
+    public KeywordDAOImpl(String host) {
     	this(host, db, collection);
     }
-
+    
     public KeywordDAOImpl(String host, String db, String collection) {
         try {
             indexes.add("score");

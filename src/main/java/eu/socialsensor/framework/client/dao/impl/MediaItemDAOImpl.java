@@ -23,9 +23,6 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     private static String collection = "MediaItems";
     private MongoHandler mongoHandler;
 
-    public MediaItemDAOImpl() {
-        this(host, db, collection);
-    }
 
     public MediaItemDAOImpl(String host) {
         this(host, db, collection);

@@ -7,10 +7,10 @@ import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.JSONable;
 import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.factories.WebPageFactory;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +23,11 @@ import org.apache.log4j.Logger;
 public class WebPageDAOImpl implements WebPageDAO {
 
     private MongoHandler mongoHandler;
-    private final static String host = "";
     private final static String db = "Streams";
     private final static String collection = "WebPages";
     private List<String> indexes = new ArrayList<String>();
 
-    public WebPageDAOImpl() {
+    public WebPageDAOImpl(String host) {
         this(host, db, collection);
     }
 
@@ -88,7 +87,7 @@ public class WebPageDAOImpl implements WebPageDAO {
         
         // remove duplicates from pages
         
-        Map map = new HashMap<String,WebPage>();
+        Map<String,WebPage> map = new HashMap<String,WebPage>();
         
         for (WebPage page: results) {
             map.put(page.getUrl(), page);
@@ -129,5 +128,10 @@ public class WebPageDAOImpl implements WebPageDAO {
         update.incField("shares", 1);
         mongoHandler.update("url", webPageURL, update);
     }
+
+	@Override
+	public boolean exists(String webPageURL) {
+		return mongoHandler.exists("url", webPageURL);
+	}
 
 }

@@ -13,15 +13,12 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 public class TimeslotDAOImpl implements TimeslotDAO {
 	 
 	private MongoHandler mongoHandler;
-	private String host;
-	private String db;
+	
+	private String db = "Streams";
 	private final String collection = "Timeslots";
 	private List<String> indexes = new ArrayList<String>();
 
-	public TimeslotDAOImpl(String hostname, String dbName) {
-		this.host = hostname;
-		this.db = dbName;
-		
+	public TimeslotDAOImpl(String host) {
 		try {
 			indexes.add("timeslotId");
 			indexes.add("timestamp");

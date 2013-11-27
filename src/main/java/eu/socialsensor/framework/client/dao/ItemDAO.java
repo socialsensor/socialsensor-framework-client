@@ -25,7 +25,7 @@ public interface ItemDAO {
     
     public List<Item> getLatestItems(int n);
     
-    public int getUserRetweets(String userName);
+    //public int getUserRetweets(String userName);
     
     public List<Item> getItemsSince(long date);
     

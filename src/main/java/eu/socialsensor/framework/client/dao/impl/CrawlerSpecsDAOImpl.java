@@ -50,9 +50,9 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
 		this(host, db, "keywords", "users", "locations");
 	}
 	
-	public CrawlerSpecsDAOImpl() {
-		this("", "CrawlerSpecs", "keywords", "users", "locations");
-	}
+//	public CrawlerSpecsDAOImpl() {
+//		this("", "CrawlerSpecs", "keywords", "users", "locations");
+//	}
 	
     @Override
     public List<Keyword> getTopKeywords(int count, SocialNetworkSource sourceType) {
