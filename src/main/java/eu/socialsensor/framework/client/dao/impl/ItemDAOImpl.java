@@ -44,7 +44,6 @@ public class ItemDAOImpl implements ItemDAO {
     	
         indexes.add("id");
         indexes.add("publicationTime");
-        indexes.add("timeslotId");
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
