@@ -20,11 +20,14 @@ public class SolrHandler implements SearchEngineHandler {
     
     private final static Logger LOGGER = Logger.getLogger(SolrHandler.class.getName());
 
-    private static final SolrDyscoHandler solrDyscoHandler = SolrDyscoHandler
-            .getInstance();
-    private static final SolrItemHandler solrItemHandler = SolrItemHandler
-            .getInstance();
+    private SolrDyscoHandler solrDyscoHandler; 
+    private SolrItemHandler solrItemHandler;
 
+    public  SolrHandler(String dyscosCollection, String itemsCollection) {
+    	solrDyscoHandler = SolrDyscoHandler.getInstance(dyscosCollection);
+    	solrItemHandler = SolrItemHandler.getInstance(itemsCollection);
+    }
+    
     @Override
     public boolean insertItem(Item item, String dyscoId) {
 
@@ -284,14 +287,7 @@ public class SolrHandler implements SearchEngineHandler {
     }
 
     public static void main(String... args) {
-        SolrHandler handler = new SolrHandler();
 
-        // StreamUserDAO dao = new StreamUserDAOImpl();
-        // StreamUser user = dao.getStreamUser("239936510");
-        // LOGGER.log(Level.INFO, null, "done");
-
-        // handler.findDyscosLight("*:*", "1HOUR", 20);
-        handler.findMostRetweetedItemsLastHour();
 
     }
 

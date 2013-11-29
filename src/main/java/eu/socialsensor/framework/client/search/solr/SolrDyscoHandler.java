@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -30,16 +32,15 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 public class SolrDyscoHandler {
 
     SolrServer server;
-    private static final SolrDyscoHandler INSTANCE = new SolrDyscoHandler();
+    private static final Map<String, SolrDyscoHandler> INSTANCES = new HashMap<String, SolrDyscoHandler>();
 
     // Private constructor prevents instantiation from other classes
-    private SolrDyscoHandler() {
+    private SolrDyscoHandler(String collection) {
         try {
 
                 Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/dyscos");
-        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/dyscos");
-                              
-        	
+        	server = new HttpSolrServer( collection );
+           
         } catch (Exception e) {
         	
             Logger.getRootLogger().info(e.getMessage());
@@ -47,7 +48,12 @@ public class SolrDyscoHandler {
     }
     //implementing Singleton pattern
 
-    public static SolrDyscoHandler getInstance() {
+    public static SolrDyscoHandler getInstance(String collection) {
+    	SolrDyscoHandler INSTANCE = INSTANCES.get(collection);
+    	if(INSTANCE == null) {
+    		INSTANCE = new SolrDyscoHandler(collection);
+    		INSTANCES.put(collection, INSTANCE);
+    	}
         return INSTANCE;
     }
 
@@ -234,9 +240,5 @@ public class SolrDyscoHandler {
 
     public static void main(String... args) {
 
-        SolrDyscoHandler handler = SolrDyscoHandler.getInstance();
-        SolrQuery query = new SolrQuery("*:*");
-
-        handler.findDyscosLight(query);
     }
 }

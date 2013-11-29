@@ -39,6 +39,7 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
 	LocationDAO locationDAO;
 	SourceDAO sourceDAO;
 
+	
 	public CrawlerSpecsDAOImpl(String host, String db, 
 			String keywords, String users, String locations) {
 		keywordDAO = new KeywordDAOImpl(host, db, keywords);
@@ -71,10 +72,11 @@ public class CrawlerSpecsDAOImpl implements CrawlerSpecsDAO {
 
     @Override
     public List<Dysco> getTopDyscos(int count) {
-        SearchEngineHandler solrHandler = new SolrHandler();
-        SearchEngineResponse<Dysco> searchResponse =  solrHandler.findDyscosLight("*:*", "1DAY", 10);
-        List<Dysco> dyscosLight = searchResponse.getResults();
-        return dyscosLight;
+//        SearchEngineHandler solrHandler = new SolrHandler();
+//        SearchEngineResponse<Dysco> searchResponse =  solrHandler.findDyscosLight("*:*", "1DAY", 10);
+//        List<Dysco> dyscosLight = searchResponse.getResults();
+//        return dyscosLight;
+    	return null;
     }
     
     

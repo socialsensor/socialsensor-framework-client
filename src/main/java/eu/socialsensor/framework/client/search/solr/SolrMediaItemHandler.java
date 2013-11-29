@@ -8,9 +8,10 @@ import eu.socialsensor.framework.common.domain.MediaItem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -30,7 +31,7 @@ public class SolrMediaItemHandler {
 
     
     SolrServer server;
-    private static SolrMediaItemHandler INSTANCE = null;
+    private static Map<String, SolrMediaItemHandler> INSTANCES = new HashMap<String, SolrMediaItemHandler>();
 
     // Private constructor prevents instantiation from other classes
     private SolrMediaItemHandler(String collection) {
@@ -45,8 +46,10 @@ public class SolrMediaItemHandler {
 
     // implementing Singleton pattern
     public static SolrMediaItemHandler getInstance(String collection) {
+    	SolrMediaItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrMediaItemHandler(collection);
+            INSTANCES.put(collection, INSTANCE);
         }
         return INSTANCE;
     }

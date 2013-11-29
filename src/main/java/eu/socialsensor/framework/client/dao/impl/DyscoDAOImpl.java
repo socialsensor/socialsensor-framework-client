@@ -31,13 +31,23 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
  */
 public class DyscoDAOImpl implements DyscoDAO {
 
-    SearchEngineHandler searchEngineHandler = new SolrHandler();
-    private static final MediaItemDAO mediaItemDAO = new MediaItemDAOImpl("social1.atc.gr","Streams","MediaItems");
-    private static final DyscoRequestDAO dyscoRequestDAO = new DyscoRequestDAOImpl("social1.atc.gr","Streams","Dyscos");
-    private static final SolrItemHandler solrItemHandler = SolrItemHandler.getInstance();
-    private static final SolrDyscoHandler handler = SolrDyscoHandler.getInstance();
-    private static final SolrMediaItemHandler solrMediaItemHandler = SolrMediaItemHandler.getInstance("");
+    SearchEngineHandler searchEngineHandler;
+    private MediaItemDAO mediaItemDAO;
+    private DyscoRequestDAO dyscoRequestDAO;
+    private SolrItemHandler solrItemHandler;
+    private SolrDyscoHandler handler;
+    private SolrMediaItemHandler solrMediaItemHandler;
 
+    public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection) {
+    	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
+    	
+    	mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
+    	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+    	solrItemHandler = SolrItemHandler.getInstance(itemCollection);
+    	handler = SolrDyscoHandler.getInstance(dyscoCollection);
+    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
+    }
+    
     @Override
     public boolean insertDysco(Dysco dysco) {
         return searchEngineHandler.insertDysco(dysco);
@@ -409,21 +419,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) {
-        DyscoDAO dyscoDAO = new DyscoDAOImpl();
-
-    	List<String> dyscoIds = new ArrayList<String>();
-    	dyscoIds.add("a3366aba-03cd-4ec7-abb5-0f2476c4c423");
-    	List<MediaItem> imagesFromSearch = null;
-    	List<String> feedKeywords = dyscoRequestDAO.readKeywordsFromDyscos(dyscoIds);
-		 if (feedKeywords != null) {
-	         if (feedKeywords.size() > 0) {
-	         	imagesFromSearch = solrMediaItemHandler.findAllMediaItemsByKeywords(feedKeywords, "image", 100);
-	         }
-	     }
-		 
-		 if(imagesFromSearch != null)
-			 Logger.getRootLogger().info("found images from search: " + imagesFromSearch.size());
-         
+        
         
     }
 }
