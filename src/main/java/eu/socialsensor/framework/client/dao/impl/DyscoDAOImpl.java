@@ -254,31 +254,31 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<Dysco> findRelatedTopics(Dysco dysco) {
 
         List<Dysco> _relatedTopics = new ArrayList<Dysco>();
-        if ((dysco.getDyscoGroup() != null) && (!dysco.getDyscoGroup().equals(""))) {
-
-//          uncomment the following line for getting only the "deprecated" Dyscos 
-//          String relatedDyscosQuery = "dyscoGroup:" + dysco.getDyscoGroup() + " AND evolution:old";
-
-            String relatedDyscosQuery = "dyscoGroup:" + dysco.getDyscoGroup();
-
-            SolrQuery _solrQuery = new SolrQuery(relatedDyscosQuery);
-            _solrQuery.setFields("id", "title", "creationDate");
-            _solrQuery.addSortField("creationDate", SolrQuery.ORDER.desc);
-            _solrQuery.setRows(4);
-
-            _relatedTopics = handler.findDyscosLight(_solrQuery).getResults();
-
-            List<Dysco> tempTopics = new ArrayList<Dysco>();
-
-            //remove itself since it's included in the results (think of uncommenting the line above)
-            for (Dysco relatedTopic : _relatedTopics) {
-                if (!dysco.getId().equals(relatedTopic.getId())) {
-                    tempTopics.add(relatedTopic);
-                }
-            }
-            _relatedTopics = tempTopics;
-
-        }
+//        if ((dysco.getDyscoGroup() != null) && (!dysco.getDyscoGroup().equals(""))) {
+//
+////          uncomment the following line for getting only the "deprecated" Dyscos 
+////          String relatedDyscosQuery = "dyscoGroup:" + dysco.getDyscoGroup() + " AND evolution:old";
+//
+//            String relatedDyscosQuery = "dyscoGroup:" + dysco.getDyscoGroup();
+//
+//            SolrQuery _solrQuery = new SolrQuery(relatedDyscosQuery);
+//            _solrQuery.setFields("id", "title", "creationDate");
+//            _solrQuery.addSortField("creationDate", SolrQuery.ORDER.desc);
+//            _solrQuery.setRows(4);
+//
+//            _relatedTopics = handler.findDyscosLight(_solrQuery).getResults();
+//
+//            List<Dysco> tempTopics = new ArrayList<Dysco>();
+//
+//            //remove itself since it's included in the results (think of uncommenting the line above)
+//            for (Dysco relatedTopic : _relatedTopics) {
+//                if (!dysco.getId().equals(relatedTopic.getId())) {
+//                    tempTopics.add(relatedTopic);
+//                }
+//            }
+//            _relatedTopics = tempTopics;
+//
+//        }
         return _relatedTopics;
     }
 

@@ -24,9 +24,8 @@ public class SolrDysco {
     public SolrDysco(Dysco dysco) {
 
         id = dysco.getId();
-        timeslotId = dysco.getTimeslotId();
+      
         creationDate = dysco.getCreationDate();
-        expiryDate = dysco.getExpiryDate();
         updateDate = dysco.getUpdateDate();
         if (dysco.getThumb() != null) {
             thumb = dysco.getThumb().toString();
@@ -35,12 +34,11 @@ public class SolrDysco {
         score = dysco.getScore();
         thumbs = dysco.getThumbs();
         keywords = dysco.getKeywords();
-        itemsCount = dysco.getItemsCount();
         evolution = dysco.getEvolution();
-        dyscoGroup = dysco.getDyscoGroup();
+
         trending = dysco.getTrending();
         alethiometerStatus = dysco.getAlethiometerStatus();
-        tags  = dysco.getTags();
+        tags  = dysco.getHashtags();
         people = dysco.getPeople();
 
         List<Ngram> dyscoNgrams = dysco.getNgrams();
@@ -69,52 +67,63 @@ public class SolrDysco {
     }
     @Field(value = "id")
     private String id;
-    @Field(value = "timeslotId")
-    private String timeslotId;
+    
     @Field(value = "creationDate")
     private Date creationDate;
-    @Field(value = "expiryDate")
-    private Date expiryDate;
+
     @Field(value = "updateDate")
     private Date updateDate;
+    
     @Field(value = "thumb")
     private String thumb;
+    
     @Field(value = "title")
     private String title;
+    
     @Field(value = "dyscoScore")
     private Float score = 0f;
+    
     @Field(value = "sentiment")
     private Float sentiment;
+    
     @Field(value = "ngrams")
     private List<String> ngrams = new ArrayList<String>();
+    
     //The following 6 map the "entities" field of Dysco
     @Field(value = "persons")
     private List<String> persons = new ArrayList<String>();
+    
     @Field(value = "locations")
     private List<String> locations = new ArrayList<String>();
+    
     @Field(value = "organizations")
     private List<String> organizations = new ArrayList<String>();
+    
     @Field(value = "personsScore")
     private List<String> personsScore = new ArrayList<String>();
+    
     @Field(value = "locationsScore")
     private List<String> locationsScore = new ArrayList<String>();
+    
     @Field(value = "organizationsScore")
     private List<String> organizationsScore = new ArrayList<String>();
+    
     //added 29.3.2013 for storing the thumbnails of the Dysco media links
     @Field(value = "thumbs")
     private List<String> thumbs = new ArrayList<String>();
+    
     @Field(value = "keywords")
     private List<String> keywords = new ArrayList<String>();
+    
     @Field(value = "evolution")
     private String evolution;
-    @Field(value = "itemsCount")
-    private int itemsCount;
-    @Field(value = "dyscoGroup")
-    private String dyscoGroup;
+    
     @Field(value = "trending")
     private int trending;
+    
     @Field(value = "alethiometerStatus")
     private int alethiometerStatus;
+    
     @Field(value = "tags")
     private List<String> tags = new ArrayList<String>();
  
@@ -126,16 +135,12 @@ public class SolrDysco {
         Dysco dysco = new Dysco();
         dysco.setId(id);
         dysco.setTitle(title);
-        dysco.setTimeslotId(timeslotId);
         dysco.setCreationDate(creationDate);
-        dysco.setExpiryDate(expiryDate);
         dysco.setUpdateDate(updateDate);
         dysco.setThumbs(thumbs);
-        dysco.setItemsCount(itemsCount);
         dysco.setEvolution(evolution);
-        dysco.setDyscoGroup(dyscoGroup);
         dysco.setTrending(trending);
-        dysco.setTags(tags);
+        dysco.setHashtags(tags);
         dysco.setPeople(people);
 
         if (thumb != null) {
@@ -186,14 +191,6 @@ public class SolrDysco {
 
     public void setEvolution(String evolution) {
         this.evolution = evolution;
-    }
-
-    public int getItemsCount() {
-        return itemsCount;
-    }
-
-    public void setItemsCount(int itemsCount) {
-        this.itemsCount = itemsCount;
     }
 
     public List<String> getKeywords() {
@@ -275,14 +272,6 @@ public class SolrDysco {
     public void setId(String id) {
         this.id = id;
     }
-    
-    public String getTimeslotId() {
-        return timeslotId;
-    }
-
-    public void setTimeslotId(String timeslotId) {
-        this.timeslotId = timeslotId;
-    }
 
     public Date getCreationDate() {
         return creationDate;
@@ -290,14 +279,6 @@ public class SolrDysco {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
     }
 
     public Date getUpdateDate() {
@@ -338,14 +319,6 @@ public class SolrDysco {
 
     public void setSentiment(Float sentiment) {
         this.sentiment = sentiment;
-    }
-
-    public String getDyscoGroup() {
-        return dyscoGroup;
-    }
-
-    public void setDyscoGroup(String dyscoGroup) {
-        this.dyscoGroup = dyscoGroup;
     }
 
     public int getTrending() {
