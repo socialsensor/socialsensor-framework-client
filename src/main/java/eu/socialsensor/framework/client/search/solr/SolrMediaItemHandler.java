@@ -33,6 +33,8 @@ public class SolrMediaItemHandler {
     SolrServer server;
     private static Map<String, SolrMediaItemHandler> INSTANCES = new HashMap<String, SolrMediaItemHandler>();
 
+    private static int commitPeriod = 10000;
+    
     // Private constructor prevents instantiation from other classes
     private SolrMediaItemHandler(String collection) {
         try {
@@ -57,24 +59,23 @@ public class SolrMediaItemHandler {
     @SuppressWarnings("finally")
     public boolean insertMediaItem(MediaItem item) {
 
-        boolean status = false;
+        boolean status = true;
         try {
-            String id = item.getId();
-            item.setId(id.replaceAll("::", "%%"));
 
             SolrMediaItem solrItem = new SolrMediaItem(item);
 
-            server.addBean(solrItem);
+            server.addBean(solrItem, commitPeriod);
 
-            UpdateResponse response = server.commit();
-            int statusId = response.getStatus();
-            if (statusId == 0) {
-                status = true;
-            }
+            //UpdateResponse response = server.commit();
+            //int statusId = response.getStatus();
+            //if (statusId == 0) {
+            //    status = true;
+            //}
 
         } catch (Exception ex) {
             ex.printStackTrace();
             Logger.getRootLogger().error(ex.getMessage());
+            status = false;
         } finally {
             return status;
         }
@@ -83,7 +84,7 @@ public class SolrMediaItemHandler {
     @SuppressWarnings("finally")
     public boolean insertMediaItems(List<MediaItem> mediaItems) {
 
-        boolean status = false;
+        boolean status = true;
         try {
             List<SolrMediaItem> solrMediaItems = new ArrayList<SolrMediaItem>();
             for (MediaItem mediaItem : mediaItems) {
@@ -91,18 +92,14 @@ public class SolrMediaItemHandler {
                 solrMediaItems.add(solrMediaItem);
             }
 
-            server.addBeans(solrMediaItems);
-
-            UpdateResponse response = server.commit();
-            int statusId = response.getStatus();
-            if (statusId == 0) {
-                status = true;
-            }
+            server.addBeans(solrMediaItems, commitPeriod);
 
         } catch (SolrServerException ex) {
             Logger.getRootLogger().error(ex.getMessage());
+            status = false;
         } catch (IOException ex) {
             Logger.getRootLogger().error(ex.getMessage());
+            status = false;
         } finally {
             return status;
         }

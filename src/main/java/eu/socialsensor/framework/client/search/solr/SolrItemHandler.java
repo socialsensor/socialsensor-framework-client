@@ -42,6 +42,8 @@ public class SolrItemHandler {
     SolrServer server;
     private static Map<String, SolrItemHandler> INSTANCES = new HashMap<String, SolrItemHandler>();
 
+    private static int commitPeriod = 10000;
+    
     // Private constructor prevents instantiation from other classes
 //    private SolrItemHandler() {
 //        try {
@@ -67,6 +69,7 @@ public class SolrItemHandler {
 //            ConfigReader configReader = new ConfigReader();
 //            String url = configReader.getSolrHTTP();    
             server = new HttpSolrServer(collection);
+
             //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
         	//server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
@@ -95,21 +98,23 @@ public class SolrItemHandler {
 
     public boolean insertItem(Item item) {
 
-        boolean status = false;
+        boolean status = true;
         try {
             SolrItem solrItem = new SolrItem(item);
 
-            server.addBean(solrItem);
-            UpdateResponse response = server.commit();
-            int statusId = response.getStatus();
-            if (statusId == 0) {
-                status = true;
-            }
+            server.addBean(solrItem, commitPeriod);
+            //UpdateResponse response = server.commit();
+            //int statusId = response.getStatus();
+            //if (statusId == 0) {
+            //    status = true;
+            //}
 
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
+            status = false;
         } catch (Exception ex) {
             ex.printStackTrace();
+            status = false;
         } finally {
             return status;
         }
@@ -117,7 +122,7 @@ public class SolrItemHandler {
 
     public boolean insertItems(List<Item> items) {
 
-        boolean status = false;
+        boolean status = true;
         try {
             List<SolrItem> solrItems = new ArrayList<SolrItem>();
             for (Item item : items) {
@@ -125,18 +130,20 @@ public class SolrItemHandler {
                 solrItems.add(solrItem);
             }
 
-            server.addBeans(solrItems);
+            server.addBeans(solrItems, commitPeriod);
 
-            UpdateResponse response = server.commit();
-            int statusId = response.getStatus();
-            if (statusId == 0) {
-                status = true;
-            }
+//            UpdateResponse response = server.commit();
+//            int statusId = response.getStatus();
+//            if (statusId == 0) {
+//                status = true;
+//            }
 
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
+            status = false;
         } catch (IOException ex) {
             logger.error(ex.getMessage());
+            status = false;
         } finally {
             return status;
         }
