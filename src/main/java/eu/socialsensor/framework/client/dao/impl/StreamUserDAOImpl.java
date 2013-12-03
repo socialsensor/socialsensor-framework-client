@@ -130,5 +130,12 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void updateStreamUserMentions(String userid) {
+    		UpdateItem changes = new UpdateItem();
+    		changes.incField("mentions", 1);
+    		mongoHandler.update("id", userid, changes);
+	}
     
 }
