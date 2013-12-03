@@ -23,14 +23,10 @@ import org.apache.log4j.Logger;
 public class ItemDAOImpl implements ItemDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host;
+
     private static String db = "Streams";
     private static String collection = "Items";
     private MongoHandler mongoHandler;
-
-//    public ItemDAOImpl() {
-//        this(host, db, collection);
-//    }
 
     public ItemDAOImpl(String host) {
         this(host, db, collection);
