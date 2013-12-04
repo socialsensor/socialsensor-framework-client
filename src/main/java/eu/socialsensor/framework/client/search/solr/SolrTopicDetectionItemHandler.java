@@ -1,7 +1,6 @@
 package eu.socialsensor.framework.client.search.solr;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,16 +14,12 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.TermsResponse;
+import org.apache.solr.client.solrj.response.TermsResponse.Term;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
 
 import eu.socialsensor.framework.client.search.Query;
-import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.common.domain.Item;
-
-import java.util.Date;
-
-import org.apache.solr.common.SolrInputDocument;
 
 /**
  *
@@ -130,12 +125,13 @@ public class SolrTopicDetectionItemHandler {
         logger.info("Get "+typeTerm+" from current timeslot");
         Map<String, List<String>> itemsTerms = new HashMap<String, List<String>>();
 
-        SolrQuery query = new SolrQuery();
+        SolrQuery query = new SolrQuery("*:*");
         query.setRequestHandler("/tvrh");
         query.setParam("tv.fl", typeTerm);
         query.setParam("f."+typeTerm+".tv.tf", true);
         query.setRows(100000);
-
+        logger.info(query.toString());
+        
         QueryResponse rsp;
         try {
             rsp = server.query(query);
@@ -146,6 +142,7 @@ public class SolrTopicDetectionItemHandler {
         }
         logger.info("Elapsed time: " + rsp.getElapsedTime());
         NamedList<NamedList<Object>> itemsTermsVectors;
+                
         if ((itemsTermsVectors = (NamedList<NamedList<Object>>) rsp.getResponse().get("termVectors")) == null) {
             logger.warn("No term vectors found...");
             return itemsTerms;
@@ -154,15 +151,19 @@ public class SolrTopicDetectionItemHandler {
         NamedList<NamedList<Object>> itemTerms;
         Iterator<Entry<String, NamedList<Object>>> itemTermsIterator;
         for (int i = 0; i < itemsTermsVectors.size(); i++) {
-            if (!itemsTermsVectors.getName(i).contains("Twitter")) {
+            /*if (!itemsTermsVectors.getName(i).contains("Twitter")) {
                 continue;
+            }*/
+
+            try {
+            	itemTermsVectors = (NamedList<Object>) itemsTermsVectors.getVal(i);
+            } catch (Exception e) {
+            	continue;
             }
 
-            itemTermsVectors = itemsTermsVectors.getVal(i);
-
             if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get(typeTerm)) == null) {
-                logger.warn("No "+typeTerm+" property found in the item: " + itemsTermsVectors.getName(i));
-                itemsTerms.put(itemTermsVectors.getName(i), new ArrayList<String>());
+                logger.info("No "+typeTerm+" property found in the item: " + itemsTermsVectors.getName(i));
+                itemsTerms.put(itemsTermsVectors.getName(i), new ArrayList<String>());
                 continue;
             }
             itemTermsIterator = itemTerms.iterator();
