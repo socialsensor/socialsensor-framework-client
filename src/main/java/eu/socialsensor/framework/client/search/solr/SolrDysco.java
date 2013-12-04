@@ -131,10 +131,6 @@ public class SolrDysco {
         	hashtagsScore.add(entry.getKey()+"@@"+entry.getValue());
         }
         
-        for(Map.Entry<String,Double> entry : dysco.getLatentKeywords().entrySet()){
-        	latent_keywords.add(entry.getKey());
-        	latent_keywordsScore.add(entry.getKey()+"@@"+entry.getValue());
-        }
         
         solrQuery = dysco.getSolrQuery();
         
