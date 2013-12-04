@@ -54,9 +54,10 @@ public class SolrItem {
 
         //this is long
         publicationTime = item.getPublicationTime();
-        List<String> peopleTemp = extractPeople(item.getTitle());
-        peopleTemp.add("@" + item.getAuthorScreenName());
-        people = peopleTemp;
+        
+        //List<String> peopleTemp = extractPeople(item.getTitle());
+        //peopleTemp.add("@" + item.getAuthorScreenName());
+        //people = peopleTemp;
 
         comments = item.getComments();
         latitude = item.getLatitude();
@@ -137,7 +138,7 @@ public class SolrItem {
         item.setDescription(description);
         item.setTags(tags);
         item.setOriginal(original);
-        item.setPeople(people);
+        //item.setPeople(people);
         
         if (links != null) {
             URL[] _links = new URL[links.size()];
@@ -219,8 +220,8 @@ public class SolrItem {
     @Field(value = "author")
     private String author;
 
-    @Field(value = "people")
-    private List<String> people;
+    //@Field(value = "people")
+    //private List<String> people;
     
     @Field(value = "links")
     private List<String> links;
@@ -339,14 +340,7 @@ public class SolrItem {
     public void setOriginal(boolean original) {
         this.original = original;
     }
-
-//    public boolean getOriginal() {
-//        return original;
-//    }
-//
-//    public void setOriginal(boolean original) {
-//        this.original = original;
-//    }
+    
     public String getCategory() {
         return category;
     }
@@ -475,13 +469,13 @@ public class SolrItem {
         this.description = description;
     }
 
-    public List<String> getPeople() {
-        return people;
-    }
+    //public List<String> getPeople() {
+    //    return people;
+    //}
 
-    public void setPeople(List<String> people) {
-        this.people = people;
-    }
+    //public void setPeople(List<String> people) {
+    //    this.people = people;
+    //}
 
     public String[] getTags() {
         return tags;
