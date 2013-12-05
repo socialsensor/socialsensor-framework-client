@@ -3,7 +3,7 @@ package eu.socialsensor.framework.client.search.solr;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
 import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
-import eu.socialsensor.framework.common.domain.dysco.Ngram;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +32,7 @@ public class SolrDysco {
     private String title;
     //The score that shows how trending the dysco is
     @Field(value = "dyscoScore")
-    private Float score = 0f;
+    private Double score = 0d;
     
     //Fields holding the information about the main context 
     //of the items that constitute the dysco
@@ -272,7 +272,7 @@ public class SolrDysco {
      * Returns the score of the dysco 
      * @return Float
      */
-    public Float getScore() {
+    public Double getScore() {
         return score;
     }
     
@@ -280,7 +280,7 @@ public class SolrDysco {
      * Sets the score of the dysco
      * @param score
      */
-    public void setScore(Float score) {
+    public void setScore(Double score) {
         this.score = score;
     }
     
