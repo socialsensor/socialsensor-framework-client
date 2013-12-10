@@ -38,7 +38,7 @@ public class Selector implements JSONable {
 		Map<Object, Object> op = (Map<Object, Object>) and.get(field);
 		if(op == null)
 			op = new HashMap<Object, Object>();
-		op.put("$gt", value);
+		op.put("$gte", value);
 		and.put(field, op);
 	}
 	

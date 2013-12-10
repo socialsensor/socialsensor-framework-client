@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 public class ItemDAOImpl implements ItemDAO {
 
     List<String> indexes = new ArrayList<String>();
-
     private static String db = "Streams";
     private static String collection = "Items";
     private MongoHandler mongoHandler;
@@ -37,13 +36,13 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     public ItemDAOImpl(String host, String db, String collection) {
-    	
+
         indexes.add("id");
         indexes.add("publicationTime");
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
-            
+
         } catch (UnknownHostException ex) {
             Logger.getRootLogger().error(ex.getMessage());
         }
@@ -58,7 +57,7 @@ public class ItemDAOImpl implements ItemDAO {
     public void updateItem(Item item) {
         mongoHandler.update("id", item.getId(), item);
     }
-  
+
     @Override
     public void updateItemCommentsAndPopularity(Item item) {
         UpdateItem changes = new UpdateItem();
@@ -75,9 +74,10 @@ public class ItemDAOImpl implements ItemDAO {
     public boolean deleteItem(String id) {
         return mongoHandler.delete("id", id);
     }
+
     @Override
-    public boolean deleteDB(){
-    	return mongoHandler.delete();
+    public boolean deleteDB() {
+        return mongoHandler.delete();
     }
 
     @Override
@@ -105,11 +105,30 @@ public class ItemDAOImpl implements ItemDAO {
 //        }
 //        return results;
     //}
-
     @Override
     public List<Item> getItemsSince(long date) {
         Selector query = new Selector();
         query.selectGreaterThan("publicationTime", date);
+        long l = System.currentTimeMillis();
+        List<String> jsonItems = mongoHandler.findMany(query, 0);
+        l = System.currentTimeMillis() - l;
+        System.out.println("Fetch time: " + l + " msecs");
+        l = System.currentTimeMillis() - l;
+        List<Item> results = new ArrayList<Item>();
+        for (String json : jsonItems) {
+            results.add(ItemFactory.create(json));
+        }
+        l = System.currentTimeMillis() - l;
+        System.out.println("List time: " + l + " msecs");
+        return results;
+    }
+
+    @Override
+    public List<Item> getItemsInRange(long start, long end) {
+        
+        Selector query = new Selector();
+        query.selectGreaterThan("publicationTime", start);
+        query.selectLessThan("publicationTime", end);
         long l = System.currentTimeMillis();
         List<String> jsonItems = mongoHandler.findMany(query, 0);
         l = System.currentTimeMillis() - l;
@@ -131,12 +150,10 @@ public class ItemDAOImpl implements ItemDAO {
         return item;
     }
 
-
     @Override
     public boolean exists(String id) {
         return mongoHandler.exists("id", id);
     }
-
 
     @Override
     public List<Item> getItemsInTimeslot(String timeslotId) {
@@ -145,11 +162,11 @@ public class ItemDAOImpl implements ItemDAO {
 
         BasicDBObject query = new BasicDBObject("timeslotId", timeslotId);
         List<String> jsonItems = mongoHandler.findMany(query, 0);
-        
+
         List<Item> results = new ArrayList<Item>();
-        
+
         System.out.println("DAO: find " + jsonItems.size() + " results");
-        
+
         for (String json : jsonItems) {
             results.add(ItemFactory.create(json));
         }
@@ -159,46 +176,43 @@ public class ItemDAOImpl implements ItemDAO {
 
         return results;
     }
+
     @Override
     public List<Item> readItems() {
-    	List<String> jsonItems = mongoHandler.findMany(-1);
-    	System.out.println("I have read "+jsonItems.size()+" jsonItems");
-    	List<Item> items = new ArrayList<Item>();
-		
-		for(String json : jsonItems){
-			
-			Item item = ItemFactory.create(json);
-			
-			items.add(item);
-			
-		}
-		return items;
-    }
-  
-    @Override
-    public List<Item> readItemsByStatus(){
-    	 Selector query = new Selector();
-         query.select("isSearched", Boolean.FALSE);
-         List<String> jsonItems = mongoHandler.findMany(query, -1);
-         List<Item> items = new ArrayList<Item>();
-         Gson gson = new GsonBuilder()
-                 .excludeFieldsWithoutExposeAnnotation()
-                 .create();
+        List<String> jsonItems = mongoHandler.findMany(-1);
+        System.out.println("I have read " + jsonItems.size() + " jsonItems");
+        List<Item> items = new ArrayList<Item>();
 
-         for (String json : jsonItems) {
-             Item item = gson.fromJson(json, Item.class);
-            
-             items.add(item);
-         }
-         
-      
-         return items;
+        for (String json : jsonItems) {
+
+            Item item = ItemFactory.create(json);
+
+            items.add(item);
+
+        }
+        return items;
     }
-    
-    
+
+    @Override
+    public List<Item> readItemsByStatus() {
+        Selector query = new Selector();
+        query.select("isSearched", Boolean.FALSE);
+        List<String> jsonItems = mongoHandler.findMany(query, -1);
+        List<Item> items = new ArrayList<Item>();
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
+        for (String json : jsonItems) {
+            Item item = gson.fromJson(json, Item.class);
+
+            items.add(item);
+        }
+
+
+        return items;
+    }
+
     public static void main(String... args) {
-        
     }
-    
-    
 }

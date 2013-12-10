@@ -36,6 +36,9 @@ public interface ItemDAO {
 	public List<Item> readItems();
 	
 	public List<Item> readItemsByStatus();
+        
+            public List<Item> getItemsInRange(long start, long end);
+
 
     
 }

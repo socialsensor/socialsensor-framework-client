@@ -270,6 +270,7 @@ public class MongoHandler {
     }
 
     public List<String> findMany(Selector query, int n) {
+        
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBCursor cursor = collection.find(object).sort(sortField);
 
