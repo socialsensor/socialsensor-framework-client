@@ -1,10 +1,10 @@
 package eu.socialsensor.framework.client.search.solr;
 
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
+import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
 import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +33,9 @@ public class SolrDysco {
     //The score that shows how trending the dysco is
     @Field(value = "dyscoScore")
     private Double score = 0d;
-    
+    //The type of the dysco (CUSTOM/TRENDING)
+    @Field(value = "dyscoType")
+    private String dyscoType;
     //Fields holding the information about the main context 
     //of the items that constitute the dysco
     
@@ -45,12 +47,6 @@ public class SolrDysco {
     private List<String> locations = new ArrayList<String>();
     @Field(value = "organizations")
     private List<String> organizations = new ArrayList<String>();
-    @Field(value = "personsScore")
-    private List<String> personsScore = new ArrayList<String>();
-    @Field(value = "locationsScore")
-    private List<String> locationsScore = new ArrayList<String>();
-    @Field(value = "organizationsScore")
-    private List<String> organizationsScore = new ArrayList<String>();
     
     //The users that contribute in social networks to dysco's topic
     @Expose
@@ -59,38 +55,21 @@ public class SolrDysco {
     //The extracted keywords from items' content with their assigned weights
     @Field(value = "keywords")
     private List<String> keywords = new ArrayList<String>();
-    @Field(value = "keywordsScore")
-    private List<String> keywordsScore = new ArrayList<String>();
     //The extracted hashtags from items' content with their assigned weights
     @Field(value = "hashtags")
     private List<String> hashtags = new ArrayList<String>();
-    @Field(value = "hashtagsScore")
-    private List<String> hashtagsScore = new ArrayList<String>();
-    //The additional keywords resulting from keywords expansion methods with their assigned weights
-    @Field(value = "latent_keywords")
-    private List<String> latent_keywords = new ArrayList<String>();
-    @Field(value = "latent_keywordsScore")
-    private List<String> latent_keywordsScore = new ArrayList<String>();
     
     //The query that will be used for retrieving relevant content to the Dysco from Solr
-    @Field(value = "solrQuery")
-    private String solrQuery;
+    @Field(value = "solrQueryString")
+    private String solrQueryString;
     
-    //The following need to be considered whether they are going to be omitted or not
-    @Field(value = "evolution")
-    private String evolution;
+    //The variable can get values 0,1,2 and shows dysco's trending evolution. 
     @Field(value = "trending")
     private int trending;
-    @Field(value = "alethiometerStatus")
-    private int alethiometerStatus;
+    //The date that the dysco was last created (updated because similar dyscos existed in the past)
     @Field(value = "updateDate")
     private Date updateDate;
-    @Field(value = "thumb")
-    private String thumb;
-    @Field(value = "thumbs")
-    private List<String> thumbs = new ArrayList<String>();
-    @Field(value = "sentiment")
-    private Float sentiment;
+    
     
     public SolrDysco() {
         id = UUID.randomUUID().toString();
@@ -102,19 +81,17 @@ public class SolrDysco {
         creationDate = dysco.getCreationDate();
         title = dysco.getTitle();
         score = dysco.getScore();
+        dyscoType = dysco.getDyscoType().toString();
         
         List<Entity> dyscoEntities = dysco.getEntities();
         for (Entity entity : dyscoEntities) {
             if (entity.getType().equals(Type.LOCATION)) {
-                locationsScore.add(entity.getName() + "@@" + entity.getCont());
                 locations.add(entity.getName());
             }
             if (entity.getType().equals(Type.PERSON)) {
-                personsScore.add(entity.getName() + "@@" + entity.getCont());
                 persons.add(entity.getName());
             }
             if (entity.getType().equals(Type.ORGANIZATION)) {
-                organizationsScore.add(entity.getName() + "@@" + entity.getCont());
                 organizations.add(entity.getName());
             }
         }
@@ -123,27 +100,20 @@ public class SolrDysco {
         
         for(Map.Entry<String,Double> entry : dysco.getKeywords().entrySet()){
         	keywords.add(entry.getKey());
-        	keywordsScore.add(entry.getKey()+"@@"+entry.getValue());
         }
         
         for(Map.Entry<String,Double> entry : dysco.getHashtags().entrySet()){
         	hashtags.add(entry.getKey());
-        	hashtagsScore.add(entry.getKey()+"@@"+entry.getValue());
         }
         
         
-        solrQuery = dysco.getSolrQuery();
+        solrQueryString = dysco.getSolrQueryString();
         
-        //The following need to be considered whether they are going to be omitted or not
-        evolution = dysco.getEvolution();
         trending = dysco.getTrending();
-        alethiometerStatus = dysco.getAlethiometerStatus();
+    
         updateDate = dysco.getUpdateDate();
-        if (dysco.getThumb() != null) {
-            thumb = dysco.getThumb().toString();
-        }
-        thumbs = dysco.getThumbs();
-        //TODO add other dimensions - e.g. Sentiment etc 
+        
+       
     }
 
     public Dysco toDysco() {
@@ -155,68 +125,49 @@ public class SolrDysco {
         dysco.setTitle(title);
         dysco.setScore(score);
         
-        if (personsScore != null) {
-            for (String entity : personsScore) {
-                String[] splitted = entity.split("@@");
-                Entity dyscoEntity = new Entity(splitted[0], new Integer(splitted[1]), Type.PERSON);
+        if(dyscoType.equals("CUSTOM"))
+        	dysco.setDyscoType(DyscoType.CUSTOM);
+        else
+        	dysco.setDyscoType(DyscoType.TRENDING);
+        
+        if (persons != null) {
+            for (String person : persons) {
+                Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
                 dysco.addEntity(dyscoEntity);
             }
         }
-        if (locationsScore != null) {
-            for (String entity : locationsScore) {
-                String[] splitted = entity.split("@@");
-                Entity dyscoEntity = new Entity(splitted[0], new Integer(splitted[1]), Type.LOCATION);
+        if (locations != null) {
+            for (String location : locations) {
+                Entity dyscoEntity = new Entity(location, 0.0, Type.LOCATION);
                 dysco.addEntity(dyscoEntity);
             }
         }
-        if (organizationsScore != null) {
-            for (String entity : organizationsScore) {
-                String[] splitted = entity.split("@@");
-                Entity dyscoEntity = new Entity(splitted[0], new Integer(splitted[1]), Type.ORGANIZATION);
+        if (organizations != null) {
+            for (String organization : organizations) {
+                Entity dyscoEntity = new Entity(organization, 0.0, Type.ORGANIZATION);
                 dysco.addEntity(dyscoEntity);
             }
         }
         
         dysco.setContributors(contributors);
 
-        if(keywordsScore != null){
-        	for(String keyword : keywordsScore){
-        		String[] splitted = keyword.split("@@");
-        		dysco.addKeyword(splitted[0], Double.parseDouble(splitted[1]));
+        if(keywords != null){
+        	for(String keyword : keywords){
+        		dysco.addKeyword(keyword, 0.0);
         	}
         }
         
-        if(hashtagsScore != null){
-        	for(String hashtag : hashtagsScore){
-        		String[] splitted = hashtag.split("@@");
-        		dysco.addHashtag(splitted[0], Double.parseDouble(splitted[1]));
+        if(hashtags != null){
+        	for(String hashtag : hashtags){
+        		dysco.addHashtag(hashtag, 0.0);
         	}
         }
         
-        if(latent_keywordsScore != null){
-        	for(String latent_keyword : latent_keywordsScore){
-        		String[] splitted = latent_keyword.split("@@");
-        		dysco.addHashtag(splitted[0], Double.parseDouble(splitted[1]));
-        	}
-        }
-        
-        dysco.setSolrQuery(solrQuery);
-      
-        //The following need to be considered whether they are going to be omitted or not
-        //TODO add Dysco Dymensions
-        dysco.setUpdateDate(updateDate);
-        dysco.setThumbs(thumbs);
-        dysco.setEvolution(evolution);
+        dysco.setSolrQuery(solrQueryString);
         dysco.setTrending(trending);
-        dysco.setAlethiometerStatus(alethiometerStatus);
-        if (thumb != null) {
-            try {
-                dysco.setThumb(new URL(thumb));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
+        dysco.setUpdateDate(updateDate);
         
+     
         return dysco;
 
     }
@@ -299,22 +250,6 @@ public class SolrDysco {
         this.persons = persons;
     }
     /**
-     * Returns the list of the name entities that are Persons inside the dysco
-     * with their corresponding weights
-     * @return List of String
-     */
-    public List<String> getPersonsScore() {
-        return personsScore;
-    }
-    /**
-     * Sets the name entities that are Persons inside the dysco
-     * with their corresponding weights
-     * @param personsScore
-     */
-    public void setPersonsScore(List<String> personsScore) {
-        this.personsScore = personsScore;
-    }
-    /**
      * Returns the list of names of the Entities that are Locations inside the dysco
      * @return
      */
@@ -329,22 +264,6 @@ public class SolrDysco {
         this.locations = locations;
     }
     /**
-     * Returns the name entities that are Locations inside the dysco
-     * with their corresponding weights
-     * @return
-     */
-    public List<String> getLocationsScore() {
-        return locationsScore;
-    }
-    /**
-     * Sets the name entities that are Locations inside the dysco
-     * with their corresponding weights
-     * @param locationsScore
-     */
-    public void setLocationsScore(List<String> locationsScore) {
-        this.locationsScore = locationsScore;
-    }
-    /**
      * Returns the list of names of the Entities that are Organizations inside the dysco
      * @return List of String
      */
@@ -357,22 +276,6 @@ public class SolrDysco {
      */
     public void setOrganizations(List<String> organizations) {
         this.organizations = organizations;
-    }
-    /**
-     * Sets the name entities that are Organizations inside the dysco
-     * with their corresponding weights
-     * @return
-     */
-    public List<String> getOrganizationsScore() {
-        return organizationsScore;
-    }
-    /**
-     * Sets the name entities that are Organizations inside the dysco
-     * with their corresponding weights
-     * @param organizationsScore
-     */
-    public void setOrganizationsScore(List<String> organizationsScore) {
-        this.organizationsScore = organizationsScore;
     }
     /**
      * Returns the list of contributors for the dysco
@@ -403,22 +306,6 @@ public class SolrDysco {
         this.keywords = keywords;
     }
     /**
-     * Returns the keywords of the dysco with their corresponding
-     * weights
-     * @return List of String
-     */
-    public List<String> getKeywordsScore() {
-        return keywordsScore;
-    }
-    /**
-     * Sets the keywords of the dysco with their corresponding
-     * weights
-     * @param keywordsScore
-     */
-    public void setKeywordsScore(List<String> keywordsScore) {
-        this.keywordsScore = keywordsScore;
-    }
-    /**
      * Returns the hashtags of the dysco
      * @return List of String
      */
@@ -432,107 +319,66 @@ public class SolrDysco {
     public void setHashtags(List<String> hashtags) {
         this.hashtags = hashtags;
     }
+
     /**
-     * Returns the hashtags of the dysco with their corresponding
-     * weights
-     * @return List of String
-     */
-    public List<String> getHashtagsScore() {
-        return hashtagsScore;
-    }
-    /**
-     * Sets the hashtags of the dysco with their corresponding
-     * weights
-     * @param hashtagsScore
-     */
-    public void setHashtagsScore(List<String> hashtagsScore) {
-        this.hashtagsScore = hashtagsScore;
-    }
-    /**
-     * Returns the latent_keywords of the dysco
-     * @return List of String
-     */
-    public List<String> getLatentKeywords() {
-        return latent_keywords;
-    }
-    /**
-     * Sets the latent_keywords of the dysco
-     * @param latent_keywords
-     */
-    public void setLatentKeywords(List<String> latent_keywords) {
-        this.latent_keywords = latent_keywords;
-    }
-    /**
-     * Returns the query for the retrieval of relevant content to the dysco from solr
+     * Returns the query as a stringfor the retrieval of relevant content to the dysco from solr
      * @return String
      */
     public String getSolrQuery(){
-    	return solrQuery;
+    	return solrQueryString;
     }
     /**
-     * Sets the solr query for the retrieval of relevant content
+     * Sets the solr query as a string for the retrieval of relevant content
      * @param solrQuery
      */
-    public void setSolrQuery(String solrQuery){
-    	this.solrQuery = solrQuery;
+    public void setSolrQueryString(String solrQueryString){
+    	this.solrQueryString = solrQueryString;
     	
     }
     
-    
-    
-    //The following need to be considered whether they are going to be omitted or not
-    public String getEvolution() {
-        return evolution;
-    }
-    public void setEvolution(String evolution) {
-        this.evolution = evolution;
-    }
-    public List<String> getThumbs() {
-        return thumbs;
-    }
-
-    public void setThumbs(List<String> thumbs) {
-        this.thumbs = thumbs;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    public String getThumb() {
-        return thumb;
-    }
-
-    public void setThumb(String thumb) {
-        this.thumb = thumb;
-    }
-
-    public Float getSentiment() {
-        return sentiment;
-    }
-
-    public void setSentiment(Float sentiment) {
-        this.sentiment = sentiment;
-    }
-
+    /**
+     * Returns the trending value that shows dysco's trending evolution (can be 0,1,2)
+     * @return
+     */
     public int getTrending() {
         return trending;
     }
 
+    /**
+     * Sets the trending value that shows dysco's trending evolution (can be 0,1,2)
+     * @param trending
+     */
     public void setTrending(int trending) {
         this.trending = trending;
     }
-
-    public int getAlethiometerStatus() {
-        return alethiometerStatus;
+    
+    /**
+     * Returns the date that dysco was last updated.
+     * @return
+     */
+    public Date getUpdateDate() {
+        return updateDate;
     }
-
-    public void setAlethiometerStatus(int alethiometerStatus) {
-        this.alethiometerStatus = alethiometerStatus;
+    /**
+     * Sets the date that dysco was last updated.
+     * @return
+     */
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
     
+    /**
+     * Returns the type of the dysco 
+     * @return dyscoType
+     */
+    public String getDyscoType(){
+    	return dyscoType;
+    }
+    /**
+     * Sets the type of the dysco (CUSTOM/TRENDING)
+     * @param dyscoType
+     */
+    public void setDyscoType(String dyscoType){
+    	this.dyscoType = dyscoType;
+    }
 }

@@ -5,6 +5,8 @@ import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
+import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,7 +197,7 @@ public class SolrHandler implements SearchEngineHandler {
         boolean status2 = false;
         LOGGER.log(Level.INFO, "inserting {0} dysco items to Solr", dysco.getItems().size());
 
-        if (dysco.getEvolution().equals("dynamic")) {
+        if (dysco.getDyscoType().equals(DyscoType.CUSTOM)) {
             status2 = true;
         }
         if (dysco.getItems().size() > 0) {
