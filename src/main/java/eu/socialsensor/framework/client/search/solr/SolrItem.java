@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
+import eu.socialsensor.framework.common.domain.StreamUser.Category;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.MalformedURLException;
@@ -188,7 +189,16 @@ public class SolrItem {
         item.setAvatarImageSmall(avatarImageSmall);
         item.setAuthorScreenName(authorScreenName);
         item.setLang(language);
-        item.setCategory(category);
+        
+        if(category.equals("politician"))
+        	item.setCategory(Category.politician);
+        else if(category.equals("footballer"))
+        	item.setCategory(Category.footballer);
+        else if(category.equals("official"))
+        	item.setCategory(Category.official);
+        else if(category.equals("journalist"))
+        	item.setCategory(Category.journalist);
+        
         item.setAlethiometerUserStatus(alethiometerUserStatus);
         item.setShares(retweetsCount);
 
