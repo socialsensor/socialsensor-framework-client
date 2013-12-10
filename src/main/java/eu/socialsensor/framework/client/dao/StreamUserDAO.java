@@ -26,7 +26,5 @@ public interface StreamUserDAO {
 
     public StreamUser getStreamUserByName(String username);
     
-    public void loadExpertsList(String file, Category category);
-    
     public boolean exists(String id);
 }

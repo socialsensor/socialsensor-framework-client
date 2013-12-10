@@ -1,23 +1,15 @@
 package eu.socialsensor.framework.client.dao.impl;
 
-import java.io.FileInputStream;
-import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-
-import com.google.gson.Gson;
 
 import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
-import eu.socialsensor.framework.common.domain.StreamUser.Category;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
 public class StreamUserDAOImpl implements StreamUserDAO {
@@ -26,8 +18,6 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     private final static String db = "Streams";
     private final static String collection = "StreamUsers";
     private MongoHandler mongoHandler;
-
-    Map<String, Category> experts = new HashMap<String, Category>();
     
     public StreamUserDAOImpl(String host) {
     	this(host, db, collection);
@@ -46,11 +36,6 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
     @Override
     public void insertStreamUser(StreamUser user) {
-    	String userid = user.getUserid();
-    	Category category = experts.get(userid);
-    	if(category != null) {
-    		user.setCategory(category);
-    	}
         mongoHandler.insert(user);
     }
 
@@ -68,23 +53,11 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     @Override
     public void updateStreamUser(StreamUser user) {
         Logger.getRootLogger().info("updating stream user new");
-        String userid = user.getUserid();
-    	Category category = experts.get(userid);
-    	if(category != null) {
-    		user.setCategory(category);
-    	}
         mongoHandler.update("id", user.getId(), user);
     }
 
     @Override
     public void updateStreamUserPopularity(StreamUser user) {
-    	String userid = user.getUserid();
-    	Category category = experts.get(userid);
-    	if(category != null) {
-    		UpdateItem changes = new UpdateItem();
-    		changes.setField("category", category.toString());
-    		mongoHandler.update("id", user.getId(), changes);
-    	}
     	String description = user.getDescription();
     	if(description != null) {
     		UpdateItem changes = new UpdateItem();
@@ -111,25 +84,6 @@ public class StreamUserDAOImpl implements StreamUserDAO {
         StreamUser user = ItemFactory.createUser(json);
         return user;
     }
-    
-    public void loadExpertsList(String file, Category category) {
-		try {
-			StringBuffer sb = new StringBuffer();
-			List<String> lines = IOUtils.readLines(new FileInputStream(file));
-			for(String line : lines) {
-				sb.append(line);
-			}
-			Map<?, ?> json = new Gson().fromJson(sb.toString(), Map.class);
-			@SuppressWarnings("unchecked")
-			List <Double> ids = (List<Double>) json.get("TwitterIds");
-			for(Double id : ids) {
-				BigDecimal big = new BigDecimal(id);
-				experts.put(big.toString(), category);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public void updateStreamUserMentions(String userid) {
