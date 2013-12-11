@@ -13,9 +13,9 @@ public interface ItemDAO {
 
     public void insertItem(Item item);
 
-    public void updateItem(Item item);
+    public void replaceItem(Item item);
 
-    public void updateItemCommentsAndPopularity(Item item);
+    public void updateItem(Item item);
 
     public boolean deleteItem(String id);
     
@@ -24,8 +24,6 @@ public interface ItemDAO {
     public Item getItem(String id);
     
     public List<Item> getLatestItems(int n);
-    
-    //public int getUserRetweets(String userName);
     
     public List<Item> getItemsSince(long date);
     
@@ -37,8 +35,6 @@ public interface ItemDAO {
 	
 	public List<Item> readItemsByStatus();
         
-            public List<Item> getItemsInRange(long start, long end);
+	public List<Item> getItemsInRange(long start, long end);
 
-
-    
 }

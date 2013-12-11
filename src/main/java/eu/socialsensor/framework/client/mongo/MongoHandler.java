@@ -389,7 +389,7 @@ public class MongoHandler {
 
     public void update(String fieldName, String fieldValue, DBObject changes) {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);
-        collection.update(q, changes);
+        collection.update(q, changes, false, false);
     }
 
     public void updateOld(String fieldName, String fieldValue, JSONable jsonObject) {
