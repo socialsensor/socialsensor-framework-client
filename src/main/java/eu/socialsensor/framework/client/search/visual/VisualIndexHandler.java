@@ -5,10 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -25,6 +25,11 @@ import org.apache.commons.io.IOUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import eu.socialsensor.framework.client.dao.MediaItemDAO;
+import eu.socialsensor.framework.client.dao.impl.MediaItemDAOImpl;
+import eu.socialsensor.framework.client.search.visual.JsonResultSet.JsonResult;
+import eu.socialsensor.framework.common.domain.MediaItem;
+
 /**
  * Client for Visual Indexer.
  *
@@ -34,6 +39,7 @@ import com.google.gson.GsonBuilder;
 public class VisualIndexHandler {
 
     private static double default_threshold = 0.75;
+    
     private String webServiceHost;
     private String collectionName;
     private HttpClient httpClient;
@@ -44,7 +50,7 @@ public class VisualIndexHandler {
         this.httpClient = new HttpClient();
     }
 
-    public NearestImage[] getSimilarImages(String imageId) {
+    public JsonResultSet getSimilarImages(String imageId) {
         return getSimilarImages(imageId, default_threshold);
     }
 
@@ -55,9 +61,9 @@ public class VisualIndexHandler {
      * @param threshold
      * @return
      */
-    public NearestImage[] getSimilarImages(String imageId, double threshold) {
+    public JsonResultSet getSimilarImages(String imageId, double threshold) {
 
-        NearestImage[] similar = new NearestImage[0];
+    	JsonResultSet similar = new JsonResultSet();
         PostMethod queryMethod = null;
         String response = null;
         try {
@@ -75,9 +81,13 @@ public class VisualIndexHandler {
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(inputStream, writer);
                 response = writer.toString();
+                //System.out.println(response);
                 queryMethod.releaseConnection();
 
                 similar = parseResponse(response);
+            }
+            else {
+            	System.out.println(code);
             }
         } catch (Exception e) {
             response = null;
@@ -89,12 +99,12 @@ public class VisualIndexHandler {
         return similar;
     }
 
-    public NearestImage[] getSimilarImages(URL url) {
+    public JsonResultSet getSimilarImages(URL url) {
     	return getSimilarImages(url, default_threshold);
     }
     
-    public NearestImage[] getSimilarImages(URL url, double threshold) {
-        NearestImage[] similar = new NearestImage[0];
+    public JsonResultSet getSimilarImages(URL url, double threshold) {
+    	JsonResultSet similar = new JsonResultSet();
         GetMethod queryMethod = null;
         String response = null;
         try {
@@ -135,12 +145,12 @@ public class VisualIndexHandler {
         return similar;
     }
 
-    public NearestImage[] getSimilarImagesAndIndex(String id, URL url) {
+    public JsonResultSet getSimilarImagesAndIndex(String id, URL url) {
     	return getSimilarImagesAndIndex(id, url, default_threshold);
     }
     
-    public NearestImage[] getSimilarImagesAndIndex(String id, URL url, double threshold) {
-        NearestImage[] similar = new NearestImage[0];
+    public JsonResultSet getSimilarImagesAndIndex(String id, URL url, double threshold) {
+    	JsonResultSet similar = new JsonResultSet();
         PostMethod queryMethod = null;
         String response = null;
         try {
@@ -152,6 +162,7 @@ public class VisualIndexHandler {
 
             queryMethod = new PostMethod(webServiceHost + "/rest/visual/qindex_url/" + collectionName);
             queryMethod.setRequestEntity(new MultipartRequestEntity(parts, queryMethod.getParams()));
+            
             int code = httpClient.executeMethod(queryMethod);
             
             if (code == 200) {
@@ -160,12 +171,18 @@ public class VisualIndexHandler {
                 IOUtils.copy(inputStream, writer);
                 response = writer.toString();
                 queryMethod.releaseConnection();
-
                 similar = parseResponse(response);
-                
             }
             else {
-            	return getSimilarImages(id, threshold);
+            	InputStream inputStream = queryMethod.getResponseBodyAsStream();
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(inputStream, writer);
+                response = writer.toString();
+                queryMethod.releaseConnection();
+                System.out.println(code);
+                System.out.println(response);
+                
+            	//return getSimilarImages(id, threshold);
             }
             
         } catch (Exception e) {
@@ -232,9 +249,9 @@ public class VisualIndexHandler {
      * @param threshold
      * @return
      */
-    public NearestImage[] getSimilarImages(double[] vector, double threshold) {
+    public JsonResultSet getSimilarImages(double[] vector, double threshold) {
 
-        NearestImage[] similar = new NearestImage[0];
+    	JsonResultSet similar = new JsonResultSet();
 
         byte[] vectorInBytes = new byte[8 * vector.length];
         ByteBuffer bbuf = ByteBuffer.wrap(vectorInBytes);
@@ -343,18 +360,57 @@ public class VisualIndexHandler {
         return response;
     }
 
-    private static NearestImage[] parseResponse(String response) {
+    private static JsonResultSet parseResponse(String response) {
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
 
-        IndexResults indexResults = gson.fromJson(response, IndexResults.class);
-        if (indexResults == null) {
-            return new NearestImage[0];
+        try {
+        	JsonResultSet indexResults = gson.fromJson(response, JsonResultSet.class);
+        	if (indexResults == null) {
+            	return new JsonResultSet();
+        	}
+        	 return (indexResults.results==null)?(new JsonResultSet()):indexResults;
         }
-        
-        return (indexResults.results==null)?(new NearestImage[0]):indexResults.results;
+        catch(Exception e) {
+        	e.printStackTrace();
+        	System.out.println(response);
+        	return new JsonResultSet();
+        }
+       
     }
 
+    public static void main(String[] args) throws IOException {
+    	
+    	
+    	VisualIndexHandler handler = new VisualIndexHandler("http://160.40.50.207:8080/VisualIndex", "prototype");
+    	
+    	MediaItemDAO dao = new MediaItemDAOImpl("160.40.50.207");
+    	List<MediaItem> mediaItems = dao.getLastMediaItems(100);
+    	
+    	int k = 0;
+    	for(MediaItem mediaItem : mediaItems) {
+    		String id = mediaItem.getId();
+    		String url = mediaItem.getUrl();
+
+    		try {
+    			handler.getSimilarImagesAndIndex(id, new URL(url));
+    			JsonResultSet results = handler.getSimilarImages(id, 1.1);
+    			List<JsonResult> list = results.results;
+    			if(list.size()>0) {
+    				k++;
+    				for(JsonResult nn : list) 
+    					System.out.println(nn.getId() + ", " + nn.getScore());
+    			
+    				System.out.println("============================");
+    			}
+    			
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
+    	System.out.println("Total items with results: " + k);
+    	
+    }
    
 }
