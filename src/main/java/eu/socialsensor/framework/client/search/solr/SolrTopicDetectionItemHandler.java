@@ -162,7 +162,6 @@ public class SolrTopicDetectionItemHandler {
             }
 
             if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get(typeTerm)) == null) {
-                logger.info("No "+typeTerm+" property found in the item: " + itemsTermsVectors.getName(i));
                 itemsTerms.put(itemsTermsVectors.getName(i), new ArrayList<String>());
                 continue;
             }
