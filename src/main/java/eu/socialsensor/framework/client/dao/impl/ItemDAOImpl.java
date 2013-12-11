@@ -130,7 +130,7 @@ public class ItemDAOImpl implements ItemDAO {
         query.selectGreaterThan("publicationTime", start);
         query.selectLessThan("publicationTime", end);
         long l = System.currentTimeMillis();
-        List<String> jsonItems = mongoHandler.findMany(query, 0);
+        List<String> jsonItems = mongoHandler.findManyNoSorting(query, 0);
         l = System.currentTimeMillis() - l;
         System.out.println("Fetch time: " + l + " msecs");
         l = System.currentTimeMillis() - l;
