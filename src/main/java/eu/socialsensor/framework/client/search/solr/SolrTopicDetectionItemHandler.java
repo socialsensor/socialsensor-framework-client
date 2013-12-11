@@ -14,8 +14,6 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.TermsResponse;
-import org.apache.solr.client.solrj.response.TermsResponse.Term;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
 
@@ -162,7 +160,6 @@ public class SolrTopicDetectionItemHandler {
             }
 
             if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get(typeTerm)) == null) {
-                logger.info("No "+typeTerm+" property found in the item: " + itemsTermsVectors.getName(i));
                 itemsTerms.put(itemsTermsVectors.getName(i), new ArrayList<String>());
                 continue;
             }
