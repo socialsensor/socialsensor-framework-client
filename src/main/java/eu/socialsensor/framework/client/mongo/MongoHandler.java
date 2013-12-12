@@ -140,6 +140,8 @@ public class MongoHandler {
         }
         return jsonResults;
     }
+    
+    
 
     public List<String> findManyWithOrDeprecated(String field, List<String> values, int n) {
         String prefix = "{$or:[";
@@ -289,6 +291,27 @@ public class MongoHandler {
         }
         return jsonResults;
     }
+    
+       public List<String> findManyNoSorting(Selector query, int n) {
+        
+        DBObject object = (DBObject) JSON.parse(query.toJSONString());
+        DBCursor cursor = collection.find(object);
+
+        if (n > 0) {
+            cursor = cursor.limit(n);
+        }
+
+        List<String> jsonResults = new ArrayList<String>();
+        try {
+            while (cursor.hasNext()) {
+                DBObject current = cursor.next();
+                jsonResults.add(JSON.serialize(current));
+            }
+        } finally {
+            cursor.close();
+        }
+        return jsonResults;
+    }
 
     public List<String> findManySortedByPublicationTime(Selector query, int n) {
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
@@ -389,7 +412,7 @@ public class MongoHandler {
 
     public void update(String fieldName, String fieldValue, DBObject changes) {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);
-        collection.update(q, changes, false, false);
+        collection.update(q, changes);
     }
 
     public void updateOld(String fieldName, String fieldValue, JSONable jsonObject) {

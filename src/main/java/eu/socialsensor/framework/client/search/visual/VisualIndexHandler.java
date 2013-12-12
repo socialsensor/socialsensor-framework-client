@@ -395,12 +395,13 @@ public class VisualIndexHandler {
 
     		try {
     			handler.getSimilarImagesAndIndex(id, new URL(url));
-    			JsonResultSet results = handler.getSimilarImages(id, 1.1);
+    			JsonResultSet results = handler.getSimilarImages(id, 0.75);
     			List<JsonResult> list = results.results;
     			if(list.size()>0) {
+    				System.out.println(results.toJSON());
     				k++;
-    				for(JsonResult nn : list) 
-    					System.out.println(nn.getId() + ", " + nn.getScore());
+    				//for(JsonResult nn : list) 
+    				//	System.out.println(nn.toString());
     			
     				System.out.println("============================");
     			}

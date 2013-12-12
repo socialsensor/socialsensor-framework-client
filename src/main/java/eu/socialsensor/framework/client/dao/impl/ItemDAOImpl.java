@@ -3,7 +3,6 @@ package eu.socialsensor.framework.client.dao.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
-
 import eu.socialsensor.framework.client.dao.ItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
@@ -13,7 +12,6 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -56,17 +54,19 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public void replaceItem(Item item) {
+    public void updateItem(Item item) {
         mongoHandler.update("id", item.getId(), item);
     }
 
     @Override
-    public void updateItem(Item item) {
+    public void updateItemCommentsAndPopularity(Item item) {
         UpdateItem changes = new UpdateItem();
-        changes.setField("lastUpdated", new Date());
-        changes.setField("likes", item.getLikes());
-        changes.setField("shares", item.getShares());
-        
+
+        String[] comments = item.getComments();
+        if (comments != null && comments.length > 0) {
+            changes.addValues("comments", comments);
+        }
+
         mongoHandler.update("id", item.getId(), changes);
     }
 
@@ -105,8 +105,6 @@ public class ItemDAOImpl implements ItemDAO {
 //        }
 //        return results;
     //}
-    
-    
     @Override
     public List<Item> getItemsSince(long date) {
         Selector query = new Selector();
@@ -132,7 +130,7 @@ public class ItemDAOImpl implements ItemDAO {
         query.selectGreaterThan("publicationTime", start);
         query.selectLessThan("publicationTime", end);
         long l = System.currentTimeMillis();
-        List<String> jsonItems = mongoHandler.findMany(query, 0);
+        List<String> jsonItems = mongoHandler.findManyNoSorting(query, 0);
         l = System.currentTimeMillis() - l;
         System.out.println("Fetch time: " + l + " msecs");
         l = System.currentTimeMillis() - l;
