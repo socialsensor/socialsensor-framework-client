@@ -22,6 +22,10 @@ public class JsonResultSet {
 		results.add(result);
 	}
 	
+	List<JsonResult> getResults() {
+		return results;
+	}
+	
 	public class JsonResult {
 		
 		@Expose
