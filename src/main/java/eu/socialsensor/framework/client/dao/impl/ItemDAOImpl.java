@@ -3,6 +3,7 @@ package eu.socialsensor.framework.client.dao.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
+
 import eu.socialsensor.framework.client.dao.ItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
@@ -12,6 +13,7 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -54,19 +56,17 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public void updateItem(Item item) {
+    public void replaceItem(Item item) {
         mongoHandler.update("id", item.getId(), item);
     }
 
     @Override
-    public void updateItemCommentsAndPopularity(Item item) {
+    public void updateItem(Item item) {
         UpdateItem changes = new UpdateItem();
-
-        String[] comments = item.getComments();
-        if (comments != null && comments.length > 0) {
-            changes.addValues("comments", comments);
-        }
-
+        changes.setField("lastUpdated", new Date());
+        changes.setField("likes", item.getLikes());
+        changes.setField("shares", item.getShares());
+        
         mongoHandler.update("id", item.getId(), changes);
     }
 
