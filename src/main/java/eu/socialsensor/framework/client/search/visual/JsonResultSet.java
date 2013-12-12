@@ -22,7 +22,7 @@ public class JsonResultSet {
 		results.add(result);
 	}
 	
-	List<JsonResult> getResults() {
+	public List<JsonResult> getResults() {
 		return results;
 	}
 	
