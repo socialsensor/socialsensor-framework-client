@@ -319,6 +319,58 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         return _videos;
     }
+    
+    @Override
+    public List<MediaItem> findVideos(String query, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
+    	//Set to the query the type of media item we want to be retrieved from solr (image - video)
+    	query += ") AND type : video";
+    	
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	Logger.getRootLogger().info("query: " + query);
+    	solrQuery.setRows(size);
+    	
+    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
+    	if(response != null){
+    		List<MediaItem> results = response.getResults();
+    		Set<String> urls = new HashSet<String>();
+	        for(MediaItem mi : results) {
+	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+	        		mediaItems.add(mi);
+	        		urls.add(mi.getUrl());
+	        	}
+	        }
+    	}
+    	return mediaItems;		
+    	
+    }
+    
+    @Override
+    public List<MediaItem> findImages(String query, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
+    	//Set to the query the type of media item we want to be retrieved from solr (image - video)
+    	query += ") AND type : image";
+    	
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	Logger.getRootLogger().info("query: " + query);
+    	solrQuery.setRows(size);
+    	
+    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
+    	if(response != null){
+    		List<MediaItem> results = response.getResults();
+    		Set<String> urls = new HashSet<String>();
+	        for(MediaItem mi : results) {
+	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+	        		mediaItems.add(mi);
+	        		urls.add(mi.getUrl());
+	        	}
+	        }
+    	}
+    	return mediaItems;		
+    	
+    }
 
     @Override
     // method to be called from outside (works only for trending dyscos)

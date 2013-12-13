@@ -124,6 +124,10 @@ public interface DyscoDAO {
 	List<Dysco> findRelatedTopics(Dysco dysco);
 
 	List<MediaItem> findVideos(List<String> dyscoIds, List<String> urls, int size);
+	
+	List<MediaItem> findVideos(String query, int size);
+	
+	List<MediaItem> findImages(String query, int size);
 
 	List<MediaItem> findImages(Dysco _dysco, int size);
 
