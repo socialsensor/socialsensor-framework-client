@@ -232,7 +232,7 @@ public class SolrHandler implements SearchEngineHandler {
     public SearchEngineResponse<Dysco> findDyscosLight(String query,
             String timeframe, int count) {
 
-        query = query + " AND evolution:latest";
+//        query = query + " AND evolution:latest";
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("creationDate:[NOW-" + timeframe + " TO NOW]");
 

@@ -73,7 +73,7 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
     @Override
     public StreamUser getStreamUser(String id) {
-        String json = mongoHandler.findOne("userid", id);
+        String json = mongoHandler.findOne("id", id);
         StreamUser user = ItemFactory.createUser(json);
         return user;
     }
