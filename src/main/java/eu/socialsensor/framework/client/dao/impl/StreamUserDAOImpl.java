@@ -2,9 +2,14 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
@@ -90,6 +95,21 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     		UpdateItem changes = new UpdateItem();
     		changes.incField("mentions", 1);
     		mongoHandler.update("id", userid, changes);
+	}
+
+	@Override
+	public Map<String, StreamUser> getStreamUsers(List<String> ids) {
+		Map<String, StreamUser> users = new HashMap<String, StreamUser>();
+
+		DBObject query = new BasicDBObject("id", new BasicDBObject("$in", ids));;
+		
+		List<String> response = mongoHandler.findMany(query, ids.size());
+		for(String json : response) {
+			StreamUser user = ItemFactory.createUser(json);
+			users.put(user.getId(), user);
+		}
+		
+		return users;
 	}
     
 }

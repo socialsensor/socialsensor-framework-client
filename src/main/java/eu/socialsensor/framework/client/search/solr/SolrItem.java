@@ -3,6 +3,7 @@ package eu.socialsensor.framework.client.search.solr;
 import com.google.gson.Gson;
 
 import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.domain.StreamUser.Category;
@@ -12,7 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -164,7 +164,7 @@ public class SolrItem {
         item.setPublicationTime(publicationTime);
 
         item.setComments(comments);
-        item.setLocation(latitude, longitude, location);
+        item.setLocation(new Location(latitude, longitude, location));
 
         //this is a Map<URL, String>
         if (mediaIds != null) {

@@ -1,5 +1,8 @@
 package eu.socialsensor.framework.client.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.domain.StreamUser.Category;
 
@@ -23,6 +26,8 @@ public interface StreamUserDAO {
     public boolean deleteStreamUser(String id);
 
     public StreamUser getStreamUser(String id);
+    
+    public Map<String, StreamUser> getStreamUsers(List<String> ids);
 
     public StreamUser getStreamUserByName(String username);
     

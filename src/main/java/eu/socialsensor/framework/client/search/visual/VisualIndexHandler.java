@@ -385,8 +385,8 @@ public class VisualIndexHandler {
     	
     	VisualIndexHandler handler = new VisualIndexHandler("http://160.40.50.207:8080/VisualIndex", "prototype");
     	
-    	MediaItemDAO dao = new MediaItemDAOImpl("160.40.50.207");
-    	List<MediaItem> mediaItems = dao.getLastMediaItems(100);
+    	MediaItemDAO dao = new MediaItemDAOImpl("160.40.50.207", "Streams", "MediaItemsFromWP_boilerpipe");
+    	List<MediaItem> mediaItems = dao.getLastMediaItems(-1);
     	
     	int k = 0;
     	for(MediaItem mediaItem : mediaItems) {
@@ -394,8 +394,8 @@ public class VisualIndexHandler {
     		String url = mediaItem.getUrl();
 
     		try {
-    			handler.getSimilarImagesAndIndex(id, new URL(url));
-    			JsonResultSet results = handler.getSimilarImages(id, 0.75);
+    			//handler.getSimilarImagesAndIndex(id, new URL(url));
+    			JsonResultSet results = handler.getSimilarImages(id, 0.8);
     			List<JsonResult> list = results.results;
     			if(list.size()>0) {
     				System.out.println(results.toJSON());
