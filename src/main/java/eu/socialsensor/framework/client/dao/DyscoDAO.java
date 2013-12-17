@@ -8,6 +8,8 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 
@@ -122,15 +124,75 @@ public interface DyscoDAO {
 	List<String> findTotalUrls(List<Item> totalItems);
 
 	List<Dysco> findRelatedTopics(Dysco dysco);
-
-	List<MediaItem> findVideos(List<String> dyscoIds, List<String> urls, int size);
 	
-	List<MediaItem> findVideos(String query, int size);
+	//The following regard multimedia content retrieval
 	
-	List<MediaItem> findImages(String query, int size);
-
-	List<MediaItem> findImages(Dysco _dysco, int size);
-
-	List<MediaItem> findImages(List<String> dyscoIds, List<String> urls, int size);
-    
+	/**
+	 * Retrieve multimedia content that are videos based on dysco's 
+	 * information
+	 * @param dysco
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findVideos(Dysco dysco, int size);
+	/**
+	 * Retrieve multimedia content that are videos based on a solr
+	 * query
+	 * @param query
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findVideos(String query, int size);
+	/**
+	 * Retrieve multimedia content that corresponds to videos 
+	 * prioritized by network based on a solr query 
+	 * @param query
+	 * @param networkPriorities
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities,int size);
+	/**
+	 * Retrieve multimedia content that corresponds to videos 
+	 * prioritized by network based on dysco's information
+	 * @param dysco
+	 * @param networkPriorities
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities,int size);
+	/**
+	 * Retrieve multimedia content tha is images based on dysco's
+	 * information
+	 * @param dysco
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findImages(Dysco dysco, int size);
+	/**
+	 * Retrieve multimedia content that is images based on a solr 
+	 * query
+	 * @param query
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findImages(String query, int size);
+	/**
+	 * Retrieve multimedia content that corresponds to images 
+	 * prioritized by network based on a solr query 
+	 * @param query
+	 * @param networkPriorities
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size);
+	/**
+	 * Retrieve multimedia content that corresponds to images 
+	 * prioritized by network based on dysco's information
+	 * @param dysco
+	 * @param networkPriorities
+	 * @param size
+	 * @return
+	 */
+	Queue<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size);
 }

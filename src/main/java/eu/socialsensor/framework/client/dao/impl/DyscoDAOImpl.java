@@ -17,9 +17,18 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -282,196 +291,206 @@ public class DyscoDAOImpl implements DyscoDAO {
         return _relatedTopics;
     }
 
+   
     @Override
-    public List<MediaItem> findVideos(List<String> dyscoIds, List<String> urls, int size) {
-
-        List<MediaItem> _videos = new ArrayList<MediaItem>();
-        List<MediaItem> videosFromSearch = new ArrayList<MediaItem>();
-
-        if (urls!=null && urls.size()>0) {
-            _videos = mediaItemDAO.getMediaItemsForUrls(urls, "video", size);
-            for (MediaItem video : _videos) {
-                video.setSource(2);
-            }
-        }
-        Logger.getRootLogger().info("found videos from urls: " + _videos.size());
-        
-      //finding videos if the already fetched videos are less than MAX_VIDEOS
-        if (dyscoIds != null && _videos.size() < size) {
-        	int remaining = size - _videos.size();
-        	//videosFromSearch = mediaItemDAO.getMediaItemsByDyscos(dyscoIds, "video", remaining);
-            
-            Logger.getRootLogger().info("videos to search: " + remaining);
-            List<String> feedKeywords = dyscoRequestDAO.readKeywordsFromDyscos(dyscoIds);
-            if (feedKeywords != null) {
-                if (feedKeywords.size() > 0) {
-                	videosFromSearch = solrMediaItemHandler.findAllMediaItemsByKeywords(feedKeywords, "video", remaining);
-                }
-            }
-            Logger.getRootLogger().info("found videos from search: " + videosFromSearch.size());
-
-            for (MediaItem video : videosFromSearch) {
-                video.setSource(1);
-            }
-
-            _videos.addAll(videosFromSearch);
-        }
-
-        return _videos;
-    }
-    
-    @Override
-    public List<MediaItem> findVideos(String query, int size){
-    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    public Queue<MediaItem> findVideos(String query, int size){
     	
     	//Set to the query the type of media item we want to be retrieved from solr (image - video)
-    	query += ") AND type : video";
-    	
-    	SolrQuery solrQuery = new SolrQuery(query);
+    	query += " AND type : video";
     	Logger.getRootLogger().info("query: " + query);
-    	solrQuery.setRows(size);
     	
-    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
-    	if(response != null){
-    		List<MediaItem> results = response.getResults();
-    		Set<String> urls = new HashSet<String>();
-	        for(MediaItem mi : results) {
-	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
-	        		mediaItems.add(mi);
-	        		urls.add(mi.getUrl());
-	        	}
-	        }
-    	}
-    	return mediaItems;		
+    	return collectMediaItems(query,null,size);		
     	
     }
     
     @Override
-    public List<MediaItem> findImages(String query, int size){
-    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    public Queue<MediaItem> findVideos(Dysco dysco, int size) {
+    	
+    	
+    	String query = dysco.getSolrQueryString();
+    	query += " AND type : video";
+    	Logger.getRootLogger().info("query: " + query);
+    	
+    	return collectMediaItems(query,null,size);
+    }
+    
+    @Override
+    public Queue<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities, int size) {
+    	
+    	query += " AND type : video";
+    	Logger.getRootLogger().info("query: " + query);
+    	
+    	return collectMediaItems(query,networkPriorities,size);
+    }
+    
+    
+    @Override
+    public Queue<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
+
+    	String query = dysco.getSolrQueryString();
+    	query += " AND type : video";
+    	Logger.getRootLogger().info("query: " + query);
+    	
+    	return collectMediaItems(query,networkPriorities,size);
+    }
+    
+    @Override
+    public Queue<MediaItem> findImages(String query, int size){
+    	
     	
     	//Set to the query the type of media item we want to be retrieved from solr (image - video)
-    	query += ") AND type : image";
-    	
-    	SolrQuery solrQuery = new SolrQuery(query);
+    	query += " AND type : image";
     	Logger.getRootLogger().info("query: " + query);
-    	solrQuery.setRows(size);
     	
-    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
-    	if(response != null){
-    		List<MediaItem> results = response.getResults();
-    		Set<String> urls = new HashSet<String>();
-	        for(MediaItem mi : results) {
-	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
-	        		mediaItems.add(mi);
-	        		urls.add(mi.getUrl());
-	        	}
-	        }
+    	return collectMediaItems(query,null,size);		
+    	
+    }
+
+    @Override
+    public Queue<MediaItem> findImages(Dysco dysco, int size) {
+    	
+    	
+    	String query = dysco.getSolrQueryString();
+    	query += " AND type : image";
+    	Logger.getRootLogger().info("query: " + query);
+    	
+    	return collectMediaItems(query,null,size);
+    }
+    
+    @Override
+    public Queue<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size) {
+    	
+    	query += " AND type : image";
+    	Logger.getRootLogger().info("query: " + query);
+    	
+    	return collectMediaItems(query,networkPriorities,size);
+    }
+    
+    
+    @Override
+    public Queue<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
+
+    	String query = dysco.getSolrQueryString();
+    	query += " AND type : image";
+    	Logger.getRootLogger().info("query: " + query);
+    	
+    	return collectMediaItems(query,networkPriorities,size);
+    }
+    
+    /**
+     * Collect media items (images/videos) of a certain size based on a solr query.
+     * Prioritize them according to a hashmap of network priorities. If no hashmap
+     * is provided use default.
+     * @param query
+     * @param networkPriorities
+     * @param size
+     * @return
+     */
+    private Queue<MediaItem> collectMediaItems(String query, Map<String,Integer> networkPriorities, int size){
+    	
+    	Queue<MediaItem> mediaItems = new LinkedList<MediaItem>();
+    	
+    	Map<String,List<MediaItem>> collectedMediaItemsPerNetwork = new HashMap<String,List<MediaItem>>();
+    	Map<String, Integer> priorities = new HashMap<String,Integer>();
+    	Map<Integer,List<String>> sortedNetworksPriorities = new TreeMap<Integer,List<String>>(Collections.reverseOrder());
+    	
+    	Set<Integer> sortedPriorities = new TreeSet<Integer>(Collections.reverseOrder());
+    	
+    	//If not priorities of networks is set, set default
+    	if(networkPriorities == null){
+    		priorities.put("Youtube", 5);
+    		priorities.put("Twitter", 3);
+    		priorities.put("Facebook", 5);
+    		priorities.put("Flickr", 3);
+    		priorities.put("Instagram", 5);
+    		priorities.put("GooglePlus", 4);
+    		priorities.put("Tumblr", 4);
+    		priorities.put("Dailymotion", 3);
+    		priorities.put("Twitpic", 5);
+    		priorities.put("Vimeo", 5);
     	}
-    	return mediaItems;		
+    	else
+    		priorities = networkPriorities;
     	
-    }
-
-    @Override
-    // method to be called from outside (works only for trending dyscos)
-    public List<MediaItem> findImages(Dysco _dysco, int size) {
-
-        List<MediaItem> _images = new ArrayList<MediaItem>();
-        List<Dysco> relatedTopics = findRelatedTopics(_dysco);
-
-        List<String> _dyscoIdsOfGroup = new ArrayList<String>();
-
-        for (Dysco relatedTopic : relatedTopics) {
-            _dyscoIdsOfGroup.add(relatedTopic.getId());
-        }
-
-        //add "this" Dysco
-        _dyscoIdsOfGroup.add(_dysco.getId());
-
-        //TODO: the following is not very good practice - to set null
-        if (_dyscoIdsOfGroup != null) {
-
-            List<Item> totalItems = findTotalItems(_dyscoIdsOfGroup);
-            List<String> totalUrlsToSearch = findTotalUrls(totalItems);
-
-            _images = findImages(_dyscoIdsOfGroup, totalUrlsToSearch, size);
-
-        }
-        return _images;
-    }
-
-    @Override
-    public List<MediaItem> findImages(List<String> dyscoIds, List<String> urls, int size) {
-
-        //TODO: maybe it's worth changing order to make it more efficient
-        List<MediaItem> _images = new ArrayList<MediaItem>();
-        List<MediaItem> imagesFromSearch = new ArrayList<MediaItem>();
-        
-        if(dyscoIds != null && dyscoIds.size()>0) {
-        	Set<String> mediaLinks = new HashSet<String>();
-    		List<Item> items = findTotalItems(dyscoIds);
+    	//Sort priorities from highest to lowest
+    	Collection<Integer> values = priorities.values();
+    	for(Integer v : values)
+    		sortedPriorities.add(v);
     	
-    		if(items!=null && items.size()>0) {
-    			for(Item item : items) {
-    				List<MediaItem> temp = item.getMediaItems();
-    				if(temp!=null) {
-    					for(MediaItem mItem : temp) {
-    						mediaLinks.add(mItem.getUrl());
-    					}
-    				}
+    	for(Integer sp : sortedPriorities){
+    		for(String net : priorities.keySet()){
+    			if(priorities.get(net).equals(sp)){
+    				if(sortedNetworksPriorities.get(sp) == null){
+    	    			List<String> sources = new ArrayList<String>();
+    	    			sources.add(net);
+    	    			sortedNetworksPriorities.put(sp, sources);
+    	    		}else{
+    	    			List<String> sources = sortedNetworksPriorities.get(sp);
+    	    			sources.add(net);
+    	    			sortedNetworksPriorities.put(sp, sources);
+    	    		}
     			}
-
-    			List<MediaItem> mi = mediaItemDAO.getMediaItemsByUrls(new ArrayList<String>(mediaLinks) , "image", size);
-    			_images.addAll(mi);	
-    			for (MediaItem image : _images) {
-            		image.setSource(2);
-        		}
-    			Logger.getRootLogger().info("found embedded images: " + _images.size());
     		}
-        }
-        
-        if (urls!=null && urls.size()>0 && _images.size() < size) { 
-        	int remaining = size - _images.size();
-            _images.addAll(mediaItemDAO.getMediaItemsForUrls(urls, "image", remaining));
-            for (MediaItem image : _images) {
-                image.setSource(2);
-            }
-        }
-        Logger.getRootLogger().info("found images from URLs: " + _images.size());   
-        
-        
-      //finding images if the already fetched images are less than MAX_IMAGES
-        if (dyscoIds != null && _images.size() < size) {
-        	int remaining = size - _images.size();
-        	 Logger.getRootLogger().info("remaining Images to search: " + remaining);
-            List<String> feedKeywords = dyscoRequestDAO.readKeywordsFromDyscos(dyscoIds);
-            if (feedKeywords != null) {
-                if (feedKeywords.size() > 0) {
-                	imagesFromSearch = solrMediaItemHandler.findAllMediaItemsByKeywords(feedKeywords, "image", remaining);
-                }
-            }
-            
-            if(imagesFromSearch != null){
-            	Logger.getRootLogger().info("found images from search: " + imagesFromSearch.size());
-
-                for (MediaItem image : imagesFromSearch) {
-                	MediaItem temp = mediaItemDAO.getMediaItem(image.getId());
-                	if(temp != null ) {
-                		if(temp.getWidth()==null || temp.getWidth()>150) {
-                			image.setSource(1);
-                			_images.add(image);
-                		}
-                	}
-                }
-            }
-            
-            //_images.addAll(imagesFromSearch);
-        }
-        return _images;
+    		
+    	}
+    	
+    	System.out.println("--Sorted Network Priorities--");
+    	for(Integer sp : sortedNetworksPriorities.keySet()){
+    		System.out.println("");
+    		System.out.print("Priority "+sp+" : ");
+    		for(String net : sortedNetworksPriorities.get(sp)){
+    			System.out.print(net+" ");
+    		}
+    	}
+    	System.out.println("");
+    	//Retrieve multimedia content that is stored in solr
+ 
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	solrQuery.setRows(2 * size);
+    	
+    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
+    	if(response != null){
+    		List<MediaItem> results = response.getResults();
+    		Set<String> urls = new HashSet<String>();
+	        for(MediaItem mi : results) {
+	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+	        		if(collectedMediaItemsPerNetwork.get(mi.getStreamId()) == null){
+	        			List<MediaItem> networkMediaItems = new ArrayList<MediaItem>();
+	        			networkMediaItems.add(mi);
+	        			collectedMediaItemsPerNetwork.put(mi.getStreamId(), networkMediaItems);
+	        		}else{
+	        			List<MediaItem> networkMediaItems = collectedMediaItemsPerNetwork.get(mi.getStreamId());
+	        			networkMediaItems.add(mi);
+	        			collectedMediaItemsPerNetwork.put(mi.getStreamId(), networkMediaItems);
+	        		}
+	        		
+	        		urls.add(mi.getUrl());
+	        	}
+	        	
+	        	if(collectedMediaItemsPerNetwork.size() > size)
+	        		break;
+	        }
+    	}
+    	
+    	//Prioritize mediaItems
+    	for(Integer sp : sortedNetworksPriorities.keySet()){
+    		for(String net : sortedNetworksPriorities.get(sp)){
+    			for(MediaItem mi : collectedMediaItemsPerNetwork.get(net)){
+    				mediaItems.add(mi);
+    			}
+    		}
+    	}
+    	
+    	return mediaItems;
     }
+    
 
     public static void main(String[] args) {
         
-        
+    	DyscoDAO dyscoDao = new DyscoDAOImpl("social1.atc.gr","Dyscos","Items","MediaItems");
+    	final SolrDyscoHandler handler = SolrDyscoHandler.getInstance("http://social1.atc.gr:8080/solr/dyscos");
+		Dysco dysco = handler.findDyscoLight("c0a942f3-6374-47ba-a669-67e17cb24c89");
+    	Queue<MediaItem> mediaItems = dyscoDao.findImages(dysco, 10);
+       
     }
 }
