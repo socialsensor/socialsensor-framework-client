@@ -3,6 +3,7 @@ package eu.socialsensor.framework.client.search.solr;
 import com.google.gson.Gson;
 
 import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.domain.StreamUser.Category;
@@ -12,7 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +28,7 @@ public class SolrItem {
     }
 
     public SolrItem(Item item) {
-        
+
         id = item.getId();
         streamId = item.getStreamId();
         title = item.getTitle();
@@ -36,16 +36,17 @@ public class SolrItem {
         tags = item.getTags();
 
         StreamUser streamUser = item.getStreamUser();
-        if(streamUser != null)
-        	author = streamUser.getUsername();
-        
+        if (streamUser != null) {
+            author = streamUser.getUsername();
+        }
+
         links = new ArrayList<String>();
         if (item.getLinks() != null) {
             for (URL link : item.getLinks()) {
                 links.add(link.toString());
             }
         }
-        
+
         mediaLinks = new ArrayList<String>();
         if (item.getMediaItems() != null) {
             for (MediaItem mediaItem : item.getMediaItems()) {
@@ -55,7 +56,7 @@ public class SolrItem {
 
         //this is long
         publicationTime = item.getPublicationTime();
-        
+
         //List<String> peopleTemp = extractPeople(item.getTitle());
         //peopleTemp.add("@" + item.getAuthorScreenName());
         //people = peopleTemp;
@@ -69,7 +70,7 @@ public class SolrItem {
 
         positiveVotes = item.getPositiveVotes();
         negativeVotes = item.getNegativeVotes();
-        
+
         //this is a map
         mediaIds = new ArrayList<String>();
         if (item.getMediaItems() != null) {
@@ -104,13 +105,15 @@ public class SolrItem {
             }
 
             Long followers = user.getFollowers();
-            if(followers != null)
-            	followersCount = followers.intValue();
+            if (followers != null) {
+                followersCount = followers.intValue();
+            }
             Long friends = user.getFriends();
-            if(friends != null)
-            	friendsCount = friends.intValue();
-                
-           
+            if (friends != null) {
+                friendsCount = friends.intValue();
+            }
+
+
 
         }
 
@@ -119,8 +122,8 @@ public class SolrItem {
         //convert votes to JSONString and put it to SolrItem
         String itemVotes = new Gson().toJson(item.getVotes());
         validityVotes = itemVotes;
-        
-        retweetsCount = item.getShares();
+
+        retweetsCount = item.getShares().intValue();
 
     }
 
@@ -132,7 +135,7 @@ public class SolrItem {
         item.setVotes(ItemFactory.createVoteList(validityVotes));
         item.setPositiveVotes(positiveVotes);
         item.setNegativeVotes(negativeVotes);
-        
+
         item.setId(id);
         item.setStreamId(streamId);
         item.setTitle(title);
@@ -140,7 +143,7 @@ public class SolrItem {
         item.setTags(tags);
         item.setOriginal(original);
         //item.setPeople(people);
-        
+
         if (links != null) {
             URL[] _links = new URL[links.size()];
             for (int i = 0; i < links.size(); i++) {
@@ -153,7 +156,7 @@ public class SolrItem {
             for (String mediaLink : mediaLinks) {
                 String[] mediaLinksPair = mediaLink.split("%%");
                 if (mediaLinksPair.length == 2) {
-                   // TODO update item with media ids
+                    // TODO update item with media ids
                 }
             }
         }
@@ -161,7 +164,7 @@ public class SolrItem {
         item.setPublicationTime(publicationTime);
 
         item.setComments(comments);
-        item.setLocation(latitude, longitude, location);
+        item.setLocation(new Location(latitude, longitude, location));
 
         //this is a Map<URL, String>
         if (mediaIds != null) {
@@ -189,135 +192,100 @@ public class SolrItem {
         item.setAvatarImageSmall(avatarImageSmall);
         item.setAuthorScreenName(authorScreenName);
         item.setLang(language);
-        
-        if(category.equals("politician"))
-        	item.setCategory(Category.politician);
-        else if(category.equals("footballer"))
-        	item.setCategory(Category.footballer);
-        else if(category.equals("official"))
-        	item.setCategory(Category.official);
-        else if(category.equals("journalist"))
-        	item.setCategory(Category.journalist);
-        
+
+        if (category != null) {
+            if (category.equals("politician")) {
+                item.setCategory(Category.politician);
+            } else if (category.equals("footballer")) {
+                item.setCategory(Category.footballer);
+            } else if (category.equals("official")) {
+                item.setCategory(Category.official);
+            } else if (category.equals("journalist")) {
+                item.setCategory(Category.journalist);
+            }
+        }
+
         item.setAlethiometerUserStatus(alethiometerUserStatus);
-        item.setShares(retweetsCount);
+        item.setShares(new Long(retweetsCount));
 
         return item;
     }
-    
-    
     @Field(value = "id")
     private String id;
-    
     @Field(value = "streamId")
     private String streamId;
-    
     @Field(value = "source")
     private String source;
-    
     @Field(value = "title")
     private String title;
-    
     @Field(value = "description")
     private String description;
-    
     @Field(value = "tags")
     private String[] tags;
-    
     @Field(value = "categories")
     private String[] categories;
-    
     @Field(value = "author")
     private String author;
-
     //@Field(value = "people")
     //private List<String> people;
-    
     @Field(value = "links")
     private List<String> links;
-    
     @Field(value = "mediaLinks")
     private List<String> mediaLinks;
-    
     @Field(value = "publicationTime")
     private long publicationTime;
-    
     @Field(value = "comments")
     private String[] comments;
-    
     @Field(value = "latitude")
     private Double latitude;
-    
     @Field(value = "longitude")
     private Double longitude;
-    
     @Field(value = "location")
     private String location;
-
     @Field(value = "mediaIds")
     private List<String> mediaIds;
-    
     // new fields added:27.3.2013
     @Field(value = "sentiment")
     private String sentiment;
-    
     // the following fields are added for the UI purposes (after retrieval from Solr)
     // no need to be populated at crawling time
     @Field(value = "alethiometerScore")
     private int alethiometerScore = -1;
-    
     @Field(value = "alethiometerUserScore")
     private int alethiometerUserScore = -1;
-    
     @Field(value = "authorFullName")
     private String authorFullName;
-    
     @Field(value = "userRole")
     private String userRole;
-    
     @Field(value = "followersCount")
     private int followersCount = 0;
-    
     @Field(value = "friendsCount")
     private int friendsCount = 0;
-    
     @Field(value = "avatarImage")
     private String avatarImage;
-    
     @Field(value = "avatarImageSmall")
     private String avatarImageSmall;
-    
     @Field(value = "authorScreenName")
     private String authorScreenName;
-    
     @Field(value = "language")
     private String language;
-    
     @Field(value = "category")
     private String category;
-    
     @Field(value = "original")
     private boolean original;
-    
     @Field(value = "alethiometerUserStatus")
     private String alethiometerUserStatus;
-    
     @Field(value = "validityScore")
     private int validityScore;
-    
     @Field(value = "validityVotes")
     private String validityVotes;
-    
     @Field(value = "positiveVotes")
     private int positiveVotes;
-    
     @Field(value = "negativeVotes")
     private int negativeVotes;
-    
     @Field(value = "retweetsCount")
-    private Long retweetsCount = 0L;
-    
-    
+    private int retweetsCount = 0;
+
     public int getPositiveVotes() {
         return positiveVotes;
     }
@@ -333,7 +301,6 @@ public class SolrItem {
     public void setNegativeVotes(int negativeVotes) {
         this.negativeVotes = negativeVotes;
     }
-       
 
     public String getAlethiometerUserStatus() {
         return alethiometerUserStatus;
@@ -350,7 +317,7 @@ public class SolrItem {
     public void setOriginal(boolean original) {
         this.original = original;
     }
-    
+
     public String getCategory() {
         return category;
     }
@@ -482,11 +449,9 @@ public class SolrItem {
     //public List<String> getPeople() {
     //    return people;
     //}
-
     //public void setPeople(List<String> people) {
     //    this.people = people;
     //}
-
     public String[] getTags() {
         return tags;
     }

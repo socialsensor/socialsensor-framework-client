@@ -5,16 +5,22 @@ import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 
 import eu.socialsensor.framework.client.dao.ItemDAO;
+import eu.socialsensor.framework.client.dao.MediaItemDAO;
+import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -214,5 +220,35 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     public static void main(String... args) {
+    	ItemDAO dao = new ItemDAOImpl("160.40.50.207");
+    	MediaItemDAO mDao = new MediaItemDAOImpl("160.40.50.207");
+    	StreamUserDAO uDao = new StreamUserDAOImpl("160.40.50.207");
+    	
+    	long end = 1386856206000L;
+    	long start = end - 5*60000;//1386856100000L;
+    	
+    	
+    	List<Item> items = dao.getItemsInRange(start, end);
+    	System.out.println(items.size() + " in " + ((end-start)/60000.0) + " minutes");
+    	
+    	long t = System.currentTimeMillis();
+
+    	for(Item item : items) {
+    		String uid = item.getUserId();
+    		StreamUser streamUser = uDao.getStreamUser(uid);
+        	item.setStreamUser(streamUser);		
+    		
+    		List<MediaItem> mItems = new ArrayList<MediaItem>();
+    		
+    		List<String> mediaIds = item.getMediaIds();
+    		for(String mId : mediaIds) {
+    			MediaItem mItem = mDao.getMediaItem(mId);
+    			mItems.add(mItem);
+    		}
+    		item.setMediaItems(mItems);
+    	}
+    	t = System.currentTimeMillis() - t;
+    	
+    	System.out.println("Fetch users and MediaItems in " + t + " msecs");
     }
 }
