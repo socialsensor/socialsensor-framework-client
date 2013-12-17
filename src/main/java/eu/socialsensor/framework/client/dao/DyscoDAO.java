@@ -134,7 +134,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findVideos(Dysco dysco, int size);
+	List<MediaItem> findVideos(Dysco dysco, int size);
 	/**
 	 * Retrieve multimedia content that are videos based on a solr
 	 * query
@@ -142,7 +142,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findVideos(String query, int size);
+	List<MediaItem> findVideos(String query, int size);
 	/**
 	 * Retrieve multimedia content that corresponds to videos 
 	 * prioritized by network based on a solr query 
@@ -151,7 +151,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities,int size);
+	List<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities,int size);
 	/**
 	 * Retrieve multimedia content that corresponds to videos 
 	 * prioritized by network based on dysco's information
@@ -160,7 +160,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities,int size);
+	List<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities,int size);
 	/**
 	 * Retrieve multimedia content tha is images based on dysco's
 	 * information
@@ -168,7 +168,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findImages(Dysco dysco, int size);
+	List<MediaItem> findImages(Dysco dysco, int size);
 	/**
 	 * Retrieve multimedia content that is images based on a solr 
 	 * query
@@ -176,7 +176,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findImages(String query, int size);
+	List<MediaItem> findImages(String query, int size);
 	/**
 	 * Retrieve multimedia content that corresponds to images 
 	 * prioritized by network based on a solr query 
@@ -185,7 +185,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size);
+	List<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size);
 	/**
 	 * Retrieve multimedia content that corresponds to images 
 	 * prioritized by network based on dysco's information
@@ -194,5 +194,5 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	Queue<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size);
+	List<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size);
 }

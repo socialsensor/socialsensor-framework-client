@@ -293,88 +293,101 @@ public class DyscoDAOImpl implements DyscoDAO {
 
    
     @Override
-    public Queue<MediaItem> findVideos(String query, int size){
+    public List<MediaItem> findVideos(String query, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	//Set to the query the type of media item we want to be retrieved from solr (image - video)
     	query += " AND type : video";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,null,size);		
+    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	return mediaItems;	
     	
     }
     
     @Override
-    public Queue<MediaItem> findVideos(Dysco dysco, int size) {
-    	
+    public List<MediaItem> findVideos(Dysco dysco, int size) {
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
     	query += " AND type : video";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,null,size);
+    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	return mediaItems;
     }
     
     @Override
-    public Queue<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities, int size) {
+    public List<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities, int size) {
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	query += " AND type : video";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,networkPriorities,size);
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	return mediaItems;
     }
     
     
     @Override
-    public Queue<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
-
+    public List<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
     	String query = dysco.getSolrQueryString();
     	query += " AND type : video";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,networkPriorities,size);
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	return mediaItems;
     }
     
     @Override
-    public Queue<MediaItem> findImages(String query, int size){
-    	
+    public List<MediaItem> findImages(String query, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	//Set to the query the type of media item we want to be retrieved from solr (image - video)
     	query += " AND type : image";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,null,size);		
+    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	return mediaItems;	
     	
     }
 
     @Override
-    public Queue<MediaItem> findImages(Dysco dysco, int size) {
-    	
+    public List<MediaItem> findImages(Dysco dysco, int size) {
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
     	query += " AND type : image";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,null,size);
+    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	return mediaItems;
     }
     
     @Override
-    public Queue<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size) {
+    public List<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size) {
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	query += " AND type : image";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,networkPriorities,size);
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	return mediaItems;
     }
     
     
     @Override
-    public Queue<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
-
+    public List<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
     	String query = dysco.getSolrQueryString();
     	query += " AND type : image";
     	Logger.getRootLogger().info("query: " + query);
     	
-    	return collectMediaItems(query,networkPriorities,size);
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	return mediaItems;
     }
     
     /**
@@ -487,10 +500,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
         
-    	DyscoDAO dyscoDao = new DyscoDAOImpl("social1.atc.gr","Dyscos","Items","MediaItems");
-    	final SolrDyscoHandler handler = SolrDyscoHandler.getInstance("http://social1.atc.gr:8080/solr/dyscos");
-		Dysco dysco = handler.findDyscoLight("c0a942f3-6374-47ba-a669-67e17cb24c89");
-    	Queue<MediaItem> mediaItems = dyscoDao.findImages(dysco, 10);
+    
        
     }
 }
