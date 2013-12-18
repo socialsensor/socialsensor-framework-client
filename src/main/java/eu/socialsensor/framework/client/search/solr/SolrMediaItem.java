@@ -30,6 +30,8 @@ public class SolrMediaItem {
         url = mediaItem.getUrl();
         thumbnail = mediaItem.getThumbnail();
         publicationTime = mediaItem.getPublicationTime();
+        
+        //popularity needs to be added here
 
         latitude = mediaItem.getLatitude();
         longitude = mediaItem.getLongitude();
@@ -53,6 +55,9 @@ public class SolrMediaItem {
         //author needs to be added here
 
         mediaItem.setPublicationTime(publicationTime);
+        
+        //popularity needs to be added here
+        
         mediaItem.setLocation(new Location(latitude, longitude, location));
         mediaItem.setType(type);
 
@@ -83,6 +88,9 @@ public class SolrMediaItem {
     
     @Field(value = "publicationTime")
     private long publicationTime;
+    
+    @Field(value = "popularity")
+    private long popularity;
    
     @Field(value = "latitude")
     private Double latitude;
@@ -164,6 +172,14 @@ public class SolrMediaItem {
 
     public void setPublicationTime(Long publicationTime) {
         this.publicationTime = publicationTime;
+    }
+    
+    public Long getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(Long popularity) {
+        this.popularity = popularity;
     }
 
     public Double getLatitude() {
