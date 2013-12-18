@@ -4,11 +4,6 @@ import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -29,6 +24,9 @@ public class SolrMediaItem {
         description = mediaItem.getDescription();
         tags = mediaItem.getTags();
         
+        //author needs to be added here
+        mentions = mediaItem.getMentions();
+        
         url = mediaItem.getUrl();
         thumbnail = mediaItem.getThumbnail();
         publicationTime = mediaItem.getPublicationTime();
@@ -36,22 +34,6 @@ public class SolrMediaItem {
         latitude = mediaItem.getLatitude();
         longitude = mediaItem.getLongitude();
         location = mediaItem.getLocationName();
-
-        
-        List<String> feedKeywords = mediaItem.getFeedKeywords();
-        if(feedKeywords != null) {
-        	this.feedKeywords = new ArrayList<String>(feedKeywords);
-        		
-        }
-        
-        List<String> feedKeywordsString = mediaItem.getFeedKeywordsString();
-        if(feedKeywordsString != null) {
-        	this.feedKeywordsString = new ArrayList<String>(feedKeywordsString);
-        		
-        }
-        
-        
-        mentions = mediaItem.getMentions();
        
         type = mediaItem.getType();
     }
@@ -67,10 +49,10 @@ public class SolrMediaItem {
         mediaItem.setTitle(title);
         mediaItem.setDescription(description);
         mediaItem.setTags(tags);
+        
+        //author needs to be added here
 
         mediaItem.setPublicationTime(publicationTime);
-        mediaItem.setFeedKeywords(feedKeywords);
-        mediaItem.setFeedKeywordsString(feedKeywordsString);
         mediaItem.setLocation(new Location(latitude, longitude, location));
         mediaItem.setType(type);
 
@@ -99,15 +81,9 @@ public class SolrMediaItem {
     @Field(value = "tags")
     private String[] tags;
     
-    @Field(value = "popularity")
-    private List<String> popularity;
-    
     @Field(value = "publicationTime")
     private long publicationTime;
-    
-    @Field(value = "operation")
-    private String operation;
-    
+   
     @Field(value = "latitude")
     private Double latitude;
     
@@ -116,15 +92,12 @@ public class SolrMediaItem {
     
     @Field(value = "location")
     private String location;
+    
+    @Field(value = "author")
+    private String author;
 
     @Field(value = "mentions")
     private String[] mentions;
-   
-    @Field(value = "feedKeywords")
-    private List<String> feedKeywords = new ArrayList<String>();
-    
-    @Field(value = "feedKeywordsString")
-    private List<String> feedKeywordsString = new ArrayList<String>();
     
     @Field(value = "type")
     private String type;
@@ -185,28 +158,12 @@ public class SolrMediaItem {
         this.tags = tags;
     }
 
-    public List<String> getPopularity() {
-        return popularity;
-    }
-
-    public void setPopularity(List<String> popularity) {
-        this.popularity = popularity;
-    }
-
     public Long getPublicationTime() {
         return publicationTime;
     }
 
     public void setPublicationTime(Long publicationTime) {
         this.publicationTime = publicationTime;
-    }
-
-    public String getOperation() {
-        return operation;
-    }
-
-    public void setOperation(String operation) {
-        this.operation = operation;
     }
 
     public Double getLatitude() {
@@ -232,23 +189,23 @@ public class SolrMediaItem {
     public void setLocation(String location) {
         this.location = location;
     }
-
-    public List<String> getFeedKeywords() {
-    	return feedKeywords;
+    
+    public String getAuthor() {
+        return author;
     }
 
-    public void setFeedKeywords(List<String> feedKeywords) {
-    	this.feedKeywords = feedKeywords;
+    public void setAuthor(String author) {
+        this.author = author;
     }
     
-    public List<String> getFeedKeywordsString() {
-    	return feedKeywordsString;
+    public String[] getMentions() {
+        return mentions;
     }
 
-    public void setFeedKeywordsString(List<String> feedKeywordsString) {
-    	this.feedKeywordsString = feedKeywordsString;
+    public void setMentions(String[] mentions) {
+        this.mentions = mentions;
     }
-    
+
     public String getType() {
         return type;
     }
