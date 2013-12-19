@@ -98,7 +98,7 @@ public class SolrItem {
         if (user != null) {
             authorFullName = user.getName();
             authorScreenName = user.getUsername();
-            avatarImage = user.getProfileImage();
+            avatarImage = user.getImageUrl();
             avatarImageSmall = user.getProfileImage();
             if (user.getCategory() != null) {
                 category = user.getCategory().name();
