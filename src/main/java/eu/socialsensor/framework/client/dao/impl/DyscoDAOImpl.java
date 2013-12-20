@@ -461,7 +461,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	SolrQuery solrQuery = new SolrQuery(query);
     	solrQuery.setRows(2 * size);
     	
-    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
+    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItemsWithSocialSearch(solrQuery);
     	if(response != null){
     		List<MediaItem> results = response.getResults();
     		Set<String> urls = new HashSet<String>();
@@ -500,7 +500,5 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
         
-    
-       
     }
 }

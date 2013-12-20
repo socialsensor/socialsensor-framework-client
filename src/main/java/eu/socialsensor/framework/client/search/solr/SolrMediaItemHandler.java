@@ -163,7 +163,12 @@ public class SolrMediaItemHandler {
     public SearchEngineResponse<MediaItem> findItems(SolrQuery query) {
         return search(query);
     }
-
+    
+    public SearchEngineResponse<MediaItem> findItemsWithSocialSearch(SolrQuery query) {
+    	query.setRequestHandler("/socialsearch");
+        return search(query);
+    }
+    
     public List<MediaItem> findAllMediaItemsByKeywords(List<String> keywords, String type, int size) {
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>(size);
@@ -403,7 +408,7 @@ public class SolrMediaItemHandler {
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
         QueryResponse rsp;
-
+       
         try {
             rsp = server.query(query);
         } catch (SolrServerException e) {
