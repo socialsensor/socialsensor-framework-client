@@ -21,6 +21,9 @@ public class SolrWebPage {
 	@Field(value = "title")
 	private String title;
 	
+	@Field(value = "text")
+	private String text;
+	
 	@Field(value = "date")
 	private Date date;
 
@@ -40,6 +43,7 @@ public class SolrWebPage {
 
         url = webPage.getUrl();
         title = webPage.getTitle();
+        text = webPage.getText();
         date = webPage.getDate();
         reference = webPage.getReference();
         streamId = webPage.getStreamId();

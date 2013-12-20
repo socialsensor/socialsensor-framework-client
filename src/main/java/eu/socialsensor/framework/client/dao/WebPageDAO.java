@@ -1,7 +1,9 @@
 package eu.socialsensor.framework.client.dao;
 
+import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.common.domain.JSONable;
 import eu.socialsensor.framework.common.domain.WebPage;
+
 import java.util.List;
 
 /**
@@ -23,6 +25,8 @@ public interface WebPageDAO {
     public boolean exists(String webPageURL);
     
     public List<WebPage> getLastWebPages(int size);
+    
+    public List<WebPage> getWebPages(Selector selector, int size);
 
     public void clearAll();
 

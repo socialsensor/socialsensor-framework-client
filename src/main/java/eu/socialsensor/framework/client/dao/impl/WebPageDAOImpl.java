@@ -134,4 +134,16 @@ public class WebPageDAOImpl implements WebPageDAO {
 		return mongoHandler.exists("url", webPageURL);
 	}
 
+	@Override
+	public List<WebPage> getWebPages(Selector query, int size) {
+		List<String> jsonWebPages = mongoHandler.findMany(query, size);
+		
+		List<WebPage> results = new ArrayList<WebPage>();
+        for (String json : jsonWebPages) {
+            results.add(WebPageFactory.create(json));
+        }
+        
+        return results;
+	}
+
 }

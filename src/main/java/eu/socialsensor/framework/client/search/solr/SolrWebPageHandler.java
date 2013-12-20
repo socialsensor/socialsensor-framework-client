@@ -1,6 +1,9 @@
 package eu.socialsensor.framework.client.search.solr;
 
 
+import eu.socialsensor.framework.client.dao.WebPageDAO;
+import eu.socialsensor.framework.client.dao.impl.WebPageDAOImpl;
+import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.WebPage;
@@ -367,4 +370,21 @@ public class SolrWebPageHandler {
          
         return response;
     }
+    
+    public static void main(String...args) {
+    	
+    	SolrWebPageHandler solr = SolrWebPageHandler.getInstance("http://160.40.50.207:8080/solr/WebPages");
+    	
+    	WebPageDAO dao = new WebPageDAOImpl("160.40.50.207");
+    	
+    	Selector query = new Selector();
+    	query.select("status", "proccessed");
+    	
+		List<WebPage> webPages = dao.getWebPages(query , -1);
+    	
+    	for(WebPage webPage : webPages) {
+    		 solr.insertWebPage(webPage);
+    	}
+    }
+    
 }
