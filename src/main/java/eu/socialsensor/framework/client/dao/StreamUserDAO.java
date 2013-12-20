@@ -21,7 +21,7 @@ public interface StreamUserDAO {
 
     public void updateStreamUserPopularity(StreamUser user);
 
-    public void updateStreamUserMentions(String id);
+    public void incStreamUserValue(String id, String field);
     
     public boolean deleteStreamUser(String id);
 

@@ -91,9 +91,9 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     }
 
 	@Override
-	public void updateStreamUserMentions(String userid) {
+	public void incStreamUserValue(String userid, String field) {
     		UpdateItem changes = new UpdateItem();
-    		changes.incField("mentions", 1);
+    		changes.incField(field, 1);
     		mongoHandler.update("id", userid, changes);
 	}
 
