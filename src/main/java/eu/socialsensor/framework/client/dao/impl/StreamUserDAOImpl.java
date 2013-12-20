@@ -94,7 +94,6 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 	public void updateStreamUserMentions(String userid) {
     		UpdateItem changes = new UpdateItem();
     		changes.incField("mentions", 1);
-    		changes.incField("shares", 1);
     		mongoHandler.update("id", userid, changes);
 	}
 
