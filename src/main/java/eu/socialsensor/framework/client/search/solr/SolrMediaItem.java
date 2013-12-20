@@ -24,14 +24,15 @@ public class SolrMediaItem {
         description = mediaItem.getDescription();
         tags = mediaItem.getTags();
         
-        //author needs to be added here
+        if(mediaItem.getUser() != null)
+        	author = mediaItem.getUser().getName();
         mentions = mediaItem.getMentions();
         
         url = mediaItem.getUrl();
         thumbnail = mediaItem.getThumbnail();
         publicationTime = mediaItem.getPublicationTime();
         
-        //popularity needs to be added here
+        popularity = mediaItem.getLikes() + mediaItem.getShares() + mediaItem.getComments() + mediaItem.getViews();
 
         latitude = mediaItem.getLatitude();
         longitude = mediaItem.getLongitude();
