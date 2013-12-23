@@ -1,7 +1,6 @@
 package eu.socialsensor.framework.client.search.solr;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,7 +21,6 @@ import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.Item;
 
 /**
@@ -32,36 +30,11 @@ import eu.socialsensor.framework.common.domain.Item;
 public class SolrItemHandler {
 
     private Logger logger = Logger.getLogger(SolrItemHandler.class);
-    /*
-     CommonsHttpSolrServer is thread-safe and if you are using the following constructor,
-     you *MUST* re-use the same instance for all requests.  If instances are created on
-     the fly, it can cause a connection leak. The recommended practice is to keep a
-     static instance of CommonsHttpSolrServer per solr server url and share it for all requests.
-     See https://issues.apache.org/jira/browse/SOLR-861 for more details
-     */
+    
     SolrServer server;
     private static Map<String, SolrItemHandler> INSTANCES = new HashMap<String, SolrItemHandler>();
     private static int commitPeriod = 1000;
 
-    // Private constructor prevents instantiation from other classes
-//    private SolrItemHandler() {
-//        try {
-////            ConfigReader configReader = new ConfigReader();
-////            String url = configReader.getSolrHTTP();  
-//              Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/items");
-//        	server = new HttpSolrServer( ConfigReader.getSolrHome() + "/items");
-////            server = new HttpSolrServer("server/solr/DyscoMediaItems");
-//            /*
-//        	DefaultHttpClient httpclient = new DefaultHttpClient();
-//        	HttpHost proxy = new HttpHost(proxyName, port, "http");
-//        	httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-//        	Credentials creds = new UsernamePasswordCredentials(username, password);
-//        	httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
-//        	server = new HttpSolrServer("http://social1.atc.gr:8080/solr/items", httpclient);*/
-//        } catch (Exception e) {
-//            Logger.getRootLogger().info(e.getMessage());
-//        }
-//    }
     private SolrItemHandler(String collection) {
         try {
 //            ConfigReader configReader = new ConfigReader();
@@ -76,13 +49,6 @@ public class SolrItemHandler {
         }
     }
 
-//    //implementing Singleton pattern
-//    public static SolrItemHandler getInstance() {
-//        if (INSTANCE == null) {
-//            INSTANCE = new SolrItemHandler();
-//        }
-//        return INSTANCE;
-//    }
     //implementing Singleton pattern
     public static SolrItemHandler getInstance(String collection) {
         SolrItemHandler INSTANCE = INSTANCES.get(collection);
@@ -340,11 +306,11 @@ public class SolrItemHandler {
 
         List<Item> items = new ArrayList<Item>();
         for (SolrItem solrItem : solrItems) {
-            try {
-                items.add(solrItem.toItem());
-            } catch (MalformedURLException ex) {
-                logger.error(ex.getMessage());
-            }
+//            try {
+//                items.add(solrItem.toItem());
+//            } catch (MalformedURLException ex) {
+//                logger.error(ex.getMessage());
+//            }
         }
 
         response.setResults(items);

@@ -18,7 +18,7 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 public class MediaItemDAOImpl implements MediaItemDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private static String host = "";
+
     private static String db = "Streams";
     private static String collection = "MediaItems";
     private MongoHandler mongoHandler;
@@ -105,12 +105,6 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     	boolean update = false;
     	UpdateItem changes = new UpdateItem();
 
-        List<String> feedKeywords = item.getFeedKeywords();
-        if (feedKeywords != null && feedKeywords.size() > 0) {
-            changes.addValues("feedKeywords", feedKeywords.toArray());
-            update = true;
-        }
-        
         if(update) {
         	mongoHandler.update("id", item.getId(), changes);
         }
