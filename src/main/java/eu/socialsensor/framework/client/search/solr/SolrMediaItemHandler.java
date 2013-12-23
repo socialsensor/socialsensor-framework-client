@@ -165,7 +165,7 @@ public class SolrMediaItemHandler {
     }
     
     public SearchEngineResponse<MediaItem> findItemsWithSocialSearch(SolrQuery query) {
-    	query.setRequestHandler("/socialsearch");
+    //	query.setRequestHandler("/socialsearch");
         return search(query);
     }
     
