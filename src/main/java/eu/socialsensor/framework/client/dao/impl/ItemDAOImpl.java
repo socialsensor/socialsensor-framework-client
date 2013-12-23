@@ -48,6 +48,7 @@ public class ItemDAOImpl implements ItemDAO {
         indexes.add("id");
         indexes.add("publicationTime");
         indexes.add("indexed");
+        indexes.add("original");
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
@@ -197,6 +198,9 @@ public class ItemDAOImpl implements ItemDAO {
     public List<Item> getUnindexedItems(int max) {
         Selector query = new Selector();
         query.select("indexed", Boolean.FALSE);
+        query.select("original", Boolean.TRUE);
+
+
         List<String> jsonItems = mongoHandler.findManyNoSorting(query, max);
         List<Item> items = new ArrayList<Item>();
         Gson gson = new GsonBuilder()
@@ -249,20 +253,26 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     public static void main(String... args) {
-        
+
         ItemDAO dao = new ItemDAOImpl("social1.atc.gr", "Streams", "Items");
-        
-       List<Item> items =  dao.getUnindexedItems(10);
-       
-       for (Item item: items) {
-           
-           System.out.println(item.getId());
-           dao.setIndexedStatusTrue(item.getId());
-       }
-        
+
+        List<Item> items = dao.getUnindexedItems(10);
+
+        for (Item item : items) {
+
+            if (item.isOriginal() == true) {
+                System.out.println("fine");
+            }
+            if (item.isOriginal() == false) {
+                System.out.println("problem!! it's false");
+            }
+//            System.out.println(item.getId());
+//            dao.setIndexedStatusTrue(item.getId());
+        }
+
         System.out.println("finished");
-        
-        
+
+
 //        ItemDAO dao = new ItemDAOImpl("160.40.50.207");
 //        MediaItemDAO mDao = new MediaItemDAOImpl("160.40.50.207");
 //        StreamUserDAO uDao = new StreamUserDAOImpl("160.40.50.207");
