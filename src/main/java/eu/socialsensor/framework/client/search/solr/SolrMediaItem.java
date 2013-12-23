@@ -32,8 +32,15 @@ public class SolrMediaItem {
         thumbnail = mediaItem.getThumbnail();
         publicationTime = mediaItem.getPublicationTime();
         
-        popularity = mediaItem.getLikes() + mediaItem.getShares() + mediaItem.getComments() + mediaItem.getViews();
-
+        if(mediaItem.getLikes() != null)
+        	popularity += mediaItem.getLikes();
+        if(mediaItem.getShares() != null)
+        	popularity +=mediaItem.getShares();
+        if(mediaItem.getComments() != null)
+        	popularity +=mediaItem.getComments();
+        if(mediaItem.getViews() != null)
+        	popularity +=mediaItem.getViews();
+        
         latitude = mediaItem.getLatitude();
         longitude = mediaItem.getLongitude();
         location = mediaItem.getLocationName();
