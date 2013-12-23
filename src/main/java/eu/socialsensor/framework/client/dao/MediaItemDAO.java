@@ -41,18 +41,18 @@ public interface MediaItemDAO {
     public boolean exists(MediaItem item);
 
     public boolean exists(String id);
-    
+
     public void updateMediaItemDyscoId(String url, String dyscoId);
 
     public List<MediaItem> getMediaItemsByDysco(String dyscoId, String mediaType, int size);
-    
+
     public List<MediaItem> getMediaItemsByUrls(List<String> url, String mediaType, int size);
 
     public List<MediaItem> getMediaItemsByDyscos(List<String> dyscoIds, String mediaType, int size);
 
     public List<MediaItem> getMediaItemsForItems(List<String> itemIds, String mediaType, int size);
 
-    public List<MediaItem> getMediaItemsForUrls(List<String> urls, String mediaType, int size) ;
-    
+    public List<MediaItem> getMediaItemsForUrls(List<String> urls, String mediaType, int size);
+
+    List<MediaItem> getUnindexedItems(int max);
 }
-    

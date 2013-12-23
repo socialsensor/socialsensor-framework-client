@@ -1,5 +1,7 @@
 package eu.socialsensor.framework.client.dao.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import eu.socialsensor.framework.client.dao.MediaItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
+import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
@@ -22,7 +25,6 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     private static String db = "Streams";
     private static String collection = "MediaItems";
     private MongoHandler mongoHandler;
-
 
     public MediaItemDAOImpl(String host) {
         this(host, db, collection);
@@ -91,8 +93,6 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     }
 
     public static void main(String[] args) {
-
-        
     }
 
     @Override
@@ -102,19 +102,19 @@ public class MediaItemDAOImpl implements MediaItemDAO {
 
     @Override
     public void updateMediaItemPopularity(MediaItem item) {
-    	boolean update = false;
-    	UpdateItem changes = new UpdateItem();
+        boolean update = false;
+        UpdateItem changes = new UpdateItem();
 
         List<String> feedKeywords = item.getFeedKeywords();
         if (feedKeywords != null && feedKeywords.size() > 0) {
             changes.addValues("feedKeywords", feedKeywords.toArray());
             update = true;
         }
-        
-        if(update) {
-        	mongoHandler.update("id", item.getId(), changes);
+
+        if (update) {
+            mongoHandler.update("id", item.getId(), changes);
         }
-        
+
     }
 
     @Override
@@ -135,7 +135,7 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     public boolean exists(String id) {
         return mongoHandler.exists("id", id);
     }
-    
+
     @Override
     public List<MediaItem> getLastMediaItemsWithGeo(int size) {
         Selector query = new Selector();
@@ -214,15 +214,15 @@ public class MediaItemDAOImpl implements MediaItemDAO {
 
         return mediaItems;
     }
-    
+
     @Override
-    public List<MediaItem> getMediaItemsForItems (List<String> itemIds, String mediaType, int size) {
+    public List<MediaItem> getMediaItemsForItems(List<String> itemIds, String mediaType, int size) {
 
         String fieldName = "type";
         String fieldValue = mediaType;
         String orField = "reference";
-        List<String> values = itemIds;        
-        
+        List<String> values = itemIds;
+
         List<String> results = mongoHandler.findManyWithOr(fieldName, fieldValue, orField, values, size);
         List<MediaItem> mediaItems = new ArrayList<MediaItem>(results.size());
         for (String json : results) {
@@ -231,51 +231,69 @@ public class MediaItemDAOImpl implements MediaItemDAO {
 
         return mediaItems;
     }
-    
+
     @Override
     public List<MediaItem> getMediaItemsForUrls(List<String> urls, String mediaType, int size) {
 
         String fieldName = "type";
         String fieldValue = mediaType;
         String orField = "refUrl";
-        List<String> values = urls;        
-        
+        List<String> values = urls;
+
         List<String> results = mongoHandler.findManyWithOr(fieldName, fieldValue, orField, values, size);
         List<MediaItem> mediaItems = new ArrayList<MediaItem>(results.size());
         Set<String> uniqueUrls = new HashSet<String>();
         for (String json : results) {
-        	MediaItem mediaItem = ItemFactory.createMediaItem(json);
-        	if(!uniqueUrls.contains(mediaItem.getUrl())) {
-        		uniqueUrls.add(mediaItem.getUrl());
-        		mediaItems.add(mediaItem);
-        	}
+            MediaItem mediaItem = ItemFactory.createMediaItem(json);
+            if (!uniqueUrls.contains(mediaItem.getUrl())) {
+                uniqueUrls.add(mediaItem.getUrl());
+                mediaItems.add(mediaItem);
+            }
         }
 
         return mediaItems;
     }
 
-	@Override
-	public List<MediaItem> getMediaItemsByUrls(List<String> urls,
-			String mediaType, int size) {
-		
-		String fieldName = "type";
+    @Override
+    public List<MediaItem> getMediaItemsByUrls(List<String> urls,
+            String mediaType, int size) {
+
+        String fieldName = "type";
         String fieldValue = mediaType;
         String orField = "url";
-        List<String> values = urls;        
-        
+        List<String> values = urls;
+
         List<String> results = mongoHandler.findManyWithOr(fieldName, fieldValue, orField, values, size);
         List<MediaItem> mediaItems = new ArrayList<MediaItem>(results.size());
         Set<String> uniqueUrls = new HashSet<String>();
         for (String json : results) {
-        	MediaItem mediaItem = ItemFactory.createMediaItem(json);
-        	if(!uniqueUrls.contains(mediaItem.getUrl())) {
-        		uniqueUrls.add(mediaItem.getUrl());
-        		mediaItems.add(mediaItem);
-        	}
+            MediaItem mediaItem = ItemFactory.createMediaItem(json);
+            if (!uniqueUrls.contains(mediaItem.getUrl())) {
+                uniqueUrls.add(mediaItem.getUrl());
+                mediaItems.add(mediaItem);
+            }
         }
 
         return mediaItems;
-	}
-    
-    
+    }
+
+    @Override
+    public List<MediaItem> getUnindexedItems(int max) {
+        Selector query = new Selector();
+        query.select("indexed", Boolean.FALSE);
+        
+        List<String> jsonMediaItems = mongoHandler.findManyNoSorting(query, max);
+        List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
+        for (String json : jsonMediaItems) {
+            MediaItem mediaItem = gson.fromJson(json, MediaItem.class);
+
+            mediaItems.add(mediaItem);
+        }
+
+        return mediaItems;
+    }
 }
