@@ -41,9 +41,8 @@ public class SolrItemHandler {
      */
     SolrServer server;
     private static Map<String, SolrItemHandler> INSTANCES = new HashMap<String, SolrItemHandler>();
-
     private static int commitPeriod = 1000;
-    
+
     // Private constructor prevents instantiation from other classes
 //    private SolrItemHandler() {
 //        try {
@@ -63,7 +62,6 @@ public class SolrItemHandler {
 //            Logger.getRootLogger().info(e.getMessage());
 //        }
 //    }
-
     private SolrItemHandler(String collection) {
         try {
 //            ConfigReader configReader = new ConfigReader();
@@ -71,7 +69,7 @@ public class SolrItemHandler {
             server = new HttpSolrServer(collection);
 
             //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
-        	//server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
+            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
@@ -85,10 +83,9 @@ public class SolrItemHandler {
 //        }
 //        return INSTANCE;
 //    }
-
     //implementing Singleton pattern
     public static SolrItemHandler getInstance(String collection) {
-    	SolrItemHandler INSTANCE = INSTANCES.get(collection);
+        SolrItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrItemHandler(collection);
             INSTANCES.put(collection, INSTANCE);
@@ -150,6 +147,18 @@ public class SolrItemHandler {
 
     }
 
+    public void forceCommitPending() {
+
+        try {
+
+            server.commit();
+        } catch (SolrServerException ex) {
+            logger.error(ex.getMessage());
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
+    }
+
     public SearchEngineResponse<Item> addFilterAndSearchItems(Query query, String fq) {
 
         SolrQuery solrQuery = new SolrQuery(query.getQueryString());
@@ -201,7 +210,7 @@ public class SolrItemHandler {
     }
 
     public SearchEngineResponse<Item> findItems(SolrQuery query) {
-        
+
         return search(query);
     }
 
@@ -261,7 +270,7 @@ public class SolrItemHandler {
         solrQuery.setRows(1000);
         return search(solrQuery);
     }
-    
+
     public SearchEngineResponse<Item> findNDyscoItems(String dyscoId, int size, boolean original) {
         SolrQuery solrQuery;
         if (original) {
@@ -320,7 +329,7 @@ public class SolrItemHandler {
             logger.info(e.getMessage());
             return null;
         }
-        
+
         response.setNumFound(rsp.getResults().getNumFound());
 
         List<SolrItem> solrItems = rsp.getBeans(SolrItem.class);
@@ -396,5 +405,4 @@ public class SolrItemHandler {
         response.setFacets(facets);
         return response;
     }
-
 }
