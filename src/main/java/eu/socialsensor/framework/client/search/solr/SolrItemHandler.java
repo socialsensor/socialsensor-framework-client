@@ -325,7 +325,7 @@ public class SolrItemHandler {
 
         List<SolrItem> solrItems = rsp.getBeans(SolrItem.class);
         if (solrItems != null) {
-            Logger.getRootLogger().info("got: " + solrItems.size() + " items from Solr");
+            Logger.getRootLogger().info("got: " + solrItems.size() + " items from Solr - total results: " + response.getNumFound());
         }
 
 
