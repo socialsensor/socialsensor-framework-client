@@ -47,6 +47,7 @@ public class ItemDAOImpl implements ItemDAO {
 
         indexes.add("id");
         indexes.add("publicationTime");
+        indexes.add("indexed");
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
@@ -72,8 +73,17 @@ public class ItemDAOImpl implements ItemDAO {
         changes.setField("lastUpdated", new Date());
         changes.setField("likes", item.getLikes());
         changes.setField("shares", item.getShares());
-        
+
         mongoHandler.update("id", item.getId(), changes);
+    }
+
+    @Override
+    public void setIndexedStatusTrue(String itemId) {
+        UpdateItem changes = new UpdateItem();
+        changes.setField("indexed", Boolean.TRUE);
+
+
+        mongoHandler.update("id", itemId, changes);
     }
 
     @Override
@@ -131,7 +141,7 @@ public class ItemDAOImpl implements ItemDAO {
 
     @Override
     public List<Item> getItemsInRange(long start, long end) {
-        
+
         Selector query = new Selector();
         query.selectGreaterThan("publicationTime", start);
         query.selectLessThan("publicationTime", end);
@@ -184,6 +194,25 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
+    public List<Item> getUnindexedItems(int max) {
+        Selector query = new Selector();
+        query.select("indexed", Boolean.FALSE);
+        List<String> jsonItems = mongoHandler.findManyNoSorting(query, max);
+        List<Item> items = new ArrayList<Item>();
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
+        for (String json : jsonItems) {
+            Item item = gson.fromJson(json, Item.class);
+
+            items.add(item);
+        }
+
+        return items;
+    }
+
+    @Override
     public List<Item> readItems() {
         List<String> jsonItems = mongoHandler.findMany(-1);
         System.out.println("I have read " + jsonItems.size() + " jsonItems");
@@ -220,35 +249,49 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     public static void main(String... args) {
-    	ItemDAO dao = new ItemDAOImpl("160.40.50.207");
-    	MediaItemDAO mDao = new MediaItemDAOImpl("160.40.50.207");
-    	StreamUserDAO uDao = new StreamUserDAOImpl("160.40.50.207");
-    	
-    	long end = 1386856206000L;
-    	long start = end - 5*60000;//1386856100000L;
-    	
-    	
-    	List<Item> items = dao.getItemsInRange(start, end);
-    	System.out.println(items.size() + " in " + ((end-start)/60000.0) + " minutes");
-    	
-    	long t = System.currentTimeMillis();
-
-    	for(Item item : items) {
-    		String uid = item.getUserId();
-    		StreamUser streamUser = uDao.getStreamUser(uid);
-        	item.setStreamUser(streamUser);		
-    		
-    		List<MediaItem> mItems = new ArrayList<MediaItem>();
-    		
-    		List<String> mediaIds = item.getMediaIds();
-    		for(String mId : mediaIds) {
-    			MediaItem mItem = mDao.getMediaItem(mId);
-    			mItems.add(mItem);
-    		}
-    		item.setMediaItems(mItems);
-    	}
-    	t = System.currentTimeMillis() - t;
-    	
-    	System.out.println("Fetch users and MediaItems in " + t + " msecs");
+        
+        ItemDAO dao = new ItemDAOImpl("social1.atc.gr", "Streams", "Items");
+        
+       List<Item> items =  dao.getUnindexedItems(10);
+       
+       for (Item item: items) {
+           
+           System.out.println(item.getId());
+           dao.setIndexedStatusTrue(item.getId());
+       }
+        
+        System.out.println("finished");
+        
+        
+//        ItemDAO dao = new ItemDAOImpl("160.40.50.207");
+//        MediaItemDAO mDao = new MediaItemDAOImpl("160.40.50.207");
+//        StreamUserDAO uDao = new StreamUserDAOImpl("160.40.50.207");
+//
+//        long end = 1386856206000L;
+//        long start = end - 5 * 60000;//1386856100000L;
+//
+//
+//        List<Item> items = dao.getItemsInRange(start, end);
+//        System.out.println(items.size() + " in " + ((end - start) / 60000.0) + " minutes");
+//
+//        long t = System.currentTimeMillis();
+//
+//        for (Item item : items) {
+//            String uid = item.getUserId();
+//            StreamUser streamUser = uDao.getStreamUser(uid);
+//            item.setStreamUser(streamUser);
+//
+//            List<MediaItem> mItems = new ArrayList<MediaItem>();
+//
+//            List<String> mediaIds = item.getMediaIds();
+//            for (String mId : mediaIds) {
+//                MediaItem mItem = mDao.getMediaItem(mId);
+//                mItems.add(mItem);
+//            }
+//            item.setMediaItems(mItems);
+//        }
+//        t = System.currentTimeMillis() - t;
+//
+//        System.out.println("Fetch users and MediaItems in " + t + " msecs");
     }
 }
