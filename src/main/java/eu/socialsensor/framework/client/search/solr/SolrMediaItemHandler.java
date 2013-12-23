@@ -1,6 +1,5 @@
 package eu.socialsensor.framework.client.search.solr;
 
-
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.MediaItem;
@@ -22,25 +21,22 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
-
 /**
  *
  * @author etzoannos
  */
 public class SolrMediaItemHandler {
 
-    
     SolrServer server;
     private static Map<String, SolrMediaItemHandler> INSTANCES = new HashMap<String, SolrMediaItemHandler>();
-
     private static int commitPeriod = 1000;
-    
+
     // Private constructor prevents instantiation from other classes
     private SolrMediaItemHandler(String collection) {
         try {
             server = new HttpSolrServer(collection);
             //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
-        	//server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
+            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
         }
@@ -48,7 +44,7 @@ public class SolrMediaItemHandler {
 
     // implementing Singleton pattern
     public static SolrMediaItemHandler getInstance(String collection) {
-    	SolrMediaItemHandler INSTANCE = INSTANCES.get(collection);
+        SolrMediaItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrMediaItemHandler(collection);
             INSTANCES.put(collection, INSTANCE);
@@ -163,207 +159,209 @@ public class SolrMediaItemHandler {
     public SearchEngineResponse<MediaItem> findItems(SolrQuery query) {
         return search(query);
     }
-    
+
     public SearchEngineResponse<MediaItem> findItemsWithSocialSearch(SolrQuery query) {
-    //	query.setRequestHandler("/socialsearch");
+        //	query.setRequestHandler("/socialsearch");
         return search(query);
     }
-    
+
     public List<MediaItem> findAllMediaItemsByKeywords(List<String> keywords, String type, int size) {
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>(size);
         boolean first = true;
-        
-        for(String key : keywords)
-        	System.out.println("key : "+key);
-        
-        String query ="(";
-        
-        if(keywords.size() == 1){
-        	if(keywords.get(0).split(" ").length>1)
-        		query+="feedKeywordsString:\""+keywords.get(0)+"\"";
-        	else
-        		query+="feedKeywords:"+keywords.get(0);
+
+        for (String key : keywords) {
+            System.out.println("key : " + key);
         }
-        else{
-        	List<String> wordEntities = new ArrayList<String>();
-        	List<String> simpleWords = new ArrayList<String>();
-        	
-        	query+="feedKeywordsString:(";
-        	
-        	//split keywords into two categories
-        	for(int i=0;i<keywords.size();i++){
-        		if(keywords.get(i).split(" ").length>1){
-        			wordEntities.add(keywords.get(i));
-        		}
-        		else{
-        			simpleWords.add(keywords.get(i));
-        		}
-        	}
-        	//feedKeywordsString matches words that are entities (names,organizations,locations)
-        	for(int i=0;i<wordEntities.size();i++){
-        		if (!first) {
+
+        String query = "(";
+
+        if (keywords.size() == 1) {
+            if (keywords.get(0).split(" ").length > 1) {
+                query += "feedKeywordsString:\"" + keywords.get(0) + "\"";
+            } else {
+                query += "feedKeywords:" + keywords.get(0);
+            }
+        } else {
+            List<String> wordEntities = new ArrayList<String>();
+            List<String> simpleWords = new ArrayList<String>();
+
+            query += "feedKeywordsString:(";
+
+            //split keywords into two categories
+            for (int i = 0; i < keywords.size(); i++) {
+                if (keywords.get(i).split(" ").length > 1) {
+                    wordEntities.add(keywords.get(i));
+                } else {
+                    simpleWords.add(keywords.get(i));
+                }
+            }
+            //feedKeywordsString matches words that are entities (names,organizations,locations)
+            for (int i = 0; i < wordEntities.size(); i++) {
+                if (!first) {
                     query += " OR ";
                 }
-        		query += "\""+wordEntities.get(i)+"\"";
-        		
-        		int j=i+1;
-        		//else for all other keywords create combinations ((key_1ANDkey_2) OR (key_1ANDkey_3) OR ..)
-	        	while(j<wordEntities.size()){
+                query += "\"" + wordEntities.get(i) + "\"";
 
-	                query += " OR ";
-	    
-	        		String oneQuery = "(\""+wordEntities.get(i)+"\" AND \""+wordEntities.get(j)+"\")";
-	        		
-	        		query += oneQuery;
-	        		
-	        		int k=j+1;
-	        		while(k<wordEntities.size()){
-	        			query += " OR ";
-	        			    
-	 	        		String secQuery = "(\""+wordEntities.get(i)+"\" AND \""+wordEntities.get(j)+"\" AND \""+wordEntities.get(k)+"\")";
-	 	        		
-	 	        		query += secQuery;
-	 	        		
-	 	        		k++;
-	        		}
-	        	
-	        		j++;
-	        	}
-	        	
-	        	first = false;
-        	}
-        	if(first && simpleWords.size()>0)
-        		query = "(feedKeywords:(";
-        	else if(simpleWords.size()>0){
-        		first = true;
-        		query+=") OR feedKeywords:(";
-        	}
-        	for(int i=0;i<simpleWords.size();i++){
-        		int j=i+1;
-        		// for all other keywords create combinations ((key_1ANDkey_2) OR (key_1ANDkey_3) OR ..)
-	        	while(j<simpleWords.size()){
-	        		if (!first) 
-	        			query += " OR ";
-	    
-	        		String oneQuery = "("+simpleWords.get(i)+" AND "+simpleWords.get(j)+")";
-	        		
-	        		query += oneQuery;
-	        		
-	        		int k=j+1;
-	        		while(k<simpleWords.size()){
-	        			query += " OR ";
-	        			    
-	 	        		String secQuery = "("+simpleWords.get(i)+" AND "+simpleWords.get(j)+" AND "+simpleWords.get(k)+")";
-	 	        		
-	 	        		query += secQuery;
-	 	        		
-	 	        		k++;
-	        		}
-	        	
-	        		j++;
-	        		
-	        		first = false;
-	        	}
-	        	j=0;
-	        	while(j<wordEntities.size()){
-	        		if (!first) 
-	        			query += " OR ";
-	    
-	        		String oneQuery = "("+simpleWords.get(i)+" AND "+wordEntities.get(j)+")";
-	        		
-	        		query += oneQuery;
-	        		
-	        		int k=j+1;
-	        		while(k<wordEntities.size()){
-	        			query += " OR ";
-	        			    
-	 	        		String secQuery = "("+simpleWords.get(i)+" AND "+wordEntities.get(j)+" AND "+wordEntities.get(k)+")";
-	 	        		
-	 	        		query += secQuery;
-	 	        		
-	 	        		k++;
-	        		}
-	        		k=i+1;
-	        		while(k<simpleWords.size()){
-	        			query += " OR ";
-	        			    
-	 	        		String secQuery = "("+simpleWords.get(i)+" AND "+wordEntities.get(j)+" AND "+simpleWords.get(k)+")";
-	 	        		
-	 	        		query += secQuery;
-	 	        		
-	 	        		k++;
-	        		}
-	        	
-	        		j++;
-	        		
-	        		first = false;
-	        	}
-        		
-        	}
-        	query+=")";
+                int j = i + 1;
+                //else for all other keywords create combinations ((key_1ANDkey_2) OR (key_1ANDkey_3) OR ..)
+                while (j < wordEntities.size()) {
+
+                    query += " OR ";
+
+                    String oneQuery = "(\"" + wordEntities.get(i) + "\" AND \"" + wordEntities.get(j) + "\")";
+
+                    query += oneQuery;
+
+                    int k = j + 1;
+                    while (k < wordEntities.size()) {
+                        query += " OR ";
+
+                        String secQuery = "(\"" + wordEntities.get(i) + "\" AND \"" + wordEntities.get(j) + "\" AND \"" + wordEntities.get(k) + "\")";
+
+                        query += secQuery;
+
+                        k++;
+                    }
+
+                    j++;
+                }
+
+                first = false;
+            }
+            if (first && simpleWords.size() > 0) {
+                query = "(feedKeywords:(";
+            } else if (simpleWords.size() > 0) {
+                first = true;
+                query += ") OR feedKeywords:(";
+            }
+            for (int i = 0; i < simpleWords.size(); i++) {
+                int j = i + 1;
+                // for all other keywords create combinations ((key_1ANDkey_2) OR (key_1ANDkey_3) OR ..)
+                while (j < simpleWords.size()) {
+                    if (!first) {
+                        query += " OR ";
+                    }
+
+                    String oneQuery = "(" + simpleWords.get(i) + " AND " + simpleWords.get(j) + ")";
+
+                    query += oneQuery;
+
+                    int k = j + 1;
+                    while (k < simpleWords.size()) {
+                        query += " OR ";
+
+                        String secQuery = "(" + simpleWords.get(i) + " AND " + simpleWords.get(j) + " AND " + simpleWords.get(k) + ")";
+
+                        query += secQuery;
+
+                        k++;
+                    }
+
+                    j++;
+
+                    first = false;
+                }
+                j = 0;
+                while (j < wordEntities.size()) {
+                    if (!first) {
+                        query += " OR ";
+                    }
+
+                    String oneQuery = "(" + simpleWords.get(i) + " AND " + wordEntities.get(j) + ")";
+
+                    query += oneQuery;
+
+                    int k = j + 1;
+                    while (k < wordEntities.size()) {
+                        query += " OR ";
+
+                        String secQuery = "(" + simpleWords.get(i) + " AND " + wordEntities.get(j) + " AND " + wordEntities.get(k) + ")";
+
+                        query += secQuery;
+
+                        k++;
+                    }
+                    k = i + 1;
+                    while (k < simpleWords.size()) {
+                        query += " OR ";
+
+                        String secQuery = "(" + simpleWords.get(i) + " AND " + wordEntities.get(j) + " AND " + simpleWords.get(k) + ")";
+
+                        query += secQuery;
+
+                        k++;
+                    }
+
+                    j++;
+
+                    first = false;
+                }
+
+            }
+            query += ")";
         }
         /*
-		 //OLD VERSION
-        String query = "feedKeywords:(";
-        //If only one keyword query with that
-        if(keywords.size() == 1){
-    		query += keywords.get(0);
-    	}
-        else{
-	        for(int i=0;i<keywords.size();i++){
-	        	//If keyword is a name (two words) make it a stand-alone term for query
-	        	if(keywords.get(i).split(" ").length >1){
-	        		if (!first) {
-	                    query += " OR ";
-	                }
+         //OLD VERSION
+         String query = "feedKeywords:(";
+         //If only one keyword query with that
+         if(keywords.size() == 1){
+         query += keywords.get(0);
+         }
+         else{
+         for(int i=0;i<keywords.size();i++){
+         //If keyword is a name (two words) make it a stand-alone term for query
+         if(keywords.get(i).split(" ").length >1){
+         if (!first) {
+         query += " OR ";
+         }
 	        		
-	        		query += "("+keywords.get(i)+")";
-	        		first = false;
-	        	}
+         query += "("+keywords.get(i)+")";
+         first = false;
+         }
 	        	
-	        	int j=i+1;
-	        	//else for all other keywords create combinations ((key_1ANDkey_2) OR (key_1ANDkey_3) OR ..)
-	        	while(j<keywords.size()){
+         int j=i+1;
+         //else for all other keywords create combinations ((key_1ANDkey_2) OR (key_1ANDkey_3) OR ..)
+         while(j<keywords.size()){
 	        		
-	        		if (!first) {
-	                    query += " OR ";
-	                }
+         if (!first) {
+         query += " OR ";
+         }
 	
-	        		String oneQuery = "("+keywords.get(i)+" AND "+keywords.get(j)+")";
+         String oneQuery = "("+keywords.get(i)+" AND "+keywords.get(j)+")";
 	        		
-	        		query += oneQuery;
+         query += oneQuery;
 	        		
-	        		first = false;
-	        		j++;
-	        	}
+         first = false;
+         j++;
+         }
 	        	
-	        }
-        }*/
-        
-      
+         }
+         }*/
+
+
         //Set to the query the type of media item we want to be retrieved from solr (image - video)
         query += ") AND type : " + type;
-        
+
         //escape "/" character in Solr Query
-        query = query.replace("/","\\/");
+        query = query.replace("/", "\\/");
 
         SolrQuery solrQuery = new SolrQuery(query);
         Logger.getRootLogger().info("query: " + query);
         solrQuery.setRows(size);
         SearchEngineResponse<MediaItem> response = search(solrQuery);
-        
-        if(response != null){
-	        List<MediaItem> results = response.getResults();
-	        Set<String> urls = new HashSet<String>();
-	        for(MediaItem mi : results) {
-	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
-	        		mediaItems.add(mi);
-	        		urls.add(mi.getUrl());
-	        	}
-	        }
+
+        if (response != null) {
+            List<MediaItem> results = response.getResults();
+            Set<String> urls = new HashSet<String>();
+            for (MediaItem mi : results) {
+                if (!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+                    mediaItems.add(mi);
+                    urls.add(mi.getUrl());
+                }
+            }
         }
-        return mediaItems;		
+        return mediaItems;
     }
 
     public SearchEngineResponse<MediaItem> findAllDyscoItemsLightByTime(
@@ -394,7 +392,7 @@ public class SolrMediaItemHandler {
 
         List<MediaItem> results = mi.getResults();
 
-        if (results==null || results.size() == 0) {
+        if (results == null || results.size() == 0) {
             return null;
         }
 
@@ -408,27 +406,27 @@ public class SolrMediaItemHandler {
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
         QueryResponse rsp;
-       
+
         try {
             rsp = server.query(query);
         } catch (SolrServerException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             Logger.getRootLogger().info(e.getMessage());
             return null;
         }
 
 
         List<SolrMediaItem> solrItems = rsp.getBeans(SolrMediaItem.class);
-  
+
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (SolrMediaItem solrMediaItem : solrItems) {
             try {
-            	MediaItem mediaItem = solrMediaItem.toMediaItem();
-            	String id = mediaItem.getId();
-            	id = id.replaceAll("%%", "::");
-            	mediaItem.setId(id);
-            	
+                MediaItem mediaItem = solrMediaItem.toMediaItem();
+                String id = mediaItem.getId();
+                id = id.replaceAll("%%", "::");
+                mediaItem.setId(id);
+
                 mediaItems.add(mediaItem);
             } catch (MalformedURLException ex) {
                 Logger.getRootLogger().error(ex.getMessage());
@@ -436,7 +434,21 @@ public class SolrMediaItemHandler {
         }
 
         response.setResults(mediaItems);
-         
+
         return response;
+    }
+
+    public void forceCommitPending() {
+
+        try {
+
+            server.commit();
+        } catch (SolrServerException ex) {
+            ex.printStackTrace();
+            Logger.getRootLogger().error(ex.getMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            Logger.getRootLogger().error(ex.getMessage());
+        }
     }
 }
