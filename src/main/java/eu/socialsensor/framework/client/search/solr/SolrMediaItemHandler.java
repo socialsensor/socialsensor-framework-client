@@ -423,16 +423,12 @@ public class SolrMediaItemHandler {
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (SolrMediaItem solrMediaItem : solrItems) {
-            try {
-            	MediaItem mediaItem = solrMediaItem.toMediaItem();
-            	String id = mediaItem.getId();
-            	id = id.replaceAll("%%", "::");
-            	mediaItem.setId(id);
-            	
-                mediaItems.add(mediaItem);
-            } catch (MalformedURLException ex) {
-                Logger.getRootLogger().error(ex.getMessage());
-            }
+//            try {
+//            	MediaItem mediaItem = solrMediaItem.toMediaItem();
+//                mediaItems.add(mediaItem);
+//            } catch (MalformedURLException ex) {
+//                Logger.getRootLogger().error(ex.getMessage());
+//            }
         }
 
         response.setResults(mediaItems);

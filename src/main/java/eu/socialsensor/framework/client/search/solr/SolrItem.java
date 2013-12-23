@@ -32,10 +32,6 @@ public class SolrItem {
         
         language = item.getLang();
 
-
-       
-
-
     }
 
     
