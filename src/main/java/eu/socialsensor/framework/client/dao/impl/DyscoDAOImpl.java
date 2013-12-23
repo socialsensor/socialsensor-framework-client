@@ -488,9 +488,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     	//Prioritize mediaItems
     	for(Integer sp : sortedNetworksPriorities.keySet()){
     		for(String net : sortedNetworksPriorities.get(sp)){
-    			for(MediaItem mi : collectedMediaItemsPerNetwork.get(net)){
-    				mediaItems.add(mi);
-    			}
+    			if(collectedMediaItemsPerNetwork.get(net) != null)
+	    			for(MediaItem mi : collectedMediaItemsPerNetwork.get(net)){
+	    				mediaItems.add(mi);
+	    			}
     		}
     	}
     	
