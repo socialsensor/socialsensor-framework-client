@@ -29,7 +29,6 @@ public class SolrItem {
         latitude = item.getLatitude();
         longitude = item.getLongitude();
         location = item.getLocationName();
-        sentiment = item.getSentiment();
         
         language = item.getLang();
 
@@ -78,9 +77,6 @@ public class SolrItem {
     
     @Field(value = "language")
     private String language;
-    
-    @Field(value = "sentiment")
-    private String sentiment;
 
     public String getId() {
         return id;
@@ -186,15 +182,5 @@ public class SolrItem {
     public void setLocation(String location) {
         this.location = location;
     }
-
-    public String getSentiment() {
-        return sentiment;
-    }
-
-    public void setSentiment(String sentiment) {
-        this.sentiment = sentiment;
-    }
-
-
   
 }
