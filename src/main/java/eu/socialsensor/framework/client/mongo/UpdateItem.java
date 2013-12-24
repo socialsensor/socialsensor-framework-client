@@ -62,8 +62,8 @@ public class UpdateItem implements JSONable {
 	
 	public void addValues(Object field, Object[] values) {
 		if(addToSet == null) {
-                addToSet = new HashMap<Object, Map<Object, Object[]>>();
-            }
+			addToSet = new HashMap<Object, Map<Object, Object[]>>();
+		}
 		Map<Object, Object[]> each = new HashMap<Object, Object[]>();
 		each.put("$each", values);
 		addToSet.put(field, each);
