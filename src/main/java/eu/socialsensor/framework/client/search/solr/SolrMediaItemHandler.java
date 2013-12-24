@@ -66,12 +66,6 @@ public class SolrMediaItemHandler {
 
             server.addBean(solrItem, commitPeriod);
 
-            //UpdateResponse response = server.commit();
-            //int statusId = response.getStatus();
-            //if (statusId == 0) {
-            //    status = true;
-            //}
-
         } catch (Exception ex) {
             ex.printStackTrace();
             Logger.getRootLogger().error(ex.getMessage());

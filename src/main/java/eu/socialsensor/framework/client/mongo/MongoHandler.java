@@ -9,9 +9,12 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
-import eu.socialsensor.framework.common.domain.JSONable;
-import java.net.UnknownHostException;
 
+import eu.socialsensor.framework.common.domain.Item;
+import eu.socialsensor.framework.common.domain.JSONable;
+import eu.socialsensor.framework.common.factories.ItemFactory;
+
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +28,9 @@ import java.util.regex.Pattern;
  */
 public class MongoHandler {
 
+	// IMPORTANT: This should be change after the review
+	private DBObject exclude = new BasicDBObject("lastUpdated", 0);
+	
     DBCollection collection;
     private DBObject sortField = new BasicDBObject("_id", -1);
     private DBObject publicationTimeField = new BasicDBObject("publicationTime", -1);
@@ -85,7 +91,7 @@ public class MongoHandler {
 
     public boolean exists(String fieldName, String fieldValue) {
         BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
-        DBObject result = collection.findOne(query, new BasicDBObject("_id", 1));
+        DBObject result = collection.findOne(query);
         if (result == null) {
             return false;
         }
@@ -94,20 +100,21 @@ public class MongoHandler {
 
     public String findOne() {
 
-        DBObject result = collection.findOne();
+        DBObject result = collection.findOne(new BasicDBObject(), 
+        		exclude);
 
         return JSON.serialize(result);
     }
 
     public String findOne(String fieldName, String fieldValue) {
         BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
-        DBObject result = collection.findOne(query);
+        DBObject result = collection.findOne(query, exclude);
         return JSON.serialize(result);
     }
 
     public String findOne(Selector query) {
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
-        DBObject result = collection.findOne(object);
+        DBObject result = collection.findOne(object, exclude);
         return JSON.serialize(result);
     }
 
@@ -125,7 +132,7 @@ public class MongoHandler {
 
     public List<String> findMany(int n) {
 
-        DBCursor cursor = collection.find().sort(sortField);
+        DBCursor cursor = collection.find(new BasicDBObject(), exclude).sort(sortField);
         List<String> jsonResults = new ArrayList<String>();
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -161,7 +168,7 @@ public class MongoHandler {
 
         jsonString = prefix + jsonString + suffix;
         DBObject object = (DBObject) JSON.parse(jsonString);
-        DBCursor cursor = collection.find(object).sort(sortField);
+        DBCursor cursor = collection.find(object, exclude).sort(sortField);
 
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -198,7 +205,7 @@ public class MongoHandler {
 
         System.out.println(jsonString);
         DBObject object = (DBObject) JSON.parse(jsonString);
-        DBCursor cursor = collection.find(object).sort(sortField);
+        DBCursor cursor = collection.find(object, exclude).sort(sortField);
 
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -235,7 +242,7 @@ public class MongoHandler {
 
         System.out.println(jsonString);
         DBObject object = (DBObject) JSON.parse(jsonString);
-        DBCursor cursor = collection.find(object).sort(sortField);
+        DBCursor cursor = collection.find(object, exclude).sort(sortField);
 
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -255,7 +262,7 @@ public class MongoHandler {
 
     public List<String> findMany(DBObject query, int n) {
 
-        DBCursor cursor = collection.find(query).sort(sortField);
+        DBCursor cursor = collection.find(query, exclude).sort(sortField);
         List<String> jsonResults = new ArrayList<String>();
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -274,7 +281,7 @@ public class MongoHandler {
     public List<String> findMany(Selector query, int n) {
         
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
-        DBCursor cursor = collection.find(object).sort(sortField);
+        DBCursor cursor = collection.find(object, exclude).sort(sortField);
 
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -295,7 +302,7 @@ public class MongoHandler {
        public List<String> findManyNoSorting(Selector query, int n) {
         
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
-        DBCursor cursor = collection.find(object);
+        DBCursor cursor = collection.find(object, exclude);
 
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -315,7 +322,7 @@ public class MongoHandler {
 
     public List<String> findManySortedByPublicationTime(Selector query, int n) {
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
-        DBCursor cursor = collection.find(object).sort(publicationTimeField);
+        DBCursor cursor = collection.find(object, exclude).sort(publicationTimeField);
 
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -336,7 +343,7 @@ public class MongoHandler {
     public List<String> findMany(String fieldName, Object fieldValue, int n) {
 
         DBObject query = new BasicDBObject(fieldName, fieldValue);
-        DBCursor cursor = collection.find(query).sort(sortField);
+        DBCursor cursor = collection.find(query, exclude).sort(sortField);
         if (n > 0) {
             cursor = cursor.limit(n);
         }
@@ -425,6 +432,6 @@ public class MongoHandler {
 
     public static void main(String[] args) throws UnknownHostException {
 
-
+    	
     }
 }
