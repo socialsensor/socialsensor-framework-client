@@ -18,12 +18,12 @@ public class MediaSearcher {
         
 	}
 	
-	public void search(String dyscoId) {
-		publisherJedis.publish(CHANNEL, dyscoId);
+	public void search(String message) {
+		publisherJedis.publish(CHANNEL, message);
 	}
 	
-	public void delete(String dyscoId){
-		publisherJedis.publish(CHANNEL, dyscoId);
+	public void delete(String message){
+		publisherJedis.publish(CHANNEL, message);
 	}
 
 }
