@@ -15,4 +15,6 @@ public interface DocumentDAO {
 	public Document getDocument(String id);
 	
 	public List<Document> getDocumentsSince(long date);
+	
+    boolean exists(String id);
 }

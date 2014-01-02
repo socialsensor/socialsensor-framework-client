@@ -166,7 +166,7 @@ public class SolrDocumentHandler {
         return search(query);
     }
     
-    public Document findItem(String id) {
+    public Document findDocument(String id) {
 
         SolrQuery solrQuery = new SolrQuery("id:\"" + id + "\"");
         solrQuery.setRows(1);

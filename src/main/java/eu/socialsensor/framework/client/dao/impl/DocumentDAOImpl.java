@@ -80,4 +80,10 @@ public class DocumentDAOImpl implements DocumentDAO{
         
         return results;
     }
+	
+	@Override
+    public boolean exists(String id) {
+        return mongoHandler.exists("id", id);
+    }
+
 }
