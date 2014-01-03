@@ -44,10 +44,4 @@ public class FeedDAOImpl implements FeedDAO{
 		 return feed;
 	 }
 	 
-	 @Override
-	 public Feed getFeedByItem(String id){
-		 String json = mongoHandler.findOne("id", id);
-		 Item item = ItemFactory.create(json);
-		 return item.getFeed();
-	 }
 }
