@@ -15,6 +15,8 @@ import eu.socialsensor.framework.common.domain.MediaItem;
 public interface MediaItemDAO {
 
     public void addMediaItem(MediaItem item);
+    
+    public void addMediaItem(String id, String originalId, long publicationTime, String userid);
 
     public void updateMediaItem(String id, String name, Object value);
 

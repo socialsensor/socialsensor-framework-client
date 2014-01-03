@@ -89,6 +89,11 @@ public class MongoHandler {
         collection.insert(new BasicDBObject(map));
     }
 
+    public void insert(Map<String, Object> map, String collName) {
+    	DBCollection coll = db.getCollection(collName);
+    	coll.insert(new BasicDBObject(map));
+    }
+    
     public boolean exists(String fieldName, String fieldValue) {
         BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
         DBObject result = collection.findOne(query);

@@ -2,8 +2,10 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -269,6 +271,18 @@ public class MediaItemDAOImpl implements MediaItemDAO {
         }
 
         return mediaItems;
+	}
+
+	@Override
+	public void addMediaItem(String id, String originalId, long publicationTime, String userid) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("id", id);
+		map.put("reference", originalId);
+		map.put("publicationTime", publicationTime);
+		map.put("userid", userid);
+		
+		mongoHandler.insert(map, "MediaShares");
+		
 	}
     
     
