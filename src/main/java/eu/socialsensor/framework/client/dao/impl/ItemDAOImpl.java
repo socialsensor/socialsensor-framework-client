@@ -94,11 +94,6 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public boolean deleteDB() {
-        return mongoHandler.delete();
-    }
-
-    @Override
     public List<Item> getLatestItems(int n) {
         List<String> jsonItems = mongoHandler.findManySortedByPublicationTime(new Selector(), n);
         List<Item> results = new ArrayList<Item>();

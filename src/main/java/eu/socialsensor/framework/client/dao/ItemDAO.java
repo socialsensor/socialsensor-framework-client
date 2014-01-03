@@ -19,8 +19,6 @@ public interface ItemDAO {
 
     public boolean deleteItem(String id);
 
-    public boolean deleteDB();
-
     public Item getItem(String id);
 
     public List<Item> getLatestItems(int n);
