@@ -15,6 +15,5 @@ public interface FeedDAO {
 	public boolean deleteFeed(Feed feed);
 	
 	public Feed getFeed(String id);
-	
-	public Feed getFeedByItem(String id);
+
 }
