@@ -34,7 +34,7 @@ public class SolrItem {
         title = item.getTitle();
         description = item.getDescription();
         tags = item.getTags();
-
+        source = item.getUrl();
         StreamUser streamUser = item.getStreamUser();
         if (streamUser != null) {
             author = streamUser.getUsername();
@@ -135,14 +135,14 @@ public class SolrItem {
         item.setVotes(ItemFactory.createVoteList(validityVotes));
         item.setPositiveVotes(positiveVotes);
         item.setNegativeVotes(negativeVotes);
-
+        
         item.setId(id);
         item.setStreamId(streamId);
         item.setTitle(title);
         item.setDescription(description);
         item.setTags(tags);
         item.setOriginal(original);
-        //item.setPeople(people);
+        item.setUrl(source);
 
         if (links != null) {
             URL[] _links = new URL[links.size()];
