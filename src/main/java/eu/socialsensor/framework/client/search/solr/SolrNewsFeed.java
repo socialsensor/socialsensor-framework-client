@@ -12,7 +12,6 @@ public class SolrNewsFeed {
 	
 	public SolrNewsFeed(Item item){
 		id = item.getId();
-        streamId = item.getStreamId();
         title = item.getTitle();
         description = item.getDescription();
         publicationTime = item.getPublicationTime();
@@ -23,7 +22,6 @@ public class SolrNewsFeed {
 		Item item = new Item();
 		
 		item.setId(id);
-		item.setStreamId(streamId);
 		item.setTitle(title);
 		item.setDescription(description);
 		item.setPublicationTime(publicationTime);
@@ -34,8 +32,6 @@ public class SolrNewsFeed {
 	
 	@Field(value = "id")
     private String id;
-    @Field(value = "streamId")
-    private String streamId;
     @Field(value = "source")
     private String source;
     @Field(value = "title")
@@ -52,14 +48,6 @@ public class SolrNewsFeed {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getStreamId() {
-        return streamId;
-    }
-
-    public void setStreamId(String streamId) {
-        this.streamId = streamId;
     }
 
     public String getSource() {
