@@ -51,7 +51,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
     	
     	mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
-    	//dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+    	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
     	solrItemHandler = SolrItemHandler.getInstance(itemCollection);
     	handler = SolrDyscoHandler.getInstance(dyscoCollection);
     	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
@@ -517,6 +517,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     
 
     public static void main(String[] args) {
-     
+    	
     }
 }
