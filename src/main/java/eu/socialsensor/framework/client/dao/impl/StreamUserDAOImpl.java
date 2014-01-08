@@ -89,7 +89,7 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
         Selector query = new Selector();
         query.select("username", username);
-        query.select("StreamId", "Twitter");
+        query.select("streamId", "Twitter");
 
         String json = mongoHandler.findOne(query);
 
@@ -122,7 +122,7 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     public static void main(String... args) {
 
         StreamUserDAO dao = new StreamUserDAOImpl("social1.atc.gr", "Streams", "StreamUsers");
-        StreamUser user = dao.getStreamUserByName("BreakingNews");
+        StreamUser user = dao.getStreamUserByName("SethMacFarlane");
         System.out.println("done");
 
 
