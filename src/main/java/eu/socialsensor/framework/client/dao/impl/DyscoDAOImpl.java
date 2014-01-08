@@ -51,7 +51,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
     	
     	mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
-    	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+    	//dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
     	solrItemHandler = SolrItemHandler.getInstance(itemCollection);
     	handler = SolrDyscoHandler.getInstance(dyscoCollection);
     	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
@@ -296,11 +296,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findVideos(String query, int size){
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	//Set to the query the type of media item we want to be retrieved from solr (image - video)
-    	query += " AND type : video";
-    	Logger.getRootLogger().info("query: " + query);
-    	
-    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	mediaItems.addAll(collectMediaItems(query,null,"video",size));
     	return mediaItems;	
     	
     }
@@ -310,10 +306,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
-    	query += " AND type : video";
-    	Logger.getRootLogger().info("query: " + query);
     	
-    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	mediaItems.addAll(collectMediaItems(query,null,"video",size));
     	return mediaItems;
     }
     
@@ -321,10 +315,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	query += " AND type : video";
-    	Logger.getRootLogger().info("query: " + query);
-    	
-    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,"video",size));
     	return mediaItems;
     }
     
@@ -334,10 +325,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
-    	query += " AND type : video";
-    	Logger.getRootLogger().info("query: " + query);
     	
-    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,"video",size));
     	return mediaItems;
     }
     
@@ -345,11 +334,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findImages(String query, int size){
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	//Set to the query the type of media item we want to be retrieved from solr (image - video)
-    	query += " AND type : image";
-    	Logger.getRootLogger().info("query: " + query);
-    	
-    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	mediaItems.addAll(collectMediaItems(query,null,"image",size));
     	return mediaItems;	
     	
     }
@@ -359,10 +344,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
-    	query += " AND type : image";
-    	Logger.getRootLogger().info("query: " + query);
     	
-    	mediaItems.addAll(collectMediaItems(query,null,size));
+    	mediaItems.addAll(collectMediaItems(query,null,"image",size));
     	return mediaItems;
     }
     
@@ -370,10 +353,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	query += " AND type : image";
-    	Logger.getRootLogger().info("query: " + query);
-    	
-    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,"image",size));
     	return mediaItems;
     }
     
@@ -383,10 +363,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
-    	query += " AND type : image";
-    	Logger.getRootLogger().info("query: " + query);
     	
-    	mediaItems.addAll(collectMediaItems(query,networkPriorities,size));
+    	mediaItems.addAll(collectMediaItems(query,networkPriorities,"image",size));
     	return mediaItems;
     }
     
@@ -399,7 +377,7 @@ public class DyscoDAOImpl implements DyscoDAO {
      * @param size
      * @return
      */
-    private Queue<MediaItem> collectMediaItems(String query, Map<String,Integer> networkPriorities, int size){
+    private Queue<MediaItem> collectMediaItems(String query, Map<String,Integer> networkPriorities, String type , int size){
     	
     	Queue<MediaItem> mediaItems = new LinkedList<MediaItem>();
     	
@@ -446,7 +424,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		}
     		
     	}
-    	
+ /*   	
     	System.out.println("--Sorted Network Priorities--");
     	for(Integer sp : sortedNetworksPriorities.keySet()){
     		System.out.println("");
@@ -455,38 +433,77 @@ public class DyscoDAOImpl implements DyscoDAO {
     			System.out.print(net+" ");
     		}
     	}
-    	System.out.println("");
+    	System.out.println("");*/
     	//Retrieve multimedia content that is stored in solr
- 
-    	SolrQuery solrQuery = new SolrQuery(query);
-    	solrQuery.setRows(2 * size);
     	
-    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItemsWithSocialSearch(solrQuery);
+    	String finalQuery = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
+    	SolrQuery solrQuery = new SolrQuery(finalQuery);
+    	solrQuery.setRows(200);
+    	solrQuery.setSortField("score", ORDER.desc);
+    	//Logger.getRootLogger().info("final query : " + finalQuery);
+    	
+    	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
     	if(response != null){
     		List<MediaItem> results = response.getResults();
     		Set<String> urls = new HashSet<String>();
 	        for(MediaItem mi : results) {
-	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
-	        		if(collectedMediaItemsPerNetwork.get(mi.getStreamId()) == null){
-	        			List<MediaItem> networkMediaItems = new ArrayList<MediaItem>();
-	        			networkMediaItems.add(mi);
-	        			collectedMediaItemsPerNetwork.put(mi.getStreamId(), networkMediaItems);
-	        		}else{
-	        			List<MediaItem> networkMediaItems = collectedMediaItemsPerNetwork.get(mi.getStreamId());
-	        			networkMediaItems.add(mi);
-	        			collectedMediaItemsPerNetwork.put(mi.getStreamId(), networkMediaItems);
-	        		}
-	        		
-	        		urls.add(mi.getUrl());
-	        	}
 	        	
-	        	if(collectedMediaItemsPerNetwork.size() > size)
-	        		break;
+	        	if(mi.getType().equals(type)){
+		        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+		        		
+		        		mediaItems.add(mi);
+		        		/*if(collectedMediaItemsPerNetwork.get(mi.getStreamId()) == null){
+		        			List<MediaItem> networkMediaItems = new ArrayList<MediaItem>();
+		        			networkMediaItems.add(mi);
+		        			collectedMediaItemsPerNetwork.put(mi.getStreamId(), networkMediaItems);
+		        		}else{
+		        			List<MediaItem> networkMediaItems = collectedMediaItemsPerNetwork.get(mi.getStreamId());
+		        			networkMediaItems.add(mi);
+		        			collectedMediaItemsPerNetwork.put(mi.getStreamId(), networkMediaItems);
+		        		}
+		        		*/
+		        		urls.add(mi.getUrl());
+		        	}
+		        	
+		        	if(mediaItems.size() >= size)
+		        		break;
+	        	}
 	        }
     	}
     	
+    	if(mediaItems.size()<size && query.contains(" AND ")){
+    		//second try query if results are not many
+        	String secondTryQuery = query.substring(query.indexOf("(")+1,query.indexOf(")"));
+        	finalQuery = "(title : "+secondTryQuery+") OR (description:"+secondTryQuery+") OR (tags:"+secondTryQuery+")";
+        	
+        	solrQuery = new SolrQuery(finalQuery);
+        	solrQuery.setRows(200);
+        	solrQuery.setSortField("score", ORDER.desc);
+        	//Logger.getRootLogger().info("final query : " + finalQuery);
+        	
+        	response = solrMediaItemHandler.findItems(solrQuery);
+        	
+        	if(response != null){
+        		List<MediaItem> results = response.getResults();
+        		Set<String> urls = new HashSet<String>();
+    	        for(MediaItem mi : results) {
+    	        	if(mi.getType().equals(type)){
+	    	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+	    	        		
+	    	        		mediaItems.add(mi);
+	    	        		
+	    	        		urls.add(mi.getUrl());
+	    	        	}
+	    	        	
+	    	        	if(mediaItems.size() >= size)
+	    	        		break;
+    	        	}
+    	        }
+        	}
+    	}
+    	
     	//Prioritize mediaItems
-    	for(Integer sp : sortedNetworksPriorities.keySet()){
+    	/*for(Integer sp : sortedNetworksPriorities.keySet()){
     		for(String net : sortedNetworksPriorities.get(sp)){
     			if(collectedMediaItemsPerNetwork.get(net) != null)
 	    			for(MediaItem mi : collectedMediaItemsPerNetwork.get(net)){
@@ -494,12 +511,12 @@ public class DyscoDAOImpl implements DyscoDAO {
 	    			}
     		}
     	}
-    	
+    	*/
     	return mediaItems;
     }
     
 
     public static void main(String[] args) {
-        
+     
     }
 }
