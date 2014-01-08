@@ -38,7 +38,7 @@ public class SolrDyscoHandler {
     private SolrDyscoHandler(String collection) {
         try {
 
-                Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/dyscos");
+//                Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/dyscos");
         	server = new HttpSolrServer( collection );
            
         } catch (Exception e) {
