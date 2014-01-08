@@ -31,18 +31,29 @@ public class InfluencerDAOImpl implements InfluencerDAO {
     private final String collection = "influencers";
     private MongoHandler mongoHandler;
 
-     public InfluencerDAOImpl(String host, String db, String collection) {
-    	
-      
+    public InfluencerDAOImpl() {
+
         try {
-        	indexes.add("keyword");
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-            
+            indexes.add("keyword");
+            mongoHandler = new MongoHandler("social1.atc.gr", "Streams", "influencers", indexes);
+
         } catch (UnknownHostException ex) {
             Logger.getRootLogger().error(ex.getMessage());
         }
     }
-     
+
+    public InfluencerDAOImpl(String host, String db, String collection) {
+
+
+        try {
+            indexes.add("keyword");
+            mongoHandler = new MongoHandler(host, db, collection, indexes);
+
+        } catch (UnknownHostException ex) {
+            Logger.getRootLogger().error(ex.getMessage());
+        }
+    }
+
 //    public InfluencerDAOImpl() {
 //        try {
 //        	indexes.add("keyword");
@@ -51,7 +62,6 @@ public class InfluencerDAOImpl implements InfluencerDAO {
 //            org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
 //        }
 //    }
-
     @Override
     public void addInfluencersForKeyword(String keyword, List<Influencer> influencers) {
 
@@ -90,7 +100,7 @@ public class InfluencerDAOImpl implements InfluencerDAO {
             }
 
         }
-        
+
         List<Influencer> list = new ArrayList<Influencer>(influencers);
         return list;
     }
@@ -107,7 +117,6 @@ public class InfluencerDAOImpl implements InfluencerDAO {
     public void clearAll() {
         mongoHandler.clean();
     }
-
 
     public static void main(String... args) {
 
