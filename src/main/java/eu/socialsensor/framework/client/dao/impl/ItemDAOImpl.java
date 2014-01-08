@@ -5,22 +5,16 @@ import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 
 import eu.socialsensor.framework.client.dao.ItemDAO;
-import eu.socialsensor.framework.client.dao.MediaItemDAO;
-import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.Item;
-import eu.socialsensor.framework.common.domain.MediaItem;
-import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -49,6 +43,7 @@ public class ItemDAOImpl implements ItemDAO {
         indexes.add("publicationTime");
         indexes.add("indexed");
         indexes.add("original");
+         indexes.add("insertionTime");
 
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
@@ -140,8 +135,8 @@ public class ItemDAOImpl implements ItemDAO {
     public List<Item> getItemsInRange(long start, long end) {
 
         Selector query = new Selector();
-        query.selectGreaterThan("publicationTime", start);
-        query.selectLessThan("publicationTime", end);
+        query.selectGreaterThan("insertionTime", start);
+        query.selectLessThan("insertionTime", end);
         long l = System.currentTimeMillis();
         List<String> jsonItems = mongoHandler.findManyNoSorting(query, 0);
         l = System.currentTimeMillis() - l;
