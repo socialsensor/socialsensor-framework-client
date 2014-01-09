@@ -381,6 +381,9 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     	Queue<MediaItem> mediaItems = new LinkedList<MediaItem>();
     	
+    	if(query.equals(""))
+    		return mediaItems;
+    	
     	Map<String,List<MediaItem>> collectedMediaItemsPerNetwork = new HashMap<String,List<MediaItem>>();
     	Map<String, Integer> priorities = new HashMap<String,Integer>();
     	Map<Integer,List<String>> sortedNetworksPriorities = new TreeMap<Integer,List<String>>(Collections.reverseOrder());
@@ -440,7 +443,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	SolrQuery solrQuery = new SolrQuery(finalQuery);
     	solrQuery.setRows(200);
     	solrQuery.setSortField("score", ORDER.desc);
-    	//Logger.getRootLogger().info("final query : " + finalQuery);
+    	Logger.getRootLogger().info("final query : " + finalQuery);
     	
     	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
     	if(response != null){
@@ -479,7 +482,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         	solrQuery = new SolrQuery(finalQuery);
         	solrQuery.setRows(200);
         	solrQuery.setSortField("score", ORDER.desc);
-        	//Logger.getRootLogger().info("final query : " + finalQuery);
+        	Logger.getRootLogger().info("final query : " + finalQuery);
         	
         	response = solrMediaItemHandler.findItems(solrQuery);
         	
