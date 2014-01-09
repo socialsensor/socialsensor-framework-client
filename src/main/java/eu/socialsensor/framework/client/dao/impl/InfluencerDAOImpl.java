@@ -31,16 +31,7 @@ public class InfluencerDAOImpl implements InfluencerDAO {
     private final String collection = "influencers";
     private MongoHandler mongoHandler;
 
-    public InfluencerDAOImpl() {
 
-        try {
-            indexes.add("keyword");
-            mongoHandler = new MongoHandler("social1.atc.gr", "Streams", "influencers", indexes);
-
-        } catch (UnknownHostException ex) {
-            Logger.getRootLogger().error(ex.getMessage());
-        }
-    }
 
     public InfluencerDAOImpl(String host, String db, String collection) {
 
