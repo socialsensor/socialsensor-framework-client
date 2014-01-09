@@ -161,7 +161,8 @@ public class SolrMediaItemHandler {
     }
 
     public SearchEngineResponse<MediaItem> findItemsWithSocialSearch(SolrQuery query) {
-        //	query.setRequestHandler("/socialsearch");
+        //query.setRequestHandler("/socialsearch");
+        query.set("qt","/socialsearch");
         return search(query);
     }
 
@@ -424,7 +425,7 @@ public class SolrMediaItemHandler {
             try {
                 MediaItem mediaItem = solrMediaItem.toMediaItem();
                 String id = mediaItem.getId();
-                id = id.replaceAll("%%", "::");
+               
                 mediaItem.setId(id);
 
                 mediaItems.add(mediaItem);

@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
 /**
