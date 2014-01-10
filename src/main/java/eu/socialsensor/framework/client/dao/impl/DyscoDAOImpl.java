@@ -439,11 +439,13 @@ public class DyscoDAOImpl implements DyscoDAO {
     	System.out.println("");*/
     	//Retrieve multimedia content that is stored in solr
     	
-    	String finalQuery = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
-    	SolrQuery solrQuery = new SolrQuery(finalQuery);
+    	if(!query.contains("title") && !query.contains("description"))
+    		query = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
+    
+    	SolrQuery solrQuery = new SolrQuery(query);
     	solrQuery.setRows(200);
     	solrQuery.setSortField("score", ORDER.desc);
-    	Logger.getRootLogger().info("final query : " + finalQuery);
+    	Logger.getRootLogger().info("final query : " + query);
     	
     	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
     	if(response != null){
@@ -498,7 +500,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     public static void main(String[] args) {
-    
-       
+    	
     }
 }
