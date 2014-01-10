@@ -474,37 +474,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        }
     	}
     	
-    	/*if(mediaItems.size()<size && query.contains(" AND ")){
-    		//second try query if results are not many
-        	String secondTryQuery = query.substring(query.indexOf("(")+1,query.indexOf(")"));
-        	finalQuery = "(title : "+secondTryQuery+") OR (description:"+secondTryQuery+") OR (tags:"+secondTryQuery+")";
-        	
-        	solrQuery = new SolrQuery(finalQuery);
-        	solrQuery.setRows(200);
-        	solrQuery.setSortField("score", ORDER.desc);
-        	Logger.getRootLogger().info("final query : " + finalQuery);
-        	
-        	response = solrMediaItemHandler.findItems(solrQuery);
-        	
-        	if(response != null){
-        		List<MediaItem> results = response.getResults();
-        		Set<String> urls = new HashSet<String>();
-    	        for(MediaItem mi : results) {
-    	        	if(mi.getType().equals(type)){
-	    	        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
-	    	        		
-	    	        		mediaItems.add(mi);
-	    	        		
-	    	        		urls.add(mi.getUrl());
-	    	        	}
-	    	        	
-	    	        	if(mediaItems.size() >= size)
-	    	        		break;
-    	        	}
-    	        }
-        	}
-    	}*/
-    	
     	//Prioritize mediaItems
     	/*for(Integer sp : sortedNetworksPriorities.keySet()){
     		for(String net : sortedNetworksPriorities.get(sp)){
@@ -529,18 +498,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     public static void main(String[] args) {
-    	 // DyscoDAO dyscoDAO = new DyscoDAOImpl("160.40.50.230", "http://localhost:8080/solr/dyscos", "http://localhost:8080/solr/items", "http://localhost:8080/solr/MediaItems");
-    	DyscoDAO dyscoDAO = new DyscoDAOImpl("social1.atc.gr", "http://social1.atc.gr/solr/dyscos", "http://social1.atc.gr/solr/items", "http://social1.atc.gr/solr/MediaItems");
-       SolrDyscoHandler solrdyscoHandler = SolrDyscoHandler.getInstance("http://social1.atc.gr:8080/solr/dyscos");
-       
-       Dysco dysco = solrdyscoHandler.findDyscoLight("fe66ce05-5f85-4133-8fad-a100b53c8d7d");
-       
-       List<MediaItem> mediaItems = dyscoDAO.findImages(dysco, 8);
-       
-       for(MediaItem mi : mediaItems){
-    	   System.out.println("MediaItem : "+mi.toJSONString());
-    	   System.out.println("");
-       }
-       
+    	
     }
 }
