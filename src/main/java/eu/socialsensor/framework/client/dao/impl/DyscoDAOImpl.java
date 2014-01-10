@@ -344,7 +344,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
-    	
+    	System.out.println("query : "+query);
     	mediaItems.addAll(collectMediaItems(query,null,"image",size));
     	return mediaItems;
     }
@@ -474,7 +474,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        }
     	}
     	
-    	if(mediaItems.size()<size && query.contains(" AND ")){
+    	/*if(mediaItems.size()<size && query.contains(" AND ")){
     		//second try query if results are not many
         	String secondTryQuery = query.substring(query.indexOf("(")+1,query.indexOf(")"));
         	finalQuery = "(title : "+secondTryQuery+") OR (description:"+secondTryQuery+") OR (tags:"+secondTryQuery+")";
@@ -503,7 +503,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	        	}
     	        }
         	}
-    	}
+    	}*/
     	
     	//Prioritize mediaItems
     	/*for(Integer sp : sortedNetworksPriorities.keySet()){
@@ -518,9 +518,29 @@ public class DyscoDAOImpl implements DyscoDAO {
     	return mediaItems;
     }
     
-
-    public static void main(String[] args) {
+    public List<MediaItem> requestThumbnails(Dysco dysco, int size){
     	
+    	
+    	return null;
+    }
+    
+    private void computePopularity(){
+    	
+    }
+    
+    public static void main(String[] args) {
+    	 // DyscoDAO dyscoDAO = new DyscoDAOImpl("160.40.50.230", "http://localhost:8080/solr/dyscos", "http://localhost:8080/solr/items", "http://localhost:8080/solr/MediaItems");
+    	DyscoDAO dyscoDAO = new DyscoDAOImpl("social1.atc.gr", "http://social1.atc.gr/solr/dyscos", "http://social1.atc.gr/solr/items", "http://social1.atc.gr/solr/MediaItems");
+       SolrDyscoHandler solrdyscoHandler = SolrDyscoHandler.getInstance("http://social1.atc.gr:8080/solr/dyscos");
+       
+       Dysco dysco = solrdyscoHandler.findDyscoLight("fe66ce05-5f85-4133-8fad-a100b53c8d7d");
+       
+       List<MediaItem> mediaItems = dyscoDAO.findImages(dysco, 8);
+       
+       for(MediaItem mi : mediaItems){
+    	   System.out.println("MediaItem : "+mi.toJSONString());
+    	   System.out.println("");
+       }
        
     }
 }
