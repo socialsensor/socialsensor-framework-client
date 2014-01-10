@@ -493,9 +493,9 @@ public class DyscoDAOImpl implements DyscoDAO {
     	return null;
     }
     
-    private void computePopularity(){
+    /*private void computePopularity(){
     	
-    }
+    }*/
     
     public static void main(String[] args) {
     	
