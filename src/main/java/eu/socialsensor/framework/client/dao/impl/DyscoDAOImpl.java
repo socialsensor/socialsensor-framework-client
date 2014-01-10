@@ -452,7 +452,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        for(MediaItem mi : results) {
 	        	
 	        	if(mi.getType().equals(type)){
-		        	if(!urls.contains(mi.getUrl()) && !mi.getThumbnail().contains("sddefault") && !mi.getUrl().contains("photo_unavailable")) {
+		        	if(!urls.contains(mi.getUrl())) {
 		        		
 		        		mediaItems.add(mi);
 		        		/*if(collectedMediaItemsPerNetwork.get(mi.getStreamId()) == null){
@@ -493,11 +493,12 @@ public class DyscoDAOImpl implements DyscoDAO {
     	return null;
     }
     
-    /*private void computePopularity(){
+    private void computePopularity(){
     	
-    }*/
+    }
     
     public static void main(String[] args) {
-    	
+    
+       
     }
 }
