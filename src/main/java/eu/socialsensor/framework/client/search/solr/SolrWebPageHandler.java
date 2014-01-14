@@ -34,7 +34,7 @@ public class SolrWebPageHandler {
     SolrServer server;
     private static Map<String, SolrWebPageHandler> INSTANCES = new HashMap<String, SolrWebPageHandler>();
 
-    private static int commitPeriod = 1000;
+    private static int commitPeriod = 3000;
     
     // Private constructor prevents instantiation from other classes
     private SolrWebPageHandler(String collection) {
