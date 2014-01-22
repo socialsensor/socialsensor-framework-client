@@ -99,7 +99,8 @@ public class SolrItemHandler {
         try {
             SolrItem solrItem = new SolrItem(item);
 
-            server.addBean(solrItem, commitPeriod);
+//            server.addBean(solrItem, commitPeriod);
+            server.addBean(solrItem);
             //UpdateResponse response = server.commit();
             //int statusId = response.getStatus();
             //if (statusId == 0) {
