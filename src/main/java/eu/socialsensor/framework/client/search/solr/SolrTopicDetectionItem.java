@@ -24,18 +24,27 @@ public class SolrTopicDetectionItem {
         
         tags = item.getTags();
         
-        List<Entity> e = item.getEntities();
-        entities = new String[e.size()];
+        if (item.getEntities()!=null && item.getEntities().size()!=0)
+        {
+        	List<Entity> e = item.getEntities();
+        	entities = new String[e.size()];
         
-        for(int i=0; i<e.size(); i++) {
-        	entities[i] = e.get(i).getName();
+        	for(int i=0; i<e.size(); i++) {
+        		entities[i] = e.get(i).getName();
+        	}
         }
+        else
+        	entities = null;
         
-        URL[] links = item.getLinks();
-        urls = new String[links.length];
-        for(int i=0; i<links.length; i++)
-        	urls[i] = links[i].toString();
-        
+        if (item.getLinks()!=null && item.getLinks().length!=0)
+        {
+        	URL[] links = item.getLinks();
+        	urls = new String[links.length];
+        	for(int i=0; i<links.length; i++)
+        		urls[i] = links[i].toString();
+        }
+        else
+        	urls = null;
         publicationTime = item.getPublicationTime();
     }
     

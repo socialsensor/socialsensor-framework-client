@@ -243,6 +243,19 @@ public class SolrItemHandler {
             return null;
         }
     }
+    
+    public List<Item> findItemsRangeTime(long lowerBound, long upperBound) {
+    	SolrQuery solrQuery = new SolrQuery("publicationTime: {" + lowerBound + " TO " + upperBound+"]");
+    	solrQuery.setRows(100000);
+        SearchEngineResponse<Item> response = search(solrQuery);
+        List<Item> items = response.getResults();
+        if (!items.isEmpty()) {
+            return items;
+        } else {
+            Logger.getRootLogger().info("no tweet for this range of time found!!");
+            return null;
+        }
+    }
 
     public Item findItem(String itemId) {
 
