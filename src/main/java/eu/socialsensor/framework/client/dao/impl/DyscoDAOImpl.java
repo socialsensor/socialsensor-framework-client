@@ -1,12 +1,9 @@
 package eu.socialsensor.framework.client.dao.impl;
 
 import eu.socialsensor.framework.client.dao.DyscoDAO;
-import eu.socialsensor.framework.client.dao.DyscoRequestDAO;
-import eu.socialsensor.framework.client.dao.MediaItemDAO;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
@@ -41,19 +38,19 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 public class DyscoDAOImpl implements DyscoDAO {
 
     SearchEngineHandler searchEngineHandler;
-    private MediaItemDAO mediaItemDAO;
-    private DyscoRequestDAO dyscoRequestDAO;
+    //private MediaItemDAO mediaItemDAO;
+    //private DyscoRequestDAO dyscoRequestDAO;
     private SolrItemHandler solrItemHandler;
-    private SolrDyscoHandler handler;
+    //private SolrDyscoHandler handler;
     private SolrMediaItemHandler solrMediaItemHandler;
 
     public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection) {
     	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
     	
-    	mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
-    	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+    	//mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
+    	//dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
     	solrItemHandler = SolrItemHandler.getInstance(itemCollection);
-    	handler = SolrDyscoHandler.getInstance(dyscoCollection);
+    	//handler = SolrDyscoHandler.getInstance(dyscoCollection);
     	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
     }
     
@@ -86,7 +83,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse findNDyscoItems(String id, int size) {
+    public SearchEngineResponse<Item> findNDyscoItems(String id, int size) {
 
         SearchEngineResponse<Item> response = searchEngineHandler
                 .findNDyscoItems(id, size);
@@ -171,7 +168,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse findNDyscoItems(String id, int size, boolean original) {
+    public SearchEngineResponse<Item> findNDyscoItems(String id, int size, boolean original) {
 
         SearchEngineResponse<Item> response = searchEngineHandler
                 .findNDyscoItems(id, size, original);
@@ -253,10 +250,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             }
 
         }
-        List totalUrlsToSearch = new ArrayList<String>(totalItemsUrls);
-
-        return totalUrlsToSearch;
-
+        return new ArrayList<String>(totalItemsUrls);
     }
 
     @Override

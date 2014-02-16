@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -396,7 +395,19 @@ public class VisualIndexHandler {
     		try {
     			//handler.getSimilarImagesAndIndex(id, new URL(url));
     			JsonResultSet results = handler.getSimilarImages(id, 0.8);
+    			
     			List<JsonResult> list = results.results;
+    			if(list.size()>0) {
+    				System.out.println(results.toJSON());
+    				k++;
+    				//for(JsonResult nn : list) 
+    				//	System.out.println(nn.toString());
+    			
+    				System.out.println("============================");
+    			}
+    			
+    			results = handler.getSimilarImages(new URL(url));
+    			list = results.results;
     			if(list.size()>0) {
     				System.out.println(results.toJSON());
     				k++;

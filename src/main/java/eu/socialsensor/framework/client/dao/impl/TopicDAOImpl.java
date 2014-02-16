@@ -6,9 +6,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import eu.socialsensor.framework.client.dao.TopicDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
@@ -19,7 +16,6 @@ import eu.socialsensor.framework.common.factories.ObjectFactory;
 public class TopicDAOImpl implements TopicDAO{
 	
 	List<String> indexes = new ArrayList<String>();
-    private static String host;
     private static String db = "Streams";
     private static String collection = "Topics";
     private MongoHandler mongoHandler;
@@ -61,17 +57,10 @@ public class TopicDAOImpl implements TopicDAO{
     	List<String> jsonItems = mongoHandler.findMany(query, -1);
     	
     	List<Topic> topics = new ArrayList<Topic>();
-    	
-		Gson gson = new GsonBuilder()
-    	.excludeFieldsWithoutExposeAnnotation()
-    	.create();
 		
 		for(String json : jsonItems){
-			
 			Topic topic = ObjectFactory.createTopic(json);
-			
 			topics.add(topic);
-			
 		}
 		return topics;
     }

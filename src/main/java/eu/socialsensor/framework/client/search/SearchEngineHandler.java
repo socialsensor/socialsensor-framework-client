@@ -5,7 +5,6 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServerException;
 
 /**
  *

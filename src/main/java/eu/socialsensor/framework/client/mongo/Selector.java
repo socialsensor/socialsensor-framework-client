@@ -15,6 +15,10 @@ import eu.socialsensor.framework.common.domain.JSONable;
 
 public class Selector implements JSONable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8296758211162088251L;
 	Map<Object, Object> and = null;
 	
 	public void select(Object field, Object value) {

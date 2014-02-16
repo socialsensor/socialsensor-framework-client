@@ -9,7 +9,6 @@ import eu.socialsensor.framework.common.domain.dimension.Dimension;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 
@@ -110,9 +109,8 @@ public interface DyscoDAO {
     List<Item> findSortedDyscoItems(String id, String fieldToSort, ORDER order,
             int rows, boolean original);
 
-    SearchEngineResponse findNDyscoItems(String id, int size);
-
-    SearchEngineResponse findNDyscoItems(String id, int size, boolean original);
+    SearchEngineResponse<Item> findNDyscoItems(String id, int size);
+    SearchEngineResponse<Item> findNDyscoItems(String id, int size, boolean original);
 
     public List<Item> findSortedDyscoItemsByQuery(Query query, String fieldToSort,
             ORDER order, int rows, boolean original);

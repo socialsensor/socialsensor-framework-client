@@ -181,7 +181,8 @@ public final class TweetTokenizer extends Tokenizer
      * (non-Javadoc)
      * @see org.apache.lucene.analysis.TokenStream#next()
      */
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public final boolean incrementToken() throws IOException
     {
         clearAttributes();

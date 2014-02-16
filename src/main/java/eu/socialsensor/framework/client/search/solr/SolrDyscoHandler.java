@@ -77,9 +77,8 @@ public class SolrDyscoHandler {
             Logger.getRootLogger().error(ex.getMessage());
         } catch (Exception ex) {
             Logger.getRootLogger().error(ex.getMessage());
-        } finally {
-            return status;
-        }
+        } 
+        return status;
     }
 
     public boolean removeDysco(String dyscoId) {
@@ -98,9 +97,8 @@ public class SolrDyscoHandler {
             Logger.getRootLogger().error(ex.getMessage());
         } catch (IOException ex) {
             Logger.getRootLogger().error(ex.getMessage());
-        } finally {
-            return status;
-        }
+        } 
+        return status;
     }
 
     public Dysco findDyscoLight(String dyscoId) {

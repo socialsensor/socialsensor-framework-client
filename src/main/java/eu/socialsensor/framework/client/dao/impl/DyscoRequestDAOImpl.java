@@ -38,7 +38,6 @@ public class DyscoRequestDAOImpl implements DyscoRequestDAO {
 
     @Override
     public void insertDyscoRequest(DyscoRequest request) {
-        String id = request.getId();
         mongoHandler.insert(request);
     }
 

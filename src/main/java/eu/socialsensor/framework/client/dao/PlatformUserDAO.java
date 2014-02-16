@@ -5,9 +5,6 @@
 package eu.socialsensor.framework.client.dao;
 
 import eu.socialsensor.framework.common.domain.PlatformUser;
-import eu.socialsensor.framework.common.domain.dysco.Dysco;
-import eu.socialsensor.framework.common.influencers.Influencer;
-import java.util.List;
 
 /**
  *

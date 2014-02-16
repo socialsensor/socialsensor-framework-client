@@ -28,7 +28,6 @@ public class FeedDAOImpl implements FeedDAO{
 	 
 	 @Override
 	 public void insertFeed(Feed feed){
-		 String id = feed.getId();
 		 mongoHandler.insert(feed);
 	 }
 	 

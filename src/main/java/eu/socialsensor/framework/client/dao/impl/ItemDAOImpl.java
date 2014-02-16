@@ -5,22 +5,16 @@ import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 
 import eu.socialsensor.framework.client.dao.ItemDAO;
-import eu.socialsensor.framework.client.dao.MediaItemDAO;
-import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.Item;
-import eu.socialsensor.framework.common.domain.MediaItem;
-import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 

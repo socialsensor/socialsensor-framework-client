@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -16,6 +15,11 @@ import java.util.Map;
 
 public class UpdateItem implements JSONable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3961118677723751119L;
+
 	Gson gson = new GsonBuilder()
     	.excludeFieldsWithoutExposeAnnotation()
     	.create();

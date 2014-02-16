@@ -17,6 +17,8 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
+import eu.socialsensor.framework.client.dao.ItemDAO;
+import eu.socialsensor.framework.client.dao.impl.ItemDAOImpl;
 import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
@@ -36,14 +38,8 @@ public class SolrItemHandler {
     private static int commitPeriod = 1000;
 
     private SolrItemHandler(String collection) {
-        try {
-//            ConfigReader configReader = new ConfigReader();
-//            String url = configReader.getSolrHTTP();    
+        try {  
             server = new HttpSolrServer(collection);
-
-            //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
-            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
-
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
         }
@@ -78,9 +74,8 @@ public class SolrItemHandler {
         } catch (Exception ex) {
             ex.printStackTrace();
             status = false;
-        } finally {
-            return status;
-        }
+        } 
+        return status;
     }
 
     public boolean insertItems(List<Item> items) {
@@ -107,10 +102,8 @@ public class SolrItemHandler {
         } catch (IOException ex) {
             logger.error(ex.getMessage());
             status = false;
-        } finally {
-            return status;
-        }
-
+        } 
+        return status;
     }
 
     public void forceCommitPending() {
@@ -151,9 +144,8 @@ public class SolrItemHandler {
             logger.error(ex.getMessage());
         } catch (IOException ex) {
             logger.error(ex.getMessage());
-        } finally {
-            return status;
         }
+        return status;
     }
 
     public boolean deleteItems(Query query) {
@@ -170,9 +162,8 @@ public class SolrItemHandler {
             logger.error(ex.getMessage());
         } catch (IOException ex) {
             logger.error(ex.getMessage());
-        } finally {
-            return status;
         }
+        return status;
     }
 
     public SearchEngineResponse<Item> findItems(SolrQuery query) {
@@ -259,12 +250,13 @@ public class SolrItemHandler {
         return search(solrQuery);
     }
 
-    private SearchEngineResponse<Item> addFilterAndSearch(SolrQuery query, String fq) {
-
-        query.addFilterQuery(fq);
-        return search(query);
-
-    }
+//    private SearchEngineResponse<Item> addFilterAndSearch(
+//    		SolrQuery query, String fq) {
+//
+//        query.addFilterQuery(fq);
+//        return search(query);
+//
+//    }
 
     private SearchEngineResponse<Item> removeFilterAndSearch(SolrQuery query, String fq) {
 
@@ -305,13 +297,13 @@ public class SolrItemHandler {
 
 
         List<Item> items = new ArrayList<Item>();
-        for (SolrItem solrItem : solrItems) {
-//            try {
-//                items.add(solrItem.toItem());
-//            } catch (MalformedURLException ex) {
-//                logger.error(ex.getMessage());
-//            }
-        }
+//        for (SolrItem solrItem : solrItems) {
+////            try {
+////                items.add(solrItem.toItem());
+////            } catch (MalformedURLException ex) {
+////                logger.error(ex.getMessage());
+////            }
+//        }
 
         response.setResults(items);
         List<Facet> facets = new ArrayList<Facet>();
@@ -370,5 +362,16 @@ public class SolrItemHandler {
         }
         response.setFacets(facets);
         return response;
+    }
+    
+    public static void main(String[] args) {
+    	SolrItemHandler solr = SolrItemHandler.getInstance("http://160.40.50.207:8080/solr/TestColl");
+    	ItemDAO dao = new ItemDAOImpl("160.40.51.18", "GreekNews", "Items");
+    	
+    	List<Item> items = dao.getLatestItems(10000);
+    	for(Item item :items) {
+    		System.out.println(item.toJSONString());
+    		solr.insertItem(item);
+    	}
     }
 }

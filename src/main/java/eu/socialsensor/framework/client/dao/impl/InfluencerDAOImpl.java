@@ -6,7 +6,6 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import eu.socialsensor.framework.client.dao.InfluencerDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
-import eu.socialsensor.framework.common.factories.ItemFactory;
 import eu.socialsensor.framework.common.factories.KeywordInfluencersPairFactory;
 import eu.socialsensor.framework.common.influencers.Influencer;
 import eu.socialsensor.framework.common.influencers.KeywordInfluencersPair;
@@ -26,9 +25,9 @@ import org.apache.log4j.Logger;
 public class InfluencerDAOImpl implements InfluencerDAO {
 
     List<String> indexes = new ArrayList<String>();
-    private final String host = "";
-    private final String db = "Streams";
-    private final String collection = "influencers";
+    //private final String host = "";
+    //private final String db = "Streams";
+    //private final String collection = "influencers";
     private MongoHandler mongoHandler;
 
      public InfluencerDAOImpl(String host, String db, String collection) {
@@ -79,7 +78,7 @@ public class InfluencerDAOImpl implements InfluencerDAO {
     public List<Influencer> getInfluencersForKeywords(List<String> keywords) {
 
         List<String> results = mongoHandler.findManyWithOr("keyword", keywords, 100);
-        List<KeywordInfluencersPair> pairs = new ArrayList<KeywordInfluencersPair>();
+        //List<KeywordInfluencersPair> pairs = new ArrayList<KeywordInfluencersPair>();
         Set<Influencer> influencers = new HashSet<Influencer>();
 
         for (String json : results) {

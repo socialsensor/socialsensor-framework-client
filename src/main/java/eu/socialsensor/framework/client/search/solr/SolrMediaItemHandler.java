@@ -6,7 +6,6 @@ import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.MediaItem;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +18,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
 
@@ -401,31 +399,29 @@ public class SolrMediaItemHandler {
     private SearchEngineResponse<MediaItem> search(SolrQuery query) {
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
-        QueryResponse rsp;
+//        QueryResponse rsp;
        
-        try {
-            rsp = server.query(query);
-        } catch (SolrServerException e) {
-        	e.printStackTrace();
-            Logger.getRootLogger().info(e.getMessage());
-            return null;
-        }
+//        try {
+//            rsp = server.query(query);
+//        } catch (SolrServerException e) {
+//        	e.printStackTrace();
+//            Logger.getRootLogger().info(e.getMessage());
+//            return null;
+//        }
 
 
-        List<SolrMediaItem> solrItems = rsp.getBeans(SolrMediaItem.class);
-  
-
-        List<MediaItem> mediaItems = new ArrayList<MediaItem>();
-        for (SolrMediaItem solrMediaItem : solrItems) {
+//        List<SolrMediaItem> solrItems = rsp.getBeans(SolrMediaItem.class);
+//        List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+//        for (SolrMediaItem solrMediaItem : solrItems) {
 //            try {
 //            	MediaItem mediaItem = solrMediaItem.toMediaItem();
 //                mediaItems.add(mediaItem);
 //            } catch (MalformedURLException ex) {
 //                Logger.getRootLogger().error(ex.getMessage());
 //            }
-        }
+//        }
 
-        response.setResults(mediaItems);
+//        response.setResults(mediaItems);
          
         return response;
     }

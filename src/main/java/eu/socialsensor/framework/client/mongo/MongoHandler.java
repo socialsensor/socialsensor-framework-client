@@ -10,9 +10,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
-import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.JSONable;
-import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -437,6 +435,23 @@ public class MongoHandler {
 
     public static void main(String[] args) throws UnknownHostException {
 
+    	MongoClient client = new MongoClient("160.40.51.18");
+    	DB database = client.getDB("GreekNews");
+    	DBCollection coll = database.getCollection("StreamUsers");
+    	
+    	DBObject query = new BasicDBObject("streamId","Instagram");
+    	DBCursor cursor = coll.find(query);
+    	while(cursor.hasNext()) {
+    		DBObject obj = cursor.next();
+    		Object username = obj.get("username");
+    		
+    		String pageUrl = "http://instagram.com/" + username;
+    		
+    		DBObject q = new BasicDBObject("username", username);
+    		DBObject o = new BasicDBObject("$set", new BasicDBObject("pageUrl", pageUrl));
+    		coll.update(q, o);
+    		
+    	}
     	
     }
 }

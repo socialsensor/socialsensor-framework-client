@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import eu.socialsensor.framework.common.domain.StreamUser;
-import eu.socialsensor.framework.common.domain.StreamUser.Category;
 
 /**
  * Data Access Object for Item
