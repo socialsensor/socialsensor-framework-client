@@ -109,21 +109,34 @@ public class SolrTopicDetectionItem {
     public String getTitle() {
         return title;
     }
+    
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String[] getTags() {
         return tags;
     }
     
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+    
     public String[] getEntities() {
         return entities;
+    }
+    
+    public void setEntities(String[] entities) {
+        this.entities = entities;
     }
 
     public String[] getUrls() {
         return urls;
     }
     
-    public void setTitle(String title) {
-        this.title = title;
+    public void setUrls(String[] urls) {
+        this.urls = urls;
     }
+    
 
 }
