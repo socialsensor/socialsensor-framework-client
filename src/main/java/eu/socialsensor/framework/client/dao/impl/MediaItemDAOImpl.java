@@ -105,12 +105,6 @@ public class MediaItemDAOImpl implements MediaItemDAO {
         boolean update = false;
         UpdateItem changes = new UpdateItem();
 
-        List<String> feedKeywords = item.getFeedKeywords();
-        if (feedKeywords != null && feedKeywords.size() > 0) {
-            changes.addValues("feedKeywords", feedKeywords.toArray());
-            update = true;
-        }
-
         if (update) {
             mongoHandler.update("id", item.getId(), changes);
         }
