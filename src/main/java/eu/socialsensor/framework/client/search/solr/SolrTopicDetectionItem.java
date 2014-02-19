@@ -71,7 +71,7 @@ public class SolrTopicDetectionItem {
     
     @Field(value="creationDate")
     private Date creationDate;
-
+    
     public Date getCreationDate() {
         return creationDate;
     }

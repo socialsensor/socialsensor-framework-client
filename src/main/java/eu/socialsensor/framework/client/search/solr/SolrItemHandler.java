@@ -246,7 +246,7 @@ public class SolrItemHandler {
     
     public List<Item> findItemsRangeTime(long lowerBound, long upperBound) {
     	SolrQuery solrQuery = new SolrQuery("publicationTime: {" + lowerBound + " TO " + upperBound+"]");
-    	solrQuery.setRows(100000);
+    	solrQuery.setRows(2000000);
         SearchEngineResponse<Item> response = search(solrQuery);
         List<Item> items = response.getResults();
         if (!items.isEmpty()) {
