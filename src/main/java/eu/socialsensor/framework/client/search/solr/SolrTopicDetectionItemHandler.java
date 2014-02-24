@@ -349,7 +349,6 @@ public class SolrTopicDetectionItemHandler {
 
     private SearchEngineResponse<SolrTopicDetectionItem> search(SolrQuery query) {
     	SearchEngineResponse<SolrTopicDetectionItem> response = new SearchEngineResponse<SolrTopicDetectionItem>();
-        query.setRows(10000000);
 ////        query.setRows(450);
 ////        query.setFacet(true);
 ////        query.addFacetField("sentiment");
