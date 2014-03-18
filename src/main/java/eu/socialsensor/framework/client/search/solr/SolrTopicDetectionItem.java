@@ -6,7 +6,6 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
-
 import java.util.Date;
 import java.util.List;
 
@@ -137,6 +136,4 @@ public class SolrTopicDetectionItem {
     public void setUrls(String[] urls) {
         this.urls = urls;
     }
-    
-
 }
