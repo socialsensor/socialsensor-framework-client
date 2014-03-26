@@ -12,6 +12,7 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -117,6 +118,11 @@ public class SolrItem {
 
         }
 
+        lists = new ArrayList<String>();
+        if (item.getList()!= null) {
+            lists.addAll(Arrays.asList(item.getList()));
+        }
+
         validityScore = item.getValidityScore();
 
         //convert votes to JSONString and put it to SolrItem
@@ -135,7 +141,7 @@ public class SolrItem {
         item.setVotes(ItemFactory.createVoteList(validityVotes));
         item.setPositiveVotes(positiveVotes);
         item.setNegativeVotes(negativeVotes);
-        
+
         item.setId(id);
         item.setStreamId(streamId);
         item.setTitle(title);
@@ -160,6 +166,7 @@ public class SolrItem {
                 }
             }
         }
+        
 
         item.setPublicationTime(publicationTime);
 
@@ -285,6 +292,8 @@ public class SolrItem {
     private int negativeVotes;
     @Field(value = "retweetsCount")
     private int retweetsCount = 0;
+    @Field(value = "lists")
+    private List<String> lists;
 
     public int getPositiveVotes() {
         return positiveVotes;
@@ -562,6 +571,14 @@ public class SolrItem {
 
     public void setValidityVotes(String validityVotes) {
         this.validityVotes = validityVotes;
+    }
+
+    public List<String> getLists() {
+        return lists;
+    }
+
+    public void setLists(List<String> lists) {
+        this.lists = lists;
     }
 
     private List<String> extractPeople(String input) {
