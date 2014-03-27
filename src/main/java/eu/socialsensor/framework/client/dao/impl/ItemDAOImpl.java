@@ -189,10 +189,7 @@ public class ItemDAOImpl implements ItemDAO {
     public List<Item> getUnindexedItems(int max) {
         Selector query = new Selector();
         query.select("indexed", Boolean.FALSE);
-        query.select("streamId", "Twitter");
         query.select("original", Boolean.TRUE);
-
-
 
         List<String> jsonItems = mongoHandler.findManyNoSorting(query, max);
         List<Item> items = new ArrayList<Item>();
