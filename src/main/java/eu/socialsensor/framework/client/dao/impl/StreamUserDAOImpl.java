@@ -17,6 +17,7 @@ import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class StreamUserDAOImpl implements StreamUserDAO {
 
@@ -88,7 +89,7 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     public StreamUser getStreamUserByName(String username) {
 
         Selector query = new Selector();
-        query.select("username", username);
+        query.select("username", StringEscapeUtils.escapeHtml(username));
         query.select("streamId", "Twitter");
 
         String json = mongoHandler.findOne(query);
