@@ -2,6 +2,8 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.MongoException;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,24 +28,22 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     private static String collection = "MediaItems";
     private MongoHandler mongoHandler;
 
-    public MediaItemDAOImpl(String host) {
+    public MediaItemDAOImpl(String host) throws Exception {
         this(host, db, collection);
     }
 
-    public MediaItemDAOImpl(String host, String db) {
+    public MediaItemDAOImpl(String host, String db) throws Exception {
         this(host, db, collection);
     }
 
-    public MediaItemDAOImpl(String host, String db, String collection) {
+    public MediaItemDAOImpl(String host, String db, String collection) throws Exception {
         indexes.add("id");
         indexes.add("publicationTime");
         indexes.add("url");
-        try {
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-            mongoHandler.sortBy("publicationTime", MongoHandler.DESC);
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(ItemDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       
+        mongoHandler = new MongoHandler(host, db, collection, indexes);
+        mongoHandler.sortBy("publicationTime", MongoHandler.DESC);
+       
     }
 
     @Override

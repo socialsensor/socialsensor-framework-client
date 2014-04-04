@@ -17,7 +17,7 @@ public class FeedDAOImpl implements FeedDAO{
 	 List<String> indexes = new ArrayList<String>();
 	 private MongoHandler mongoHandler;
 	 
-	 public FeedDAOImpl(String host, String db, String collection){
+	 public FeedDAOImpl(String host, String db, String collection) throws Exception{
 		 indexes.add("id");
 		 try {
 	            mongoHandler = new MongoHandler(host, db, collection, indexes);

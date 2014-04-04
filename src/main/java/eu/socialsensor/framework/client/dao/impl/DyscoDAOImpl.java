@@ -47,14 +47,20 @@ public class DyscoDAOImpl implements DyscoDAO {
     private SolrDyscoHandler handler;
     private SolrMediaItemHandler solrMediaItemHandler;
 
-    public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection) {
+    public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection) throws Exception {
     	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
     	
-    	mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
-    	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
-    	solrItemHandler = SolrItemHandler.getInstance(itemCollection);
-    	handler = SolrDyscoHandler.getInstance(dyscoCollection);
-    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
+    	try {
+    		mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
+        	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+			solrItemHandler = SolrItemHandler.getInstance(itemCollection);
+			handler = SolrDyscoHandler.getInstance(dyscoCollection);
+	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     }
     
     @Override

@@ -25,7 +25,7 @@ public class SolrHandler implements SearchEngineHandler {
     private SolrDyscoHandler solrDyscoHandler; 
     private SolrItemHandler solrItemHandler;
 
-    public  SolrHandler(String dyscosCollection, String itemsCollection) {
+    public  SolrHandler(String dyscosCollection, String itemsCollection) throws Exception {
     	solrDyscoHandler = SolrDyscoHandler.getInstance(dyscosCollection);
     	solrItemHandler = SolrItemHandler.getInstance(itemsCollection);
     }

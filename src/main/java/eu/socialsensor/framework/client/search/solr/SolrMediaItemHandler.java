@@ -32,18 +32,17 @@ public class SolrMediaItemHandler {
     private static int commitPeriod = 1000;
 
     // Private constructor prevents instantiation from other classes
-    private SolrMediaItemHandler(String collection) {
-        try {
+    private SolrMediaItemHandler(String collection) throws Exception{
+       
             server = new HttpSolrServer(collection);
+            server.ping();
             //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
             //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
-        } catch (Exception e) {
-            Logger.getRootLogger().info(e.getMessage());
-        }
+      
     }
 
     // implementing Singleton pattern
-    public static SolrMediaItemHandler getInstance(String collection) {
+    public static SolrMediaItemHandler getInstance(String collection) throws Exception {
         SolrMediaItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrMediaItemHandler(collection);

@@ -39,9 +39,10 @@ public class KeywordDAOImpl implements KeywordDAO {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
             
             mongoHandler.sortBy("score", 1);
-        } catch (UnknownHostException ex) {
-            org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
-        }
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     @Override

@@ -56,18 +56,15 @@ public class SolrNewsFeedHandler {
 //	            Logger.getRootLogger().info(e.getMessage());
 //	        }
 //	    }
-	    private SolrNewsFeedHandler(String collection) {
-	        try {
+	    private SolrNewsFeedHandler(String collection) throws Exception{
+	    
 //	            ConfigReader configReader = new ConfigReader();
 //	            String url = configReader.getSolrHTTP();    
 	            server = new HttpSolrServer(collection);
-
+	            server.ping();
 	            //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
 	            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
-	        } catch (Exception e) {
-	            Logger.getRootLogger().info(e.getMessage());
-	        }
 	    }
 
 //	    //implementing Singleton pattern
@@ -78,7 +75,7 @@ public class SolrNewsFeedHandler {
 //	        return INSTANCE;
 //	    }
 	    //implementing Singleton pattern
-	    public static SolrNewsFeedHandler getInstance(String collection) {
+	    public static SolrNewsFeedHandler getInstance(String collection) throws Exception {
 	    	SolrNewsFeedHandler INSTANCE = INSTANCES.get(collection);
 	        if (INSTANCE == null) {
 	            INSTANCE = new SolrNewsFeedHandler(collection);

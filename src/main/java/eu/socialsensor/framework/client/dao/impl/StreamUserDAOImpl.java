@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 
 import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
@@ -26,19 +27,17 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     private final static String collection = "StreamUsers";
     private MongoHandler mongoHandler;
 
-    public StreamUserDAOImpl(String host) {
+    public StreamUserDAOImpl(String host) throws Exception {
         this(host, db, collection);
     }
 
-    public StreamUserDAOImpl(String host, String db, String collection) {
+    public StreamUserDAOImpl(String host, String db, String collection) throws Exception {
         indexes.add("id");
         indexes.add("userid");
         indexes.add("username");
-        try {
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-        } catch (UnknownHostException ex) {
-            Logger.getRootLogger().error(ex.getMessage());
-        }
+        
+        mongoHandler = new MongoHandler(host, db, collection, indexes);
+        
     }
 
     @Override
@@ -122,7 +121,13 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
     public static void main(String... args) {
 
-        StreamUserDAO dao = new StreamUserDAOImpl("social1.atc.gr", "Streams", "StreamUsers");
+        StreamUserDAO dao = null;
+		try {
+			dao = new StreamUserDAOImpl("social1.atc.gr", "Streams", "StreamUsers");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         StreamUser user = dao.getStreamUserByName("SethMacFarlane");
         System.out.println("done");
 

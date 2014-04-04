@@ -23,11 +23,14 @@ public class LocationDAOImpl implements LocationDAO {
     }
     
     public LocationDAOImpl(String host, String db, String collection) {
+        
         try {
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-        } catch (UnknownHostException ex) {
-            org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
-        }
+			mongoHandler = new MongoHandler(host, db, collection, indexes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+   
     }
     
 	@Override

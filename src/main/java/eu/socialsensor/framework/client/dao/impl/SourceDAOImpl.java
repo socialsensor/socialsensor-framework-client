@@ -41,7 +41,7 @@ public class SourceDAOImpl implements SourceDAO {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
             
             mongoHandler.sortBy("score", 1);
-        } catch (UnknownHostException ex) {
+        } catch (Exception ex) {
             org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
         }
     }

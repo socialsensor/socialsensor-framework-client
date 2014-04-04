@@ -30,7 +30,10 @@ public class ExpertDAOImpl implements ExpertDAO {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
         } catch (UnknownHostException ex) {
             org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
-        }
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
 	@Override
