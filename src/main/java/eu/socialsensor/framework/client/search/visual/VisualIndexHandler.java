@@ -385,7 +385,13 @@ public class VisualIndexHandler {
     	
     	VisualIndexHandler handler = new VisualIndexHandler("http://160.40.50.207:8080/VisualIndex", "prototype");
     	
-    	MediaItemDAO dao = new MediaItemDAOImpl("160.40.50.207", "Streams", "MediaItemsFromWP_boilerpipe");
+    	MediaItemDAO dao = null;
+		try {
+			dao = new MediaItemDAOImpl("160.40.50.207", "Streams", "MediaItemsFromWP_boilerpipe");
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     	List<MediaItem> mediaItems = dao.getLastMediaItems(-1);
     	
     	int k = 0;

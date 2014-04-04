@@ -7,6 +7,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import eu.socialsensor.framework.common.domain.JSONable;
@@ -37,9 +38,11 @@ public class MongoHandler {
     private static Map<String, MongoClient> connections = new HashMap<String, MongoClient>();
     private static Map<String, DB> databases = new HashMap<String, DB>();
 
-    public MongoHandler(String host, String dbName, String collectionName, List<String> indexes) throws UnknownHostException {
+    public MongoHandler(String host, String dbName, String collectionName, List<String> indexes) throws Exception {
         this(host, dbName);
         collection = db.getCollection(collectionName);
+        
+      
         if (indexes != null) {
             for (String index : indexes) {
                 collection.ensureIndex(index);
@@ -47,22 +50,28 @@ public class MongoHandler {
         }
     }
 
-    public MongoHandler(String hostname, String dbName)
-            throws UnknownHostException {
+    public MongoHandler(String hostname, String dbName) throws Exception{
         String connectionKey = hostname + "#" + dbName;
-
         db = databases.get(connectionKey);
         if (db == null) {
             MongoClient mongo = connections.get(hostname);
+            
             if (mongo == null) {
                 mongo = new MongoClient(hostname);
                 connections.put(hostname, mongo);
             }
             db = mongo.getDB(dbName);
             databases.put(connectionKey, db);
+            try{
+            	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
+            
+            }
+            catch(Exception e){
+            	System.out.println("Mongo DB at "+hostname+" is closed");
+            	throw e;
+            }
+            
         }
-
-
     }
 
     public void sortBy(String field, int order) {

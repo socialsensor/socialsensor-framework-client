@@ -25,7 +25,7 @@ public class TimeslotDAOImpl implements TimeslotDAO {
 			mongoHandler = new MongoHandler(host, db, collection, indexes);
 			
 			mongoHandler.sortBy("timestamp", MongoHandler.DESC);
-		} catch (UnknownHostException ex) {
+		} catch (Exception ex) {
 			org.apache.log4j.Logger.getRootLogger().error(ex.getMessage());
 		}
 	}

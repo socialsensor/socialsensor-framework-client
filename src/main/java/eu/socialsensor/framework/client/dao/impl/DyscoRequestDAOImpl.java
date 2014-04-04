@@ -33,7 +33,10 @@ public class DyscoRequestDAOImpl implements DyscoRequestDAO {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
         } catch (UnknownHostException ex) {
             Logger.getRootLogger().error(ex.getMessage());
-        }
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @Override

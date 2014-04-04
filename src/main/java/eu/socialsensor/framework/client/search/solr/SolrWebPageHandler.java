@@ -10,6 +10,7 @@ import eu.socialsensor.framework.common.domain.WebPage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -375,7 +376,13 @@ public class SolrWebPageHandler {
     	
     	SolrWebPageHandler solr = SolrWebPageHandler.getInstance("http://160.40.50.207:8080/solr/WebPages");
     	
-    	WebPageDAO dao = new WebPageDAOImpl("160.40.50.207");
+    	WebPageDAO dao = null;
+		try {
+			dao = new WebPageDAOImpl("");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	Selector query = new Selector();
     	query.select("status", "proccessed");

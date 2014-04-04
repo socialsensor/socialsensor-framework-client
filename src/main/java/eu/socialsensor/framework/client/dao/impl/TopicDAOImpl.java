@@ -39,7 +39,7 @@ public class TopicDAOImpl implements TopicDAO{
         try {
             mongoHandler = new MongoHandler(host, db, collection, indexes);
             
-        } catch (UnknownHostException ex) {
+        } catch (Exception ex) {
             Logger.getRootLogger().error(ex.getMessage());
         }
     }

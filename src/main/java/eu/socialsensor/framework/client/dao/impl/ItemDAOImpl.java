@@ -3,6 +3,7 @@ package eu.socialsensor.framework.client.dao.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
+import com.mongodb.MongoException;
 
 import eu.socialsensor.framework.client.dao.ItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
@@ -29,28 +30,24 @@ public class ItemDAOImpl implements ItemDAO {
     private static String collection = "Items";
     private MongoHandler mongoHandler;
 
-    public ItemDAOImpl(String host) {
+    public ItemDAOImpl(String host) throws Exception {
         this(host, db, collection);
     }
 
-    public ItemDAOImpl(String host, String db) {
+    public ItemDAOImpl(String host, String db) throws Exception {
         this(host, db, collection);
     }
 
-    public ItemDAOImpl(String host, String db, String collection) {
+    public ItemDAOImpl(String host, String db, String collection) throws Exception {
 
         indexes.add("id");
         indexes.add("publicationTime");
         indexes.add("indexed");
         indexes.add("original");
-         indexes.add("insertionTime");
+        indexes.add("insertionTime");
 
-        try {
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
+        mongoHandler = new MongoHandler(host, db, collection, indexes);
 
-        } catch (UnknownHostException ex) {
-            Logger.getRootLogger().error(ex.getMessage());
-        }
     }
 
     @Override
@@ -189,10 +186,7 @@ public class ItemDAOImpl implements ItemDAO {
     public List<Item> getUnindexedItems(int max) {
         Selector query = new Selector();
         query.select("indexed", Boolean.FALSE);
-        query.select("streamId", "Twitter");
         query.select("original", Boolean.TRUE);
-
-
 
         List<String> jsonItems = mongoHandler.findManyNoSorting(query, max);
         List<Item> items = new ArrayList<Item>();
@@ -247,7 +241,13 @@ public class ItemDAOImpl implements ItemDAO {
 
     public static void main(String... args) {
 
-        ItemDAO dao = new ItemDAOImpl("social1.atc.gr", "Streams", "Items");
+        ItemDAO dao = null;
+		try {
+			dao = new ItemDAOImpl("social1.atc.gr", "Streams", "Items");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         List<Item> items = dao.getUnindexedItems(10);
 

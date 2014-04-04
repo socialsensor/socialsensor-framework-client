@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.mongodb.MongoException;
+
 /**
  *
  * @author etzoannos - e.tzoannos@atc.gr
@@ -27,18 +29,16 @@ public class WebPageDAOImpl implements WebPageDAO {
     private final static String collection = "WebPages";
     private List<String> indexes = new ArrayList<String>();
 
-    public WebPageDAOImpl(String host) {
+    public WebPageDAOImpl(String host) throws Exception {
         this(host, db, collection);
     }
 
-    public WebPageDAOImpl(String host, String db, String collection) {
+    public WebPageDAOImpl(String host, String db, String collection) throws Exception {
         indexes.add("url");
         indexes.add("references");
-        try {
-            mongoHandler = new MongoHandler(host, db, collection, indexes);
-        } catch (UnknownHostException ex) {
-            Logger.getRootLogger().error(ex.getMessage());
-        }
+        
+        mongoHandler = new MongoHandler(host, db, collection, indexes);
+        
     }
 
     @Override

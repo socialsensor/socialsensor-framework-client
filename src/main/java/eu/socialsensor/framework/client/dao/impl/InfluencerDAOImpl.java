@@ -39,7 +39,10 @@ public class InfluencerDAOImpl implements InfluencerDAO {
 
         } catch (UnknownHostException ex) {
             Logger.getRootLogger().error(ex.getMessage());
-        }
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public InfluencerDAOImpl(String host, String db, String collection) {
@@ -51,7 +54,10 @@ public class InfluencerDAOImpl implements InfluencerDAO {
 
         } catch (UnknownHostException ex) {
             Logger.getRootLogger().error(ex.getMessage());
-        }
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 //    public InfluencerDAOImpl() {
