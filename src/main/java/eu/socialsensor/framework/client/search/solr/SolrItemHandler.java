@@ -365,8 +365,8 @@ public class SolrItemHandler {
     }
     
     public static void main(String[] args) {
-    	SolrItemHandler solr = SolrItemHandler.getInstance("http://160.40.50.207:8080/solr/TestColl");
-    	ItemDAO dao = new ItemDAOImpl("160.40.51.18", "GreekNews", "Items");
+    	SolrItemHandler solr = SolrItemHandler.getInstance("http://xxx.xxx.xxx.xxx:8080/solr/GreekElectionsItems");
+    	ItemDAO dao = new ItemDAOImpl("xxx.xxx.xxx.xxx", "GreekElections", "Items");
     	
     	List<Item> items = dao.getLatestItems(10000);
     	for(Item item :items) {

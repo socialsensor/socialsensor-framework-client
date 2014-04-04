@@ -1,8 +1,13 @@
 package eu.socialsensor.framework.client.search.solr;
 
 
+import eu.socialsensor.framework.client.dao.ItemDAO;
+import eu.socialsensor.framework.client.dao.MediaItemDAO;
+import eu.socialsensor.framework.client.dao.impl.ItemDAOImpl;
+import eu.socialsensor.framework.client.dao.impl.MediaItemDAOImpl;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 
 import java.io.IOException;
@@ -424,5 +429,16 @@ public class SolrMediaItemHandler {
 //        response.setResults(mediaItems);
          
         return response;
+    }
+    
+    public static void main(String[] args) {
+    	SolrMediaItemHandler solr = SolrMediaItemHandler.getInstance("http://xxx.xxx.xxx.xxx:8080/solr/GreekElectionsMediaItems");
+    	MediaItemDAO dao = new MediaItemDAOImpl("xxx.xxx.xxx.xxx", "GreekElections", "MediaItems");
+    	
+    	List<MediaItem> mItems = dao.getLastMediaItems(10000);
+    	for(MediaItem item :mItems) {
+    		System.out.println(item.toJSONString());
+    		solr.insertMediaItem(item);
+    	}
     }
 }
