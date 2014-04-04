@@ -6,7 +6,6 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
-
 import java.util.Date;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class SolrTopicDetectionItem {
     
     @Field(value="creationDate")
     private Date creationDate;
-
+    
     public Date getCreationDate() {
         return creationDate;
     }
@@ -109,21 +108,32 @@ public class SolrTopicDetectionItem {
     public String getTitle() {
         return title;
     }
+    
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String[] getTags() {
         return tags;
     }
     
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+    
     public String[] getEntities() {
         return entities;
+    }
+    
+    public void setEntities(String[] entities) {
+        this.entities = entities;
     }
 
     public String[] getUrls() {
         return urls;
     }
     
-    public void setTitle(String title) {
-        this.title = title;
+    public void setUrls(String[] urls) {
+        this.urls = urls;
     }
-
 }
