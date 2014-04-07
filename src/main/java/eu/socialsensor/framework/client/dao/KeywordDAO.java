@@ -11,9 +11,9 @@ import eu.socialsensor.framework.common.domain.SocialNetworkSource;
  */
 public interface KeywordDAO {
 
-    public void insertKeyword(String keyword, float score);
+    public void insertKeyword(String keyword, double score);
 
-    public void insertKeyword(String keyword, float score, SocialNetworkSource sourceType);
+    public void insertKeyword(String keyword, double score, SocialNetworkSource sourceType);
     
     public void insertKeyword(Keyword keyword, SocialNetworkSource sourceType);
     

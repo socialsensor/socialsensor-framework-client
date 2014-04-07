@@ -63,7 +63,7 @@ public class KeywordDAOImpl implements KeywordDAO {
 	}
     
     @Override
-    public void insertKeyword(String keyword, float score) {
+    public void insertKeyword(String keyword, double score) {
         Map<String, Object> map = new HashMap<String, Object>();
         String id = SocialNetworkSource.All+"::"+keyword;
         map.put("_id", id);
@@ -74,7 +74,7 @@ public class KeywordDAOImpl implements KeywordDAO {
     }
 
     @Override
-	public void insertKeyword(String keyword, float score, SocialNetworkSource sourceType) {
+	public void insertKeyword(String keyword, double score, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
     	String id = sourceType+"::"+keyword;
         map.put("_id", id);
