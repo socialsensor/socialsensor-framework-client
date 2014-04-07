@@ -66,7 +66,12 @@ public class SolrNewsFeedHandler {
 	            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
 	    }
-
+	    
+	    
+	    public void checkServerStatus() throws Exception{
+	    	server.ping();
+	    }
+	    
 //	    //implementing Singleton pattern
 //	    public static SolrItemHandler getInstance() {
 //	        if (INSTANCE == null) {
