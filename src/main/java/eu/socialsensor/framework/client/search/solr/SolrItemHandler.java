@@ -63,6 +63,7 @@ public class SolrItemHandler {
 //        }
 //    }
     private SolrItemHandler(String collection) throws Exception{
+    	
        
 //            ConfigReader configReader = new ConfigReader();
 //            String url = configReader.getSolrHTTP();    
@@ -91,6 +92,7 @@ public class SolrItemHandler {
         SolrItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrItemHandler(collection);
+            
             INSTANCES.put(collection, INSTANCE);
         }
         return INSTANCE;
@@ -103,7 +105,8 @@ public class SolrItemHandler {
             SolrItem solrItem = new SolrItem(item);
 
 //            server.addBean(solrItem, commitPeriod);
-            server.addBean(solrItem);
+            server.addBean(solrItem,commitPeriod);
+           
             //UpdateResponse response = server.commit();
             //int statusId = response.getStatus();
             //if (statusId == 0) {

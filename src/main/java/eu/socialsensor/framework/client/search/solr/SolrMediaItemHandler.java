@@ -50,6 +50,7 @@ public class SolrMediaItemHandler {
         SolrMediaItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrMediaItemHandler(collection);
+            
             INSTANCES.put(collection, INSTANCE);
         }
         return INSTANCE;
