@@ -7,12 +7,15 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoException;
+import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
-import eu.socialsensor.framework.common.domain.JSONable;
-import java.net.UnknownHostException;
 
+import eu.socialsensor.framework.common.domain.JSONable;
+
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +41,9 @@ public class MongoHandler {
     private static Map<String, MongoClient> connections = new HashMap<String, MongoClient>();
     private static Map<String, DB> databases = new HashMap<String, DB>();
 
+    private static MongoClientOptions options = MongoClientOptions.builder()
+            .writeConcern(WriteConcern.UNACKNOWLEDGED).build();
+    
     public MongoHandler(String host, String dbName, String collectionName, List<String> indexes) throws Exception {
         this(host, dbName);
         collection = db.getCollection(collectionName);
@@ -57,7 +63,7 @@ public class MongoHandler {
             MongoClient mongo = connections.get(hostname);
             
             if (mongo == null) {
-                mongo = new MongoClient(hostname);
+                mongo = new MongoClient(hostname, options);
                 connections.put(hostname, mongo);
             }
             db = mongo.getDB(dbName);
