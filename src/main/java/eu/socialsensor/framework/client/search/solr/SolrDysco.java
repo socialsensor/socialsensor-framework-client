@@ -104,7 +104,7 @@ public class SolrDysco {
             hashtags.add(entry.getKey());
         }
 
-        solrQueryString = dysco.getSolrQueryString();
+        solrQueryString = dysco.getSolrQuery();
 
         trending = dysco.getTrending();
 
