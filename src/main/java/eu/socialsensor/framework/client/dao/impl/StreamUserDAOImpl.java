@@ -18,6 +18,7 @@ import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
+
 import org.apache.commons.lang.StringEscapeUtils;
 
 public class StreamUserDAOImpl implements StreamUserDAO {
@@ -99,11 +100,16 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
     @Override
     public void incStreamUserValue(String userid, String field) {
-        UpdateItem changes = new UpdateItem();
-        changes.incField(field, 1);
-        mongoHandler.update("id", userid, changes);
+    	incStreamUserValue(userid, field, 1);
     }
 
+	@Override
+	public void incStreamUserValue(String userid, String field, int value) {
+        UpdateItem changes = new UpdateItem();
+        changes.incField(field, value);
+        mongoHandler.update("id", userid, changes);
+	}
+	
     @Override
     public Map<String, StreamUser> getStreamUsers(List<String> ids) {
         Map<String, StreamUser> users = new HashMap<String, StreamUser>();
