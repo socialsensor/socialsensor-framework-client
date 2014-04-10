@@ -1,5 +1,6 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import eu.socialsensor.framework.common.domain.Query;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
@@ -59,6 +60,10 @@ public class SolrDysco {
     //The query that will be used for retrieving relevant content to the Dysco from Solr
     @Field(value = "solrQueryString")
     private String solrQueryString;
+    @Field(value = "solrQueriesString")
+    private List<String> solrQueriesString;
+    @Field(value = "solrQueriesScore")
+    private List<String> solrQueriesScore;
     //The variable can get values 0,1,2 and shows dysco's trending evolution. 
     @Field(value = "trending")
     private int trending;
@@ -105,6 +110,11 @@ public class SolrDysco {
         }
 
         solrQueryString = dysco.getSolrQuery();
+        
+        for(Query query : dysco.getSolrQueries()){
+        	solrQueriesString.add(query.getName());
+        	solrQueriesScore.add(query.getScore().toString());
+        }
 
         trending = dysco.getTrending();
 
@@ -163,6 +173,15 @@ public class SolrDysco {
         }
 
         dysco.setSolrQuery(solrQueryString);
+        List<Query> queries = new ArrayList<Query>();
+        for(int i=0;i<solrQueriesString.size();i++){
+        	Query query = new Query();
+        	query.setName(solrQueriesString.get(i));
+        	query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+        	queries.add(query);
+        }
+        dysco.setSolrQueries(queries);
+        
         dysco.setTrending(trending);
         dysco.setUpdateDate(updateDate);
         
