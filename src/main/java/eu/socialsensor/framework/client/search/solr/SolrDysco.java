@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.beans.Field;
 
 import com.google.gson.annotations.Expose;
@@ -21,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
  * @author etzoannos - e.tzoannos@atc.gr
  */
 public class SolrDysco {
+	public final Logger logger = Logger.getLogger(SolrDysco.class);
 
     //The id of the dysco
     @Field(value = "id")
@@ -79,7 +82,7 @@ public class SolrDysco {
     }
 
     public SolrDysco(Dysco dysco) {
-
+    
         id = dysco.getId();
         creationDate = dysco.getCreationDate();
         title = dysco.getTitle();
@@ -111,9 +114,11 @@ public class SolrDysco {
 
         solrQueryString = dysco.getSolrQuery();
         
-        for(Query query : dysco.getSolrQueries()){
-        	solrQueriesString.add(query.getName());
-        	solrQueriesScore.add(query.getScore().toString());
+        if(dysco.getSolrQueries()!=null){
+            for(Query query : dysco.getSolrQueries()){
+            	solrQueriesString.add(query.getName());
+            	solrQueriesScore.add(query.getScore().toString());
+            }
         }
 
         trending = dysco.getTrending();
