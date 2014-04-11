@@ -195,6 +195,7 @@ public class SolrTopicDetectionItemHandler {
         query.setParam("tv.fl", typeTerm);
         query.setParam("f."+typeTerm+".tv.tf", true);
         query.setRows(2000000);
+        query.setParam("shards.qt","/tvrh");
         logger.info(query.toString());
         
         QueryResponse rsp;
