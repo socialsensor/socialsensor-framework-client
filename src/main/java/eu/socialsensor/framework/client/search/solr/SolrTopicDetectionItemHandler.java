@@ -27,12 +27,11 @@ import eu.socialsensor.framework.client.search.SearchEngineResponse;
 public class SolrTopicDetectionItemHandler {
 
     private Logger logger = Logger.getLogger(SolrTopicDetectionItemHandler.class);
-
     private SolrServer server;
     private static SolrTopicDetectionItemHandler INSTANCE = null;
 
     private SolrTopicDetectionItemHandler(String collection) {
-        try { 
+        try {
             server = new HttpSolrServer(collection);
         } catch (Exception e) {
             Logger.getRootLogger().info(e.getMessage());
@@ -48,7 +47,7 @@ public class SolrTopicDetectionItemHandler {
     }
 
     @SuppressWarnings("finally")
-	public boolean deleteItem(String itemId) {
+    public boolean deleteItem(String itemId) {
         boolean status = false;
         try {
             server.deleteByQuery("id:" + itemId);
@@ -68,7 +67,7 @@ public class SolrTopicDetectionItemHandler {
     }
 
     @SuppressWarnings("finally")
-	public boolean deleteItems(Query query) {
+    public boolean deleteItems(Query query) {
         boolean status = false;
         try {
             server.deleteByQuery(query.getQueryString());
@@ -90,7 +89,6 @@ public class SolrTopicDetectionItemHandler {
 //    public SearchEngineResponse<Item> findItems(SolrQuery query) {
 //        return search(query);
 //    }
-
 //    public List<Item> findItemsByTimeslotId(String timeslotId) {
 //
 //        SolrQuery solrQuery = new SolrQuery("timeslotId:\"" + timeslotId + "\"");
@@ -104,23 +102,23 @@ public class SolrTopicDetectionItemHandler {
 //            return null;
 //        }
 //    }
-
     public Map<String, SolrTopicDetectionItem> findItems(long lowerBound, long upperBound) {
-    	Map<String, SolrTopicDetectionItem> itemsMap=new HashMap<String, SolrTopicDetectionItem>();
-    	SolrQuery solrQuery = new SolrQuery("publicationTime: ["+lowerBound+" TO "+upperBound+"}");
+        Map<String, SolrTopicDetectionItem> itemsMap = new HashMap<String, SolrTopicDetectionItem>();
+        SolrQuery solrQuery = new SolrQuery("publicationTime: [" + lowerBound + " TO " + upperBound + "}");
         solrQuery.setRows(10000000);
         SearchEngineResponse<SolrTopicDetectionItem> response = search(solrQuery);
         List<SolrTopicDetectionItem> items = response.getResults();
         if (!items.isEmpty()) {
-        	for (SolrTopicDetectionItem item:items)
-        		itemsMap.put(item.getId(), item);
-        	return itemsMap;
+            for (SolrTopicDetectionItem item : items) {
+                itemsMap.put(item.getId(), item);
+            }
+            return itemsMap;
         } else {
             Logger.getRootLogger().info("no tweets found!!");
             return null;
         }
     }
-    
+
     public SolrTopicDetectionItem findItem(String itemId) {
 
         SolrQuery solrQuery = new SolrQuery("id:\"" + itemId + "\"");
@@ -136,15 +134,17 @@ public class SolrTopicDetectionItemHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Integer> getItemTermsId(String id) {
-        Map<String,Integer> terms=new HashMap<String,Integer>();
-    	SolrQuery query = new SolrQuery("id:"+id);
+    public Map<String, Integer> getItemTermsId(String id) {
+        Map<String, Integer> terms = new HashMap<String, Integer>();
+        SolrQuery query = new SolrQuery("id:" + id);
         query.setRequestHandler("/tvrh");
         query.setParam("tv.fl", "title");
         query.setParam("f.title.tv.tf", true);
+        query.setParam("shards.qt", "/tvrh");
+
         query.setRows(2000000);
         logger.info(query.toString());
-        
+
         QueryResponse rsp;
         try {
             rsp = server.query(query);
@@ -160,44 +160,44 @@ public class SolrTopicDetectionItemHandler {
             logger.warn("No term vectors found...");
             return terms;
         }
-        
+
         for (int i = 0; i < termsVectors.size(); i++) {
-        	try {
-        		itemTermsVectors = (NamedList<Object>) termsVectors.getVal(i);
-        	} catch (Exception e) {
-        		continue;
-        	}
-        
-        	NamedList<NamedList<Object>> itemTerms;
-        	Iterator<Entry<String, NamedList<Object>>> itemTermsIterator;
-        
-        	if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get("title")) == null) {
-        		return terms;
-        	}
-        	itemTermsIterator = itemTerms.iterator();
-        	while (itemTermsIterator.hasNext()) {
-        		Entry<String,NamedList<Object>> ngram=itemTermsIterator.next();
-        		terms.put(ngram.getKey(), new Integer(ngram.getValue().get("tf").toString()));
-        		//System.out.println(ngram.getKey()+" -- tf-idf: "+ngram.getValue().get("tf-idf").toString());
-        	}
+            try {
+                itemTermsVectors = (NamedList<Object>) termsVectors.getVal(i);
+            } catch (Exception e) {
+                continue;
+            }
+
+            NamedList<NamedList<Object>> itemTerms;
+            Iterator<Entry<String, NamedList<Object>>> itemTermsIterator;
+
+            if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get("title")) == null) {
+                return terms;
+            }
+            itemTermsIterator = itemTerms.iterator();
+            while (itemTermsIterator.hasNext()) {
+                Entry<String, NamedList<Object>> ngram = itemTermsIterator.next();
+                terms.put(ngram.getKey(), new Integer(ngram.getValue().get("tf").toString()));
+                //System.out.println(ngram.getKey()+" -- tf-idf: "+ngram.getValue().get("tf-idf").toString());
+            }
         }
-        
+
         return terms;
     }
-    
+
     @SuppressWarnings("unchecked")
     public Map<String, List<String>> getItemTermsTimeslot(String typeTerm) {
-        logger.info("Get "+typeTerm+" from current timeslot");
+        logger.info("Get " + typeTerm + " from current timeslot");
         Map<String, List<String>> itemsTerms = new HashMap<String, List<String>>();
 
         SolrQuery query = new SolrQuery("*:*");
         query.setRequestHandler("/tvrh");
         query.setParam("tv.fl", typeTerm);
-        query.setParam("f."+typeTerm+".tv.tf", true);
+        query.setParam("f." + typeTerm + ".tv.tf", true);
         query.setRows(2000000);
-        query.setParam("shards.qt","/tvrh");
+        query.setParam("shards.qt", "/tvrh");
         logger.info(query.toString());
-        
+
         QueryResponse rsp;
         try {
             rsp = server.query(query);
@@ -208,7 +208,7 @@ public class SolrTopicDetectionItemHandler {
         }
         logger.info("Elapsed time: " + rsp.getElapsedTime());
         NamedList<NamedList<Object>> itemsTermsVectors;
-                
+
         if ((itemsTermsVectors = (NamedList<NamedList<Object>>) rsp.getResponse().get("termVectors")) == null) {
             logger.warn("No term vectors found...");
             return itemsTerms;
@@ -218,9 +218,9 @@ public class SolrTopicDetectionItemHandler {
         Iterator<Entry<String, NamedList<Object>>> itemTermsIterator;
         for (int i = 0; i < itemsTermsVectors.size(); i++) {
             try {
-            	itemTermsVectors = (NamedList<Object>) itemsTermsVectors.getVal(i);
+                itemTermsVectors = (NamedList<Object>) itemsTermsVectors.getVal(i);
             } catch (Exception e) {
-            	continue;
+                continue;
             }
 
             if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get(typeTerm)) == null) {
@@ -237,19 +237,21 @@ public class SolrTopicDetectionItemHandler {
         }
         return itemsTerms;
     }
-    
+
     @SuppressWarnings("unchecked")
     public Map<String, List<String>> getItemTermsTimeslot(String typeTerm, long lowerBound, long upperBound) {
-        logger.info("Get "+typeTerm+" from current timeslot");
+        logger.info("Get " + typeTerm + " from current timeslot");
         Map<String, List<String>> itemsTerms = new HashMap<String, List<String>>();
 
-        SolrQuery query = new SolrQuery("publicationTime: ["+lowerBound+" TO "+upperBound+"}");
+        SolrQuery query = new SolrQuery("publicationTime: [" + lowerBound + " TO " + upperBound + "}");
         query.setRequestHandler("/tvrh");
         query.setParam("tv.fl", typeTerm);
-        query.setParam("f."+typeTerm+".tv.tf", true);
+        query.setParam("f." + typeTerm + ".tv.tf", true);
+        query.setParam("shards.qt", "/tvrh");
+
         query.setRows(2000000);
         logger.info(query.toString());
-        
+
         QueryResponse rsp;
         try {
             rsp = server.query(query);
@@ -260,7 +262,7 @@ public class SolrTopicDetectionItemHandler {
         }
         logger.info("Elapsed time: " + rsp.getElapsedTime());
         NamedList<NamedList<Object>> itemsTermsVectors;
-                
+
         if ((itemsTermsVectors = (NamedList<NamedList<Object>>) rsp.getResponse().get("termVectors")) == null) {
             logger.warn("No term vectors found...");
             return itemsTerms;
@@ -270,9 +272,9 @@ public class SolrTopicDetectionItemHandler {
         Iterator<Entry<String, NamedList<Object>>> itemTermsIterator;
         for (int i = 0; i < itemsTermsVectors.size(); i++) {
             try {
-            	itemTermsVectors = (NamedList<Object>) itemsTermsVectors.getVal(i);
+                itemTermsVectors = (NamedList<Object>) itemsTermsVectors.getVal(i);
             } catch (Exception e) {
-            	continue;
+                continue;
             }
 
             if ((itemTerms = (NamedList<NamedList<Object>>) itemTermsVectors.get(typeTerm)) == null) {
@@ -289,7 +291,7 @@ public class SolrTopicDetectionItemHandler {
         }
         return itemsTerms;
     }
-    
+
 //    @SuppressWarnings("unchecked")
 //    public Map<String, Integer> getAllDyscoKeywords(String dyscoId) {
 //        logger.info("Getting terms from dysco: " + dyscoId);
@@ -347,9 +349,8 @@ public class SolrTopicDetectionItemHandler {
 //        }
 //        return terms;
 //    }
-
     private SearchEngineResponse<SolrTopicDetectionItem> search(SolrQuery query) {
-    	SearchEngineResponse<SolrTopicDetectionItem> response = new SearchEngineResponse<SolrTopicDetectionItem>();
+        SearchEngineResponse<SolrTopicDetectionItem> response = new SearchEngineResponse<SolrTopicDetectionItem>();
 ////        query.setRows(450);
 ////        query.setFacet(true);
 ////        query.addFacetField("sentiment");
@@ -380,8 +381,7 @@ public class SolrTopicDetectionItemHandler {
         response.setResults(solrTopicDetectionItems);
 
         return response;
-}
-
+    }
 //    public void updateItemFields(String id, String dyscoId, Date creationDate) throws SolrServerException, IOException {
 //
 //        SolrInputDocument doc = new SolrInputDocument();
@@ -395,7 +395,6 @@ public class SolrTopicDetectionItemHandler {
 //        server.add(doc);
 //        server.commit();
 //    }
-
 //    public void updateItems(List<Item> items, Date creationDate, String dyscoId) throws SolrServerException, IOException {
 //
 //        List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
