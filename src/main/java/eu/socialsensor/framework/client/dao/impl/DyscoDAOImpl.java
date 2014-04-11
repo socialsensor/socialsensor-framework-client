@@ -311,7 +311,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findVideos(Dysco dysco, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	String query = dysco.getSolrQueryString();
+    	String query = dysco.getSolrQuery();
     	
     	mediaItems.addAll(collectMediaItems(query,null,"video",size));
     	return mediaItems;
@@ -330,7 +330,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	String query = dysco.getSolrQueryString();
+    	String query = dysco.getSolrQuery();
     	
     	mediaItems.addAll(collectMediaItems(query,networkPriorities,"video",size));
     	return mediaItems;
@@ -349,7 +349,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findImages(Dysco dysco, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	String query = dysco.getSolrQueryString();
+    	String query = dysco.getSolrQuery();
     	System.out.println("query : "+query);
     	mediaItems.addAll(collectMediaItems(query,null,"image",size));
     	return mediaItems;
@@ -368,7 +368,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	String query = dysco.getSolrQueryString();
+    	String query = dysco.getSolrQuery();
     	
     	mediaItems.addAll(collectMediaItems(query,networkPriorities,"image",size));
     	return mediaItems;

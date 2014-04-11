@@ -23,6 +23,8 @@ public interface StreamUserDAO {
 
     public void incStreamUserValue(String id, String field);
     
+    public void incStreamUserValue(String id, String field, int value);
+    
     public boolean deleteStreamUser(String id);
 
     public StreamUser getStreamUser(String id);

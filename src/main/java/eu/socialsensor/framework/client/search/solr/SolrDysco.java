@@ -1,5 +1,6 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import eu.socialsensor.framework.common.domain.Query;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
@@ -10,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.beans.Field;
 
 import com.google.gson.annotations.Expose;
@@ -20,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
  * @author etzoannos - e.tzoannos@atc.gr
  */
 public class SolrDysco {
+	public final Logger logger = Logger.getLogger(SolrDysco.class);
 
     //The id of the dysco
     @Field(value = "id")
@@ -59,6 +63,10 @@ public class SolrDysco {
     //The query that will be used for retrieving relevant content to the Dysco from Solr
     @Field(value = "solrQueryString")
     private String solrQueryString;
+    @Field(value = "solrQueriesString")
+    private List<String> solrQueriesString;
+    @Field(value = "solrQueriesScore")
+    private List<String> solrQueriesScore;
     //The variable can get values 0,1,2 and shows dysco's trending evolution. 
     @Field(value = "trending")
     private int trending;
@@ -74,7 +82,7 @@ public class SolrDysco {
     }
 
     public SolrDysco(Dysco dysco) {
-
+    
         id = dysco.getId();
         creationDate = dysco.getCreationDate();
         title = dysco.getTitle();
@@ -104,7 +112,14 @@ public class SolrDysco {
             hashtags.add(entry.getKey());
         }
 
-        solrQueryString = dysco.getSolrQueryString();
+        solrQueryString = dysco.getSolrQuery();
+        
+        if(dysco.getSolrQueries()!=null){
+            for(Query query : dysco.getSolrQueries()){
+            	solrQueriesString.add(query.getName());
+            	solrQueriesScore.add(query.getScore().toString());
+            }
+        }
 
         trending = dysco.getTrending();
 
@@ -163,6 +178,15 @@ public class SolrDysco {
         }
 
         dysco.setSolrQuery(solrQueryString);
+        List<Query> queries = new ArrayList<Query>();
+        for(int i=0;i<solrQueriesString.size();i++){
+        	Query query = new Query();
+        	query.setName(solrQueriesString.get(i));
+        	query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+        	queries.add(query);
+        }
+        dysco.setSolrQueries(queries);
+        
         dysco.setTrending(trending);
         dysco.setUpdateDate(updateDate);
         

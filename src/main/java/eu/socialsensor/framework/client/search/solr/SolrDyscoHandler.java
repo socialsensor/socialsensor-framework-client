@@ -60,10 +60,11 @@ public class SolrDyscoHandler {
 
         boolean status = false;
         try {
-
+        	
             SolrDysco solrDysco = new SolrDysco(dysco);
+           
             server.addBean(solrDysco);
-
+           
             UpdateResponse response = server.commit();
             int statusId = response.getStatus();
             if (statusId == 0) {

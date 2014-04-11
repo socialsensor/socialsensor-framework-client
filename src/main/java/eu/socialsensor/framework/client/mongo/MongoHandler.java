@@ -56,7 +56,7 @@ public class MongoHandler {
         }
     }
 
-    public MongoHandler(String hostname, String dbName) throws Exception{
+    public MongoHandler(String hostname, String dbName) throws Exception {
         String connectionKey = hostname + "#" + dbName;
         db = databases.get(connectionKey);
         if (db == null) {
@@ -73,14 +73,14 @@ public class MongoHandler {
             
             }
             catch(Exception e){
-            	System.out.println("Mongo DB at "+hostname+" is closed");
+            	System.out.println("Mongo DB at " + hostname+" is closed");
             	throw e;
             }
             
         }
     }
     
-    public boolean checkConnection(String hostname){
+    public boolean checkConnection(String hostname) {
     	
     	MongoClient mongo = connections.get(hostname);
     	
