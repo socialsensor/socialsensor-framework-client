@@ -64,9 +64,9 @@ public class SolrDysco {
     @Field(value = "solrQueryString")
     private String solrQueryString;
     @Field(value = "solrQueriesString")
-    private List<String> solrQueriesString;
+    private List<String> solrQueriesString = new ArrayList<String>();
     @Field(value = "solrQueriesScore")
-    private List<String> solrQueriesScore;
+    private List<String> solrQueriesScore = new ArrayList<String>();
     //The variable can get values 0,1,2 and shows dysco's trending evolution. 
     @Field(value = "trending")
     private int trending;
@@ -114,12 +114,14 @@ public class SolrDysco {
 
         solrQueryString = dysco.getSolrQuery();
         
-        if(dysco.getSolrQueries()!=null){
-            for(Query query : dysco.getSolrQueries()){
-            	solrQueriesString.add(query.getName());
-            	solrQueriesScore.add(query.getScore().toString());
-            }
+        logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
+        for(Query query : dysco.getSolrQueries()){
+        	logger.info("query name: "+query.getName());
+        	logger.info("query score: "+query.getScore().toString());
+        	solrQueriesString.add(query.getName());
+        	solrQueriesScore.add(query.getScore().toString());
         }
+       
 
         trending = dysco.getTrending();
 
@@ -399,6 +401,22 @@ public class SolrDysco {
     public void setSolrQueryString(String solrQueryString) {
         this.solrQueryString = solrQueryString;
 
+    }
+    
+    public List<String> getSolrQueriesString(){
+    	return solrQueriesString;
+    }
+    
+    public List<String> getSolrQueriesScore(){
+    	return solrQueriesScore;
+    }
+    
+    public void setSolrQueriesString(List<String> solrQueriesString){
+    	this.solrQueriesString = solrQueriesString;
+    }
+
+    public void setSolrQueriesScore(List<String> solrQueriesScore){
+    	this.solrQueriesScore = solrQueriesScore;
     }
 
     /**

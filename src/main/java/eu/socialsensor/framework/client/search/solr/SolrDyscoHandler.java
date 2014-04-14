@@ -29,6 +29,7 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
  * @author etzoannos - e.tzoannos@atc.gr
  */
 public class SolrDyscoHandler {
+	public final Logger logger = Logger.getLogger(SolrDyscoHandler.class);
 
     SolrServer server;
     private static final Map<String, SolrDyscoHandler> INSTANCES = new HashMap<String, SolrDyscoHandler>();
@@ -62,7 +63,7 @@ public class SolrDyscoHandler {
         try {
         	
             SolrDysco solrDysco = new SolrDysco(dysco);
-           
+            
             server.addBean(solrDysco);
            
             UpdateResponse response = server.commit();
