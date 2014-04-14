@@ -65,6 +65,8 @@ public class SolrDysco {
     private String solrQueryString;
     @Field(value = "solrQueriesString")
     private List<String> solrQueriesString = new ArrayList<String>();
+    @Field(value = "primalSolrQueriesString")
+    private List<String> primalSolrQueriesString = new ArrayList<String>();
     @Field(value = "solrQueriesScore")
     private List<String> solrQueriesScore = new ArrayList<String>();
     //The variable can get values 0,1,2 and shows dysco's trending evolution. 
@@ -114,10 +116,17 @@ public class SolrDysco {
 
         solrQueryString = dysco.getSolrQuery();
         
-        logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
+        for(Query query : dysco.getPrimalSolrQueries()){
+        	//logger.info("query name: "+query.getName());
+        	//logger.info("query score: "+query.getScore().toString());
+        	primalSolrQueriesString.add(query.getName());
+        	
+        }
+        
+        //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
         for(Query query : dysco.getSolrQueries()){
-        	logger.info("query name: "+query.getName());
-        	logger.info("query score: "+query.getScore().toString());
+        	//logger.info("query name: "+query.getName());
+        	//logger.info("query score: "+query.getScore().toString());
         	solrQueriesString.add(query.getName());
         	solrQueriesScore.add(query.getScore().toString());
         }
@@ -403,12 +412,20 @@ public class SolrDysco {
 
     }
     
+    public List<String> getPrimalSolrQueriesString(){
+    	return primalSolrQueriesString;
+    }
+    
     public List<String> getSolrQueriesString(){
     	return solrQueriesString;
     }
     
     public List<String> getSolrQueriesScore(){
     	return solrQueriesScore;
+    }
+    
+    public void setPrimalSolrQueriesString(List<String> primalSolrQueriesString){
+    	this.primalSolrQueriesString = primalSolrQueriesString;
     }
     
     public void setSolrQueriesString(List<String> solrQueriesString){
