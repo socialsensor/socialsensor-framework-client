@@ -143,24 +143,7 @@ public interface DyscoDAO {
 	 * @return
 	 */
 	List<MediaItem> findVideos(String query, int size);
-	/**
-	 * Retrieve multimedia content that corresponds to videos 
-	 * prioritized by network based on a solr query 
-	 * @param query
-	 * @param networkPriorities
-	 * @param size
-	 * @return
-	 */
-	List<MediaItem> findVideos(String query,Map<String,Integer> networkPriorities,int size);
-	/**
-	 * Retrieve multimedia content that corresponds to videos 
-	 * prioritized by network based on dysco's information
-	 * @param dysco
-	 * @param networkPriorities
-	 * @param size
-	 * @return
-	 */
-	List<MediaItem> findVideos(Dysco dysco,Map<String,Integer> networkPriorities,int size);
+
 	/**
 	 * Retrieve multimedia content tha is images based on dysco's
 	 * information
@@ -177,22 +160,5 @@ public interface DyscoDAO {
 	 * @return
 	 */
 	List<MediaItem> findImages(String query, int size);
-	/**
-	 * Retrieve multimedia content that corresponds to images 
-	 * prioritized by network based on a solr query 
-	 * @param query
-	 * @param networkPriorities
-	 * @param size
-	 * @return
-	 */
-	List<MediaItem> findImages(String query,Map<String,Integer> networkPriorities, int size);
-	/**
-	 * Retrieve multimedia content that corresponds to images 
-	 * prioritized by network based on dysco's information
-	 * @param dysco
-	 * @param networkPriorities
-	 * @param size
-	 * @return
-	 */
-	List<MediaItem> findImages(Dysco dysco,Map<String,Integer> networkPriorities, int size);
+	
 }

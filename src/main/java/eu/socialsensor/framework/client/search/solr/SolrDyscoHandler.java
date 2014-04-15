@@ -87,7 +87,7 @@ public class SolrDyscoHandler {
 
         boolean status = false;
         try {
-
+        	
             server.deleteById(dyscoId);
             UpdateResponse response = server.commit();
             int statusId = response.getStatus();
