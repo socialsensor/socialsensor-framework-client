@@ -10,7 +10,6 @@ import eu.socialsensor.framework.common.domain.WebPage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

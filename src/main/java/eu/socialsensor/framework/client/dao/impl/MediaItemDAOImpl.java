@@ -59,6 +59,11 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     }
 
     @Override
+    public void updateMediaItem(String id, UpdateItem updates) {
+        mongoHandler.update("id", id, updates);
+    }
+    
+    @Override
     public boolean removeMediaItem(String mediaItemId) {
         return mongoHandler.delete("id", mediaItemId);
     }

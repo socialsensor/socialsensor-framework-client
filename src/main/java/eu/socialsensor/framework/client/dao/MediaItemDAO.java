@@ -6,6 +6,7 @@ package eu.socialsensor.framework.client.dao;
 
 import java.util.List;
 
+import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.MediaItem;
 
 /**
@@ -18,8 +19,10 @@ public interface MediaItemDAO {
 
     public void updateMediaItem(String id, String name, Object value);
 
+	public void updateMediaItem(String id, UpdateItem updates);
+	
     public void updateMediaItem(MediaItem item);
-
+    
     public void updateMediaItemPopularity(MediaItem item);
 
     public boolean removeMediaItem(String mediaItemId);

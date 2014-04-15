@@ -12,12 +12,13 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author etzoannos - e.tzoannos@atc.gr
  */
 public class SolrWebPage {
-
-	
 	
 	@Field(value = "url")
 	private String url;
 
+	@Field(value = "domain")
+	private String domain;
+	
 	@Field(value = "title")
 	private String title;
 	
@@ -33,20 +34,22 @@ public class SolrWebPage {
 	@Field(value = "streamId")
 	private String streamId;	
 	
+	@Field(value = "shares")
+	private int shares;	
+	
 	public SolrWebPage() {
 		
 	}
 
 	public SolrWebPage(WebPage webPage) {
-
-        
-
         url = webPage.getUrl();
+        domain = webPage.getDomain();
         title = webPage.getTitle();
         text = webPage.getText();
         date = webPage.getDate();
         reference = webPage.getReference();
         streamId = webPage.getStreamId();
+        shares = webPage.getShares();
     }
 
     public WebPage toWebPage() throws MalformedURLException {
@@ -54,8 +57,11 @@ public class SolrWebPage {
     	WebPage webPage = new WebPage(url, reference);
 
     	webPage.setTitle(title);
+    	webPage.setText(text);
     	webPage.setStreamId(streamId);
     	webPage.setDate(date);
+    	webPage.setDomain(domain);
+    	webPage.setShares(shares);
     	
         return webPage;
     }
@@ -81,4 +87,8 @@ public class SolrWebPage {
     	return streamId;
 	}
 	
+    public int getShares() {
+    	return shares;
+	}
+    
 }
