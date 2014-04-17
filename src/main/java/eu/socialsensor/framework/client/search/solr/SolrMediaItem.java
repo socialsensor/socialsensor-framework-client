@@ -1,9 +1,12 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import eu.socialsensor.framework.common.domain.Concept;
 import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.MediaItem;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -45,6 +48,14 @@ public class SolrMediaItem {
         longitude = mediaItem.getLongitude();
         location = mediaItem.getLocationName();
        
+        List<Concept> miConcepts = mediaItem.getConcepts();
+        if(miConcepts != null) {
+        	concepts = new String[miConcepts.size()];
+        	for(int i = 0; i<concepts.length; i++) {
+        		concepts[i] = miConcepts.get(i).getConcept();
+        	}
+        }
+        
         type = mediaItem.getType();
     }
 
@@ -114,6 +125,9 @@ public class SolrMediaItem {
 
     @Field(value = "mentions")
     private String[] mentions;
+    
+    @Field(value = "concepts")
+    private String[] concepts;
     
     @Field(value = "type")
     private String type;
