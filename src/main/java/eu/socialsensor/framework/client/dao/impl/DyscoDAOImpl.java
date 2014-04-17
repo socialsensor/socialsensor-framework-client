@@ -311,7 +311,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findVideos(Dysco dysco, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	String query = dysco.getSolrQuery();
+    	String query = dysco.getSolrQueryString();
     	
     	mediaItems.addAll(collectMediaItems(query,"video",size));
     	return mediaItems;
@@ -331,7 +331,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> findImages(Dysco dysco, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	String query = dysco.getSolrQuery();
+    	String query = dysco.getSolrQueryString();
     	//List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	mediaItems.addAll(collectMediaItems(query,"image",size));
     	return mediaItems;

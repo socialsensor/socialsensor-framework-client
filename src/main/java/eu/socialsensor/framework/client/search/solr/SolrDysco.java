@@ -114,7 +114,7 @@ public class SolrDysco {
             hashtags.add(entry.getKey());
         }
 
-        solrQueryString = dysco.getSolrQuery();
+        solrQueryString = dysco.getSolrQueryString();
         
         for(Query query : dysco.getPrimalSolrQueries()){
         	//logger.info("query name: "+query.getName());
@@ -188,7 +188,7 @@ public class SolrDysco {
             }
         }
 
-        dysco.setSolrQuery(solrQueryString);
+        dysco.setSolrQueryString(solrQueryString);
         List<Query> queries = new ArrayList<Query>();
         for(int i=0;i<solrQueriesString.size();i++){
         	Query query = new Query();
