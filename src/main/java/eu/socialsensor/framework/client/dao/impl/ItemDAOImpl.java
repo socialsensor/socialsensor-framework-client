@@ -3,7 +3,6 @@ package eu.socialsensor.framework.client.dao.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoException;
 
 import eu.socialsensor.framework.client.dao.ItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
@@ -12,12 +11,8 @@ import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -63,7 +58,6 @@ public class ItemDAOImpl implements ItemDAO {
     @Override
     public void updateItem(Item item) {
         UpdateItem changes = new UpdateItem();
-        //changes.setField("lastUpdated", new Date());
         changes.setField("likes", item.getLikes());
         changes.setField("shares", item.getShares());
         changes.setField("indexed", item.isIndexed());
@@ -110,6 +104,7 @@ public class ItemDAOImpl implements ItemDAO {
 //        }
 //        return results;
     //}
+    
     @Override
     public List<Item> getItemsSince(long date) {
         Selector query = new Selector();
@@ -119,6 +114,7 @@ public class ItemDAOImpl implements ItemDAO {
         l = System.currentTimeMillis() - l;
         System.out.println("Fetch time: " + l + " msecs");
         l = System.currentTimeMillis() - l;
+        
         List<Item> results = new ArrayList<Item>();
         for (String json : jsonItems) {
             results.add(ItemFactory.create(json));

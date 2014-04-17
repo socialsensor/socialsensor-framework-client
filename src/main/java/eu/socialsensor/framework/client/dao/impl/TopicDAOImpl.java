@@ -1,6 +1,5 @@
 package eu.socialsensor.framework.client.dao.impl;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import eu.socialsensor.framework.client.dao.TopicDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.common.domain.Topic;
-import eu.socialsensor.framework.common.factories.ObjectFactory;
+import eu.socialsensor.framework.common.factories.ItemFactory;
 
 
 public class TopicDAOImpl implements TopicDAO{
@@ -68,7 +67,7 @@ public class TopicDAOImpl implements TopicDAO{
 		
 		for(String json : jsonItems){
 			
-			Topic topic = ObjectFactory.createTopic(json);
+			Topic topic = ItemFactory.createTopic(json);
 			
 			topics.add(topic);
 			

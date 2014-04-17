@@ -6,7 +6,7 @@ import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.JSONable;
 import eu.socialsensor.framework.common.domain.WebPage;
-import eu.socialsensor.framework.common.factories.WebPageFactory;
+import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class WebPageDAOImpl implements WebPageDAO {
     @Override
     public WebPage getWebPage(String webPageURL) {
         String resultString = mongoHandler.findOne("url", webPageURL);
-        WebPage result = WebPageFactory.create(resultString);
+        WebPage result = ItemFactory.createWebPage(resultString);
         return result;
     }
 
@@ -58,7 +58,7 @@ public class WebPageDAOImpl implements WebPageDAO {
         List<String> jsonWebPages = mongoHandler.findMany(new Selector(), size);
         List<WebPage> results = new ArrayList<WebPage>();
         for (String json : jsonWebPages) {
-            results.add(WebPageFactory.create(json));
+            results.add(ItemFactory.createWebPage(json));
         }
         return results;
     }
@@ -70,7 +70,7 @@ public class WebPageDAOImpl implements WebPageDAO {
 
         List<WebPage> results = new ArrayList<WebPage>();
         for (String json : jsonWebPages) {
-            results.add(WebPageFactory.create(json));
+            results.add(ItemFactory.createWebPage(json));
         }
         return results;
     }
@@ -82,7 +82,7 @@ public class WebPageDAOImpl implements WebPageDAO {
 
         List<WebPage> results = new ArrayList<WebPage>();
         for (String json : jsonWebPages) {
-            results.add(WebPageFactory.create(json));
+            results.add(ItemFactory.createWebPage(json));
         }
         
         // remove duplicates from pages
@@ -140,7 +140,7 @@ public class WebPageDAOImpl implements WebPageDAO {
 		
 		List<WebPage> results = new ArrayList<WebPage>();
         for (String json : jsonWebPages) {
-            results.add(WebPageFactory.create(json));
+            results.add(ItemFactory.createWebPage(json));
         }
         
         return results;
