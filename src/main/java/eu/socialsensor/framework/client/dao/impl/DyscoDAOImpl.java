@@ -442,15 +442,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
    
     public static void main(String[] args) {
-    	try {
-			DyscoDAO dyscoDAO = new DyscoDAOImpl("160.40.50.230","http://160.40.50.230:8080/solr/dyscos",
-					"http://160.40.50.230:8080/solr/Items", "http://160.40.50.230:8080/solr/MediaItems");
-			SolrDyscoHandler dyscohandler = SolrDyscoHandler.getInstance("http://160.40.50.230:8080/solr/dyscos");
-			Dysco dysco = dyscohandler.findDyscoLight("efa3bb3c-9247-4bd9-be49-440615c754df");
-			dyscoDAO.findImages(dysco, 100);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	
     }
 }
