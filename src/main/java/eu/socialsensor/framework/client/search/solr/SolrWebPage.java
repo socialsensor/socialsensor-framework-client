@@ -37,6 +37,13 @@ public class SolrWebPage {
 	@Field(value = "shares")
 	private int shares;	
 	
+	@Field(value = "media")
+	private int media;	
+	
+	@Field(value = "mediaIds")
+	private String[] mediaIds;	
+	
+	
 	public SolrWebPage() {
 		
 	}
@@ -50,6 +57,8 @@ public class SolrWebPage {
         reference = webPage.getReference();
         streamId = webPage.getStreamId();
         shares = webPage.getShares();
+        media = webPage.getMedia();
+        mediaIds = webPage.getMediaIds();
     }
 
     public WebPage toWebPage() throws MalformedURLException {
@@ -62,6 +71,8 @@ public class SolrWebPage {
     	webPage.setDate(date);
     	webPage.setDomain(domain);
     	webPage.setShares(shares);
+    	webPage.setMedia(media);
+    	webPage.setMediaIds(mediaIds);
     	
         return webPage;
     }
