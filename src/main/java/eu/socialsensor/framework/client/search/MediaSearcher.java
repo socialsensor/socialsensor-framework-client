@@ -18,7 +18,6 @@ public class MediaSearcher {
         JedisPool jedisPool = new JedisPool(poolConfig, searcherHostname, 6379, 0);
         
         this.publisherJedis = jedisPool.getResource();
-        
 	}
 	
 	public void search(String message) {
@@ -39,4 +38,22 @@ public class MediaSearcher {
 		}
 	}
 
+	public void search(String message, String channel) {
+		try {
+			publisherJedis.publish(channel, message);
+		}
+		catch(Exception e) {
+			logger.error(e);
+		}
+	}
+	
+	public void delete(String message, String channel) {
+		try {
+			publisherJedis.publish(channel, message);
+		}
+		catch(Exception e) {
+			logger.error(e);
+		}
+	}
+	
 }
