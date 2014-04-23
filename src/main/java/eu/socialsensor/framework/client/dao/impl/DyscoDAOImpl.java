@@ -10,8 +10,10 @@ import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
+import eu.socialsensor.framework.client.search.solr.SolrWebPageHandler;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
@@ -30,7 +32,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 
@@ -46,6 +47,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     private SolrItemHandler solrItemHandler;
     private SolrDyscoHandler handler;
     private SolrMediaItemHandler solrMediaItemHandler;
+    private SolrWebPageHandler solrWebPageHandler;
 
     public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection) throws Exception {
     	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
@@ -338,6 +340,43 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
 
+    @Override
+    public List<WebPage> findHealines(Dysco dysco, int size) {
+    	
+    	List<WebPage> webPages = new LinkedList<WebPage>();
+    	
+    	String query = dysco.getSolrQueryString();
+    	
+    	if(query.equals(""))
+    		return webPages;
+    
+    	if(!query.contains("title") && !query.contains("description")) {
+    		query = "(title : "+query+") OR (text:"+query+")";
+    	}
+    	
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	solrQuery.setRows(200);
+    	solrQuery.setSortField("score", ORDER.desc);
+    	Logger.getRootLogger().info("final query : " + query);
+    	
+    	SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
+    	if(response != null){
+    		List<WebPage> results = response.getResults();
+    		Set<String> urls = new HashSet<String>();
+	        for(WebPage wp : results) {
+		        	if(!urls.contains(wp.getExpandedUrl())) {
+		        		webPages.add(wp);
+		        		urls.add(wp.getExpandedUrl());
+		        	}
+		        	
+		        	if(webPages.size() >= size)
+		        		break;
+	        }    
+    	}
+    	
+    	return webPages;
+    }
+    
     /**
      * Collect media items (images/videos) of a certain size based on a solr query.
      * Prioritize them according to a hashmap of network priorities. If no hashmap

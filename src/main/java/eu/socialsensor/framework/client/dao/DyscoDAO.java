@@ -4,6 +4,7 @@ import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
 
@@ -160,5 +161,7 @@ public interface DyscoDAO {
 	 * @return
 	 */
 	List<MediaItem> findImages(String query, int size);
+
+	List<WebPage> findHealines(Dysco dysco, int size);
 	
 }
