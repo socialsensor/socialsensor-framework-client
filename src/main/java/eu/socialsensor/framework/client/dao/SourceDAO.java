@@ -24,5 +24,9 @@ public interface SourceDAO {
 	public List<Source> findTopSources(int n);
 
 	public List<Source> findTopSources(int n, SocialNetworkSource sourceType);
+	
+	public List<Source> findAllSources();
+	
+	public List<Source> findListSources(String listId);
 
 }

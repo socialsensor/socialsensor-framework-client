@@ -10,7 +10,6 @@ import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.Source;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -134,6 +133,22 @@ public class SourceDAOImpl implements SourceDAO {
 		List<Source> sources = new ArrayList<Source>();
 		
 		List<String> res = mongoHandler.findMany("source", sourceType.toString(), n);
+		for(String json : res) {
+			sources.add(ItemFactory.createSource(json));
+		}
+		return sources;
+	}
+
+	@Override
+	public List<Source> findAllSources() {
+		return findTopSources(-1);
+	}
+
+	@Override
+	public List<Source> findListSources(String listId) {
+		List<Source> sources = new ArrayList<Source>();
+		
+		List<String> res = mongoHandler.findMany("list", listId, -1);
 		for(String json : res) {
 			sources.add(ItemFactory.createSource(json));
 		}

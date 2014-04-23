@@ -6,6 +6,7 @@ import eu.socialsensor.framework.common.domain.MediaItem;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
@@ -80,6 +81,13 @@ public class SolrMediaItem {
         mediaItem.setLocation(new Location(latitude, longitude, location));
         mediaItem.setType(type);
 
+        
+		List<Concept> conceptsList = new ArrayList<Concept>();
+		for(String concept : concepts) {
+			conceptsList.add(new Concept(concept, 0d));
+		}
+		mediaItem.setConcepts(conceptsList );
+        
         return mediaItem;
     }
     

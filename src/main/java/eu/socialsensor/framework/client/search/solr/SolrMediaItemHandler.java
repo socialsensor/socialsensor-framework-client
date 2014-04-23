@@ -41,7 +41,7 @@ public class SolrMediaItemHandler {
       
     }
     
-    public void checkServerStatus() throws Exception{
+    public void checkServerStatus() throws Exception {
     	server.ping();
     }
 
