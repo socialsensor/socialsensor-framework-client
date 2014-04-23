@@ -373,7 +373,7 @@ public class SolrWebPageHandler {
     
     public static void main(String...args) {
     	
-    	SolrWebPageHandler solr = SolrWebPageHandler.getInstance("http://160.40.50.207:8080/solr/WebPages");
+    	SolrWebPageHandler solr = SolrWebPageHandler.getInstance("http://xxx.xxx.xxx.xxx:8080/solr/WebPages");
     	
     	WebPageDAO dao = null;
 		try {
