@@ -17,126 +17,119 @@ import org.apache.solr.client.solrj.beans.Field;
  */
 public class SolrMediaItem {
 
-	public SolrMediaItem() {
-	}
+    public SolrMediaItem() {
+    }
 
-	public SolrMediaItem(MediaItem mediaItem) {
+    public SolrMediaItem(MediaItem mediaItem) {
 
         id = mediaItem.getId();
         streamId = mediaItem.getStreamId();
         title = mediaItem.getTitle();
         description = mediaItem.getDescription();
         tags = mediaItem.getTags();
-        
-        if(mediaItem.getUser() != null)
-        	author = mediaItem.getUser().getName();
+
+        if (mediaItem.getUser() != null) {
+            author = mediaItem.getUser().getName();
+        }
         mentions = mediaItem.getMentions();
-        
+
         url = mediaItem.getUrl();
         thumbnail = mediaItem.getThumbnail();
         publicationTime = mediaItem.getPublicationTime();
-        
-        if(mediaItem.getLikes() != null)
-        	popularity += mediaItem.getLikes();
-        if(mediaItem.getShares() != null)
-        	popularity +=mediaItem.getShares();
-        if(mediaItem.getComments() != null)
-        	popularity +=mediaItem.getComments();
-        if(mediaItem.getViews() != null)
-        	popularity +=mediaItem.getViews();
-        
+
+        if (mediaItem.getLikes() != null) {
+            popularity += mediaItem.getLikes();
+        }
+        if (mediaItem.getShares() != null) {
+            popularity += mediaItem.getShares();
+        }
+        if (mediaItem.getComments() != null) {
+            popularity += mediaItem.getComments();
+        }
+        if (mediaItem.getViews() != null) {
+            popularity += mediaItem.getViews();
+        }
+
         latitude = mediaItem.getLatitude();
         longitude = mediaItem.getLongitude();
         location = mediaItem.getLocationName();
-       
+
         List<Concept> miConcepts = mediaItem.getConcepts();
-        if(miConcepts != null) {
-        	concepts = new String[miConcepts.size()];
-        	for(int i = 0; i<concepts.length; i++) {
-        		concepts[i] = miConcepts.get(i).getConcept();
-        	}
+        if (miConcepts != null) {
+            concepts = new String[miConcepts.size()];
+            for (int i = 0; i < concepts.length; i++) {
+                concepts[i] = miConcepts.get(i).getConcept();
+            }
         }
-        
+
         type = mediaItem.getType();
     }
 
     public MediaItem toMediaItem() throws MalformedURLException {
 
-    	MediaItem mediaItem = new MediaItem(new URL(url));
+        MediaItem mediaItem = new MediaItem(new URL(url));
 
-    	mediaItem.setId(id);
-    	mediaItem.setStreamId(streamId);
-    	mediaItem.setThumbnail(thumbnail);
+        mediaItem.setId(id);
+        mediaItem.setStreamId(streamId);
+        mediaItem.setThumbnail(thumbnail);
 
         mediaItem.setTitle(title);
         mediaItem.setDescription(description);
         mediaItem.setTags(tags);
-        
+
         //author needs to be added here
 
         mediaItem.setPublicationTime(publicationTime);
-        
+
         //popularity needs to be added here
-        
-        mediaItem.setLocation(new Location(latitude, longitude, location));
+        if (latitude != null && longitude != null && location != null) {
+            mediaItem.setLocation(new Location(latitude, longitude, location));
+        }
         mediaItem.setType(type);
 
-        
-		List<Concept> conceptsList = new ArrayList<Concept>();
-		for(String concept : concepts) {
-			conceptsList.add(new Concept(concept, 0d));
-		}
-		mediaItem.setConcepts(conceptsList );
-        
+
+        List<Concept> conceptsList = new ArrayList<Concept>();
+
+        if (concepts != null) {
+
+            for (String concept : concepts) {
+                conceptsList.add(new Concept(concept, 0d));
+            }
+        }
+        mediaItem.setConcepts(conceptsList);
+
         return mediaItem;
     }
-    
-    
     @Field(value = "id")
     private String id;
-    
     @Field(value = "url")
     private String url;
-    
     @Field(value = "thumbnail")
     private String thumbnail;
-    
     @Field(value = "streamId")
     private String streamId;
-
     @Field(value = "title")
     private String title;
-    
     @Field(value = "description")
     private String description;
-    
     @Field(value = "tags")
     private String[] tags;
-    
     @Field(value = "publicationTime")
     private long publicationTime;
-    
     @Field(value = "popularity")
     private long popularity;
-   
     @Field(value = "latitude")
     private Double latitude;
-    
     @Field(value = "longitude")
     private Double longitude;
-    
     @Field(value = "location")
     private String location;
-    
     @Field(value = "author")
     private String author;
-
     @Field(value = "mentions")
     private String[] mentions;
-    
     @Field(value = "concepts")
     private String[] concepts;
-    
     @Field(value = "type")
     private String type;
 
@@ -163,7 +156,7 @@ public class SolrMediaItem {
     public void setUrl(String url) {
         this.url = url;
     }
-    
+
     public String getThumbnail() {
         return thumbnail;
     }
@@ -171,7 +164,7 @@ public class SolrMediaItem {
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
-    
+
     public String getTitle() {
         return title;
     }
@@ -203,7 +196,7 @@ public class SolrMediaItem {
     public void setPublicationTime(Long publicationTime) {
         this.publicationTime = publicationTime;
     }
-    
+
     public Long getPopularity() {
         return popularity;
     }
@@ -235,7 +228,7 @@ public class SolrMediaItem {
     public void setLocation(String location) {
         this.location = location;
     }
-    
+
     public String getAuthor() {
         return author;
     }
@@ -243,7 +236,7 @@ public class SolrMediaItem {
     public void setAuthor(String author) {
         this.author = author;
     }
-    
+
     public String[] getMentions() {
         return mentions;
     }
