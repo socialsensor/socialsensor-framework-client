@@ -27,7 +27,7 @@
             <name>Manos Schinas</name>
             <email>manosetro</email>
         </developer>
-         <developer>
+        <developer>
             <id>ailiakop</id>
             <name>Aikaterini Iliakopoulou</name>
             <email>ailiakop@iti.gr</email>
@@ -49,8 +49,8 @@
     </parent>
     
     <dependencies>
-    	<!-- Social Sensor -->
-    	 <dependency>
+        <!-- Social Sensor -->
+        <dependency>
             <groupId>eu.socialsensor</groupId>
             <artifactId>socialsensor-framework-common</artifactId>
             <version>0.2-SNAPSHOT</version>
@@ -95,6 +95,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -120,6 +121,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
