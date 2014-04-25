@@ -25,6 +25,7 @@ public class MediaSearcher {
 			publisherJedis.publish(CHANNEL, message);
 		}
 		catch(Exception e) {
+			e.printStackTrace();
 			logger.error(e);
 		}
 	}
@@ -34,6 +35,7 @@ public class MediaSearcher {
 			publisherJedis.publish(CHANNEL, message);
 		}
 		catch(Exception e) {
+			e.printStackTrace();
 			logger.error(e);
 		}
 	}
@@ -43,6 +45,7 @@ public class MediaSearcher {
 			publisherJedis.publish(channel, message);
 		}
 		catch(Exception e) {
+			e.printStackTrace();
 			logger.error(e);
 		}
 	}
@@ -52,6 +55,7 @@ public class MediaSearcher {
 			publisherJedis.publish(channel, message);
 		}
 		catch(Exception e) {
+			e.printStackTrace();
 			logger.error(e);
 		}
 	}
