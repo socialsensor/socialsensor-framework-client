@@ -1,12 +1,10 @@
 package eu.socialsensor.framework.client.dao.impl;
 
 import eu.socialsensor.framework.client.dao.DyscoDAO;
-import eu.socialsensor.framework.client.dao.DyscoRequestDAO;
-import eu.socialsensor.framework.client.dao.MediaItemDAO;
+import eu.socialsensor.framework.client.dao.WebPageDAO;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
@@ -19,17 +17,11 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -42,26 +34,31 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 public class DyscoDAOImpl implements DyscoDAO {
 
     SearchEngineHandler searchEngineHandler;
-    private MediaItemDAO mediaItemDAO;
-    private DyscoRequestDAO dyscoRequestDAO;
+    
+    //private MediaItemDAO mediaItemDAO;
+    private WebPageDAO webPageDAO;
+    //private DyscoRequestDAO dyscoRequestDAO;
+    
     private SolrItemHandler solrItemHandler;
-    private SolrDyscoHandler handler;
+    //private SolrDyscoHandler solrDyscoHandler;
     private SolrMediaItemHandler solrMediaItemHandler;
     private SolrWebPageHandler solrWebPageHandler;
 
-    public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection,
-    		String webPageCollection) throws Exception {
-    	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
+    public DyscoDAOImpl(String mongoHost, String webPageDB, 
+    		String solrDyscoCollection, String solrItemCollection, String solrMediaItemCollection, String solrWebPageCollection) 
+    				throws Exception {
+    	searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
     	
     	try {
-    		mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
-        	dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
-			solrItemHandler = SolrItemHandler.getInstance(itemCollection);
-			handler = SolrDyscoHandler.getInstance(dyscoCollection);
-	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
-	    	solrWebPageHandler = SolrWebPageHandler.getInstance(webPageCollection);
+    		//mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
+    		webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB,"WebPages");
+        	//dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+        	
+			solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
+			//solrDyscoHandler = SolrDyscoHandler.getInstance(solrDyscoCollection);
+	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
+	    	solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
@@ -81,7 +78,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     @Override
     public boolean destroyDysco(String id) {
-
         // TODO: check if this is actually string or long - try to unify it
         return searchEngineHandler.deleteDysco(id);
     }
@@ -357,7 +353,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	}
     	
     	SolrQuery solrQuery = new SolrQuery(query);
-    	solrQuery.setRows(200);
+    	solrQuery.setRows(100);
     	solrQuery.setSortField("score", ORDER.desc);
     	solrQuery.addSortField("date", ORDER.desc);
     	
@@ -368,15 +364,22 @@ public class DyscoDAOImpl implements DyscoDAO {
     		List<WebPage> results = response.getResults();
     		Set<String> urls = new HashSet<String>();
 	        for(WebPage wp : results) {
-		        	if(!urls.contains(wp.getExpandedUrl())) {
-		        		webPages.add(wp);
+		        if(!urls.contains(wp.getExpandedUrl())) {
+		        	WebPage webPage = webPageDAO.getWebPage(wp.getUrl());
+		        	if(webPage!=null) {
+		        		webPages.add(webPage);
 		        		//urls.add(wp.getExpandedUrl());
 		        	}
-		        	
-		        	if(webPages.size() >= size)
-		        		break;
+		        }
 	        }    
     	}
+    	
+//    	for(int k=0; k<webPages.size(); k++) {
+//    		
+//    	}
+//    	
+//    	if(webPages.size() >= size)
+//    		break;
     	
     	return webPages;
     }
@@ -478,17 +481,18 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     
-    public List<MediaItem> requestThumbnails(Dysco dysco, int size){
+    public List<MediaItem> requestThumbnails(Dysco dysco, int size) {
     	return null;
     }
    
     public static void main(String[] args) {
     	try {
-			DyscoDAOImpl dao = new DyscoDAOImpl("xxx.xxx.xxx", 
-					"", 
-					"http://xxx.xxx.xxx:8080/solr/Items", 
-					"http://xxx.xxx.xxx:8080/solr/MediaItems",
-					"http://xxx.xxx.xxx:8080/solr/WebPages");
+			DyscoDAOImpl dao = new DyscoDAOImpl("xxx.xxx.xxx.xxx", 
+					"Prototype", 
+					"",
+					"http://xxx.xxx.xxx.xxx:8080/solr/Items", 
+					"http://xxx.xxx.xxx.xxx:8080/solr/MediaItems",
+					"http://xxx.xxx.xxx.xxx:8080/solr/WebPages");
 			
 			Dysco dysco = new Dysco();
 			dysco.setSolrQueryString("obama");
@@ -497,6 +501,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 			for(WebPage wp : webPages) {
 				System.out.println(wp.getTitle());
 				System.out.println(wp.getDate());
+				System.out.println(wp.getShares());
 			}
 			
 		} catch (Exception e) {
