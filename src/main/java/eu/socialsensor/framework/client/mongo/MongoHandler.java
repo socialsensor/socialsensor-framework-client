@@ -44,7 +44,6 @@ public class MongoHandler {
     public MongoHandler(String host, String dbName, String collectionName, List<String> indexes) throws Exception {
         this(host, dbName);
         collection = db.getCollection(collectionName);
-        
       
         if (indexes != null) {
             for (String index : indexes) {
@@ -65,6 +64,8 @@ public class MongoHandler {
             }
             db = mongo.getDB(dbName);
             databases.put(connectionKey, db);
+            
+            /*
             try{
             	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
             
@@ -73,7 +74,7 @@ public class MongoHandler {
             	System.out.println("Mongo DB at " + hostname +" is closed");
             	throw e;
             }
-            
+            */
         }
     }
     
