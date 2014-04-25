@@ -130,8 +130,13 @@ public class SolrDysco {
         	solrQueriesString.add(query.getName());
         	solrQueriesScore.add(query.getScore().toString());
         }
+        for(Query query : dysco.getPrimalSolrQueries()){
+        	
+        	primalSolrQueriesString.add(query.getName());
+        	
+        }
        
-
+        
         trending = dysco.getTrending();
 
         updateDate = dysco.getUpdateDate();
