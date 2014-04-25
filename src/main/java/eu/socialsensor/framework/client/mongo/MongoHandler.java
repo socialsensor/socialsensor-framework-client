@@ -70,7 +70,7 @@ public class MongoHandler {
             
             }
             catch(Exception e){
-            	System.out.println("Mongo DB at " + hostname+" is closed");
+            	System.out.println("Mongo DB at " + hostname +" is closed");
             	throw e;
             }
             

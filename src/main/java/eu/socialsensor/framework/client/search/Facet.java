@@ -1,6 +1,7 @@
 
 package eu.socialsensor.framework.client.search;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * @author etzoannos - e.tzoannos@atc.gr
  */
 
-public class Facet {
+public class Facet implements Serializable{
 
     String name;
     List<Bucket> buckets = new ArrayList<Bucket>();
