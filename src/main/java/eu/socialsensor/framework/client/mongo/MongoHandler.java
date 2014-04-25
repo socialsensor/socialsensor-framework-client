@@ -84,15 +84,15 @@ public class MongoHandler {
     	if(mongo == null)
     		return false;
     	
-    	 try{
-         	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
-         
-         }
-         catch(Exception e){
-         	System.out.println("Mongo DB at "+hostname+" is closed");
-         	return false;
-         }
-    	 
+//    	 try{
+//         	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
+//         
+//         }
+//         catch(Exception e){
+//         	System.out.println("Mongo DB at "+hostname+" is closed");
+//         	return false;
+//         }
+//    	 
          return true;
     }
 
