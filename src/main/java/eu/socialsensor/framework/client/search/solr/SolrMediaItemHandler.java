@@ -160,6 +160,22 @@ public class SolrMediaItemHandler {
         }
     }
 
+    public MediaItem findLatestItem(){
+    	SolrQuery solrQuery = new SolrQuery("*:*");
+    	solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
+    	solrQuery.setRows(1);
+    	
+    	 SearchEngineResponse<MediaItem> response = search(solrQuery);
+         List<MediaItem> items = response.getResults();
+         if (!items.isEmpty()) {
+             return items.get(0);
+         } else {
+             Logger.getRootLogger().info("no solr found!!");
+             return null;
+         }
+    }
+
+    
     public SearchEngineResponse<MediaItem> findItems(SolrQuery query) {
         return search(query);
     }
@@ -456,4 +472,6 @@ public class SolrMediaItemHandler {
             Logger.getRootLogger().error(ex.getMessage());
         }
     }
+    
+    
 }

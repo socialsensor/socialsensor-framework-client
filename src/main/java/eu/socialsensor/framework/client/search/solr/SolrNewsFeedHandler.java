@@ -25,7 +25,7 @@ import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.Item;
 
 public class SolrNewsFeedHandler {
-	 private Logger logger = Logger.getLogger(SolrItemHandler.class);
+	 private Logger logger = Logger.getLogger(SolrNewsFeedHandler.class);
 	    /*
 	     CommonsHttpSolrServer is thread-safe and if you are using the following constructor,
 	     you *MUST* re-use the same instance for all requests.  If instances are created on
@@ -61,7 +61,9 @@ public class SolrNewsFeedHandler {
 //	            ConfigReader configReader = new ConfigReader();
 //	            String url = configReader.getSolrHTTP();    
 	            server = new HttpSolrServer(collection);
+	            
 	            server.ping();
+	            
 	            //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
 	            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
@@ -204,13 +206,32 @@ public class SolrNewsFeedHandler {
 	            return status;
 	        }
 	    }
+	    
+	    public boolean deleteItemsOlderThan(long dateTime) {
+	    	 boolean status = false;
+	    	 try {
+	             server.deleteByQuery("publicationTime : [* TO "+dateTime+"]");
+	             UpdateResponse response = server.commit();
+	             int statusId = response.getStatus();
+	             if (statusId == 0) {
+	                 status = true;
+	             }
+
+	         } catch (SolrServerException ex) {
+	             logger.error(ex.getMessage());
+	         } catch (IOException ex) {
+	             logger.error(ex.getMessage());
+	         } finally {
+	             return status;
+	         }
+	    }
 
 	    public SearchEngineResponse<Item> findItems(SolrQuery query) {
 
 	        return search(query);
 	    }
 
-
+	    
 
 	    public Item findItem(String itemId) {
 
@@ -224,6 +245,21 @@ public class SolrNewsFeedHandler {
 	            Logger.getRootLogger().info("no tweet for this id found!!");
 	            return null;
 	        }
+	    }
+	    
+	    public Item findLatestItem(){
+	    	SolrQuery solrQuery = new SolrQuery("*:*");
+	    	solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
+	    	solrQuery.setRows(1);
+	    	
+	    	 SearchEngineResponse<Item> response = search(solrQuery);
+	         List<Item> items = response.getResults();
+	         if (!items.isEmpty()) {
+	             return items.get(0);
+	         } else {
+	             Logger.getRootLogger().info("no solr found!!");
+	             return null;
+	         }
 	    }
 	    
 	    private SearchEngineResponse<Item> addFilterAndSearch(SolrQuery query, String fq) {

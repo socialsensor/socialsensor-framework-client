@@ -215,6 +215,25 @@ public class SolrItemHandler {
             return status;
         }
     }
+    
+    public boolean deleteItemsOlderThan(long dateTime) {
+    	 boolean status = false;
+    	 try {
+             server.deleteByQuery("publicationTime : [* TO "+dateTime+"]");
+             UpdateResponse response = server.commit();
+             int statusId = response.getStatus();
+             if (statusId == 0) {
+                 status = true;
+             }
+
+         } catch (SolrServerException ex) {
+             logger.error(ex.getMessage());
+         } catch (IOException ex) {
+             logger.error(ex.getMessage());
+         } finally {
+             return status;
+         }
+    }
 
     public SearchEngineResponse<Item> findItems(SolrQuery query) {
 
@@ -234,6 +253,21 @@ public class SolrItemHandler {
             Logger.getRootLogger().info("no tweet for this user found!!");
             return null;
         }
+    }
+    
+    public Item findLatestItem(){
+    	SolrQuery solrQuery = new SolrQuery("*:*");
+    	solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
+    	solrQuery.setRows(1);
+    	
+    	 SearchEngineResponse<Item> response = search(solrQuery);
+         List<Item> items = response.getResults();
+         if (!items.isEmpty()) {
+             return items.get(0);
+         } else {
+             Logger.getRootLogger().info("no solr found!!");
+             return null;
+         }
     }
 
     public List<Item> findLatestItemsByAuthor(String authorId) {

@@ -124,11 +124,16 @@ public class WebPageDAOImpl implements WebPageDAO {
 
     @Override
     public void updateWebPageShares(String webPageURL) {
-        UpdateItem update = new UpdateItem();
-        update.incField("shares", 1);
-        mongoHandler.update("url", webPageURL, update);
+    	updateWebPageShares(webPageURL, 1);
     }
 
+    @Override
+    public void updateWebPageShares(String webPageURL, int shares) {
+        UpdateItem update = new UpdateItem();
+        update.incField("shares", shares);
+        mongoHandler.update("url", webPageURL, update);
+    }
+    
 	@Override
 	public boolean exists(String webPageURL) {
 		return mongoHandler.exists("url", webPageURL);
