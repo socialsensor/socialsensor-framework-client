@@ -49,7 +49,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     private SolrMediaItemHandler solrMediaItemHandler;
     private SolrWebPageHandler solrWebPageHandler;
 
-    public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection) throws Exception {
+    public DyscoDAOImpl(String mongoHost, String dyscoCollection, String itemCollection, String mediaItemCollection,
+    		String webPageCollection) throws Exception {
     	searchEngineHandler = new SolrHandler(dyscoCollection, itemCollection);
     	
     	try {
@@ -58,6 +59,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 			solrItemHandler = SolrItemHandler.getInstance(itemCollection);
 			handler = SolrDyscoHandler.getInstance(dyscoCollection);
 	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(mediaItemCollection);
+	    	solrWebPageHandler = SolrWebPageHandler.getInstance(webPageCollection);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -347,7 +349,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     	String query = dysco.getSolrQueryString();
     	
-    	if(query.equals(""))
+    	if(query==null || query.equals(""))
     		return webPages;
     
     	if(!query.contains("title") && !query.contains("description")) {
@@ -357,6 +359,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     	SolrQuery solrQuery = new SolrQuery(query);
     	solrQuery.setRows(200);
     	solrQuery.setSortField("score", ORDER.desc);
+    	solrQuery.addSortField("date", ORDER.desc);
+    	
     	Logger.getRootLogger().info("final query : " + query);
     	
     	SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
@@ -366,7 +370,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        for(WebPage wp : results) {
 		        	if(!urls.contains(wp.getExpandedUrl())) {
 		        		webPages.add(wp);
-		        		urls.add(wp.getExpandedUrl());
+		        		//urls.add(wp.getExpandedUrl());
 		        	}
 		        	
 		        	if(webPages.size() >= size)
@@ -475,12 +479,29 @@ public class DyscoDAOImpl implements DyscoDAO {
     
     
     public List<MediaItem> requestThumbnails(Dysco dysco, int size){
-    	
-    	
     	return null;
     }
    
     public static void main(String[] args) {
-    	
+    	try {
+			DyscoDAOImpl dao = new DyscoDAOImpl("xxx.xxx.xxx", 
+					"", 
+					"http://xxx.xxx.xxx:8080/solr/Items", 
+					"http://xxx.xxx.xxx:8080/solr/MediaItems",
+					"http://xxx.xxx.xxx:8080/solr/WebPages");
+			
+			Dysco dysco = new Dysco();
+			dysco.setSolrQueryString("obama");
+			
+			List<WebPage> webPages = dao.findHealines(dysco, 50);
+			for(WebPage wp : webPages) {
+				System.out.println(wp.getTitle());
+				System.out.println(wp.getDate());
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

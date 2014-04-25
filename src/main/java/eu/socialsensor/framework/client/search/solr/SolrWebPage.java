@@ -16,6 +16,9 @@ public class SolrWebPage {
 	@Field(value = "url")
 	private String url;
 
+	@Field(value = "expandedUrl")
+	private String expandedUrl;
+	
 	@Field(value = "domain")
 	private String domain;
 	
@@ -50,6 +53,7 @@ public class SolrWebPage {
 
 	public SolrWebPage(WebPage webPage) {
         url = webPage.getUrl();
+        expandedUrl = webPage.getExpandedUrl();
         domain = webPage.getDomain();
         title = webPage.getTitle();
         text = webPage.getText();
@@ -65,6 +69,7 @@ public class SolrWebPage {
 
     	WebPage webPage = new WebPage(url, reference);
 
+    	webPage.setExpandedUrl(expandedUrl);
     	webPage.setTitle(title);
     	webPage.setText(text);
     	webPage.setStreamId(streamId);
