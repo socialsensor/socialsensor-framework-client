@@ -35,10 +35,7 @@ public class ItemDAOImpl implements ItemDAO {
 
     public ItemDAOImpl(String host, String db, String collection) throws Exception {
 
-        indexes.add("id");
         indexes.add("publicationTime");
-        indexes.add("indexed");
-        indexes.add("original");
         indexes.add("insertionTime");
 
         mongoHandler = new MongoHandler(host, db, collection, indexes);
