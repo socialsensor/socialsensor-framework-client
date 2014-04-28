@@ -201,7 +201,7 @@ public class SolrDysco {
         for(int i=0;i<primalSolrQueriesString.size();i++){
         	Query query = new Query();
         	query.setName(primalSolrQueriesString.get(i));
-        	queries.add(query);
+        	primalQueries.add(query);
         }
         dysco.setPrimalSolrQueries(primalQueries);
         
