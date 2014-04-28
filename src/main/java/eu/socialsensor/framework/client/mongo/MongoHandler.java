@@ -134,12 +134,23 @@ public class MongoHandler {
         return JSON.serialize(result);
     }
 
-    public String findOne(String fieldName, String fieldValue)throws MongoException {
+    public String findOne(String fieldName, String fieldValue) throws MongoException {
         BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
         DBObject result = collection.findOne(query);
         return JSON.serialize(result);
     }
 
+    public Object findOneField(String fieldName, String fieldValue, String retField) throws MongoException {
+        BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
+        BasicDBObject field = new BasicDBObject(retField, 1);
+        
+        DBObject result = collection.findOne(query, field);
+        if(result == null)
+        	return null;
+        
+        return result.get(retField);
+    }
+    
     public String findOne(Selector query) throws MongoException{
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBObject result = collection.findOne(object);

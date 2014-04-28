@@ -37,4 +37,6 @@ public interface WebPageDAO {
 	void updateWebPageShares(String webPageURL);
 
 	void updateWebPageShares(String webPageURL, int shares);
+
+	int getWebPageShares(String webPageURL);
 }

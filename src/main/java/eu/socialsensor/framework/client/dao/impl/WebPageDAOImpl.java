@@ -54,6 +54,15 @@ public class WebPageDAOImpl implements WebPageDAO {
     }
 
     @Override
+    public int getWebPageShares(String webPageURL) {
+        Object result = mongoHandler.findOneField("url", webPageURL, "shares");
+        if(result == null)
+        	return 0;
+        
+        return (Integer) result;
+    }
+    
+    @Override
     public List<WebPage> getLastWebPages(int size) {
         List<String> jsonWebPages = mongoHandler.findMany(new Selector(), size);
         List<WebPage> results = new ArrayList<WebPage>();

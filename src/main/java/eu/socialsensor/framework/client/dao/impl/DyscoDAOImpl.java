@@ -17,9 +17,13 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -341,48 +345,57 @@ public class DyscoDAOImpl implements DyscoDAO {
     @Override
     public List<WebPage> findHealines(Dysco dysco, int size) {
     	
-    	List<WebPage> webPages = new LinkedList<WebPage>();
+    	Logger.getRootLogger().info("============ Web Pages Retrieval =============");
     	
-    	String query = dysco.getSolrQueryString();
-    	
-    	if(query==null || query.equals(""))
+    	List<WebPage> webPages = new ArrayList<WebPage>();
+   
+    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries(); 	
+    	if(queries==null || queries.isEmpty()) {
     		return webPages;
-    
-    	if(!query.contains("title") && !query.contains("description")) {
-    		query = "(title : "+query+") OR (text:"+query+")";
     	}
     	
-    	SolrQuery solrQuery = new SolrQuery(query);
-    	solrQuery.setRows(100);
-    	solrQuery.setSortField("score", ORDER.desc);
-    	solrQuery.addSortField("date", ORDER.desc);
-    	
-    	Logger.getRootLogger().info("final query : " + query);
-    	
-    	SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
-    	if(response != null){
-    		List<WebPage> results = response.getResults();
-    		Set<String> urls = new HashSet<String>();
-	        for(WebPage wp : results) {
-		        if(!urls.contains(wp.getExpandedUrl())) {
-		        	WebPage webPage = webPageDAO.getWebPage(wp.getUrl());
-		        	if(webPage!=null) {
-		        		webPages.add(webPage);
-		        		//urls.add(wp.getExpandedUrl());
-		        	}
-		        }
-	        }    
+    	//Retrieve web pages that is stored in solr
+    	Set<String> uniqueUrls = new HashSet<String>();
+    	for(eu.socialsensor.framework.common.domain.Query query : queries) {
+    		String queryForRequest = "(title : ("+query.getName()+")) OR (text:("+query.getName()+"))";
+    		
+    		SolrQuery solrQuery = new SolrQuery(queryForRequest);
+    		solrQuery.setRows(20);
+        	solrQuery.addSortField("score", ORDER.desc);
+        	solrQuery.addSortField("date", ORDER.desc);
+        	
+        	Logger.getRootLogger().info("Query : " + query);
+        	SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
+        	if(response != null) {
+        		List<WebPage> results = response.getResults();
+    	        for(WebPage webPage : results) {
+    	        	String url = webPage.getUrl();
+    	        	String expandedUrl = webPage.getExpandedUrl(); 	
+    		        if(!uniqueUrls.contains(expandedUrl)) {
+    		        	WebPage updatedWP = webPageDAO.getWebPage(url);
+    		        	webPage.setShares(updatedWP.getShares());
+    		        	
+    		        	webPages.add(webPage);
+    		        	uniqueUrls.add(expandedUrl);
+    		        }
+    	        }    
+        	}
     	}
     	
-//    	for(int k=0; k<webPages.size(); k++) {
-//    		
-//    	}
-//    	
-//    	if(webPages.size() >= size)
-//    		break;
+    	Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank...");
+    	Collections.sort(webPages, new Comparator<WebPage>() {
+            public int compare(WebPage wp1, WebPage wp2) {
+                if (wp1.getShares() == wp2.getShares()) {
+                    return 0;
+                } else {
+                    return wp1.getShares()<=wp2.getShares()?1:-1; 
+                }
+            }
+        });
     	
-    	return webPages;
+    	return webPages.subList(0, Math.min(webPages.size(), size));
     }
+    
     
     /**
      * Collect media items (images/videos) of a certain size based on a solr query.
@@ -456,7 +469,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         		Set<String> urls = new HashSet<String>();
     	        for(MediaItem mi : results) {
     	        	
-    	        	if(mi.getType().equals(type)){
+    	        	if(mi.getType().equals(type)) {
     		        	if(!urls.contains(mi.getUrl())) {
     		        		
     		        		mediaItems.add(mi);
@@ -495,12 +508,21 @@ public class DyscoDAOImpl implements DyscoDAO {
 					"http://xxx.xxx.xxx.xxx:8080/solr/WebPages");
 			
 			Dysco dysco = new Dysco();
-			dysco.setSolrQueryString("obama");
+			List<eu.socialsensor.framework.common.domain.Query> solrQueries = 
+					new ArrayList<eu.socialsensor.framework.common.domain.Query>();
+			solrQueries.add(new eu.socialsensor.framework.common.domain.Query("Japanese robot", 0.2));
 			
-			List<WebPage> webPages = dao.findHealines(dysco, 50);
+			dysco.setSolrQueries(solrQueries );
+			
+			long t = System.currentTimeMillis();
+			List<WebPage> webPages = dao.findHealines(dysco, 5);
+			t = System.currentTimeMillis()-t;
+			
+			System.out.println(webPages.size() + " web pages retrieved in " + t + " msecs!");
 			for(WebPage wp : webPages) {
 				System.out.println(wp.getTitle());
 				System.out.println(wp.getDate());
+				System.out.println(wp.getDomain());
 				System.out.println(wp.getShares());
 			}
 			
