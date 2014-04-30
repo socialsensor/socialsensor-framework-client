@@ -57,7 +57,7 @@ public class ItemDAOImpl implements ItemDAO {
         UpdateItem changes = new UpdateItem();
         changes.setField("likes", item.getLikes());
         changes.setField("shares", item.getShares());
-        changes.setField("indexed", item.isIndexed());
+//        changes.setField("indexed", item.isIndexed());
 
         mongoHandler.update("id", item.getId(), changes);
     }
