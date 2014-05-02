@@ -123,6 +123,10 @@ public interface DyscoDAO {
 	List<Item> findTotalItems(String _query);
 
 	List<Item> findTotalItems(List<String> dyscoIdsOfGroup);
+	
+	List<Item> findItems(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size);
+	
+	List<Item> findItems(String query, SocialNetworkSource source, RankingValue orderBy, int size);
 
 	List<String> findTotalUrls(List<Item> totalItems);
 

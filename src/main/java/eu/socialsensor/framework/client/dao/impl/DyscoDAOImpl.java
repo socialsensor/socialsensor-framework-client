@@ -304,6 +304,26 @@ public class DyscoDAOImpl implements DyscoDAO {
         return _relatedTopics;
     }
 
+    @Override
+    public List<Item> findItems(String query, SocialNetworkSource source, RankingValue orderBy, int size){
+    	List<Item> items = new ArrayList<Item>();
+    	
+    	items.addAll(collectItems(query,source,orderBy,size));
+    	
+    	return items;
+    }
+    
+    @Override
+    public List<Item> findItems(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size){
+    	List<Item> items = new ArrayList<Item>();
+    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+    	if(queries.isEmpty())
+    		queries = dysco.getPrimalSolrQueries(); //temporary
+    	items.addAll(collectItems(queries,source,orderBy,size));
+    	
+    	return items;
+    }
+    
    
     @Override
     public List<MediaItem> findVideos(String query, SocialNetworkSource source, RankingValue orderBy, int size){
@@ -430,16 +450,177 @@ public class DyscoDAOImpl implements DyscoDAO {
     	return webPages.subList(0, Math.min(webPages.size(), size));
     }
     
+  
+    private Queue<Item> collectItems(String query, SocialNetworkSource source, RankingValue orderBy, int size){
+    	boolean defaultOperation = false;
+    	double aggregatedScore = 0;
+    	Queue<Item> items = new LinkedList<Item>();
+    	
+    	Map<Double,Item> scoredItems = new TreeMap<Double,Item>(Collections.reverseOrder());
+    	
+    	if(query.equals(""))
+    		return items;
     
-    /**
-     * Collect media items (images/videos) of a certain size based on a solr query.
-     * Prioritize them according to a hashmap of network priorities. If no hashmap
-     * is provided use default.
-     * @param query
-     * @param networkPriorities
-     * @param size
-     * @return
-     */
+    	//Retrieve multimedia content that is stored in solr
+    	
+    	if(!query.contains("title") && !query.contains("description"))
+    		query = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
+    
+    	//Set source filters in case they exist exist
+    	if(!source.equals(SocialNetworkSource.All)){
+    		if(source.equals(SocialNetworkSource.Twitter))
+    			query += " AND (streamId : Twitter)";
+    		if(source.equals(SocialNetworkSource.Facebook))
+    			query += " AND (streamId : Facebook)";
+    	}
+    	
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	
+    	solrQuery.setRows(200);
+    	
+    	if(orderBy.equals(RankingValue.Relevance))
+    		solrQuery.setSortField("score", ORDER.desc);
+    	if(orderBy.equals(RankingValue.Recency))
+    		solrQuery.setSortField("publicationTime", ORDER.desc);
+    	if(orderBy.equals(RankingValue.Popularity))
+    		solrQuery.setSortField("popularity", ORDER.desc);
+    	if(orderBy.equals(RankingValue.Default)){
+    		solrQuery.setSortField("score", ORDER.desc);
+    		defaultOperation = true;
+    	}
+    	Logger.getRootLogger().info("Solr Query : " + query);
+    	
+    	SearchEngineResponse<Item> response = solrItemHandler.findItems(solrQuery);
+    	if(response != null){
+    		List<Item> results = response.getResults();
+    		
+	        for(Item it : results) {
+	
+		        	
+        		if(defaultOperation){
+        			aggregatedScore++;
+        			System.out.println("Storing item : "+it.getId()+" with score : "+aggregatedScore);
+        			scoredItems.put(aggregatedScore, it);
+        		}
+        		else
+        			items.add(it);
+		        	
+		        	if((items.size() >= size) || scoredItems.size() >= size)
+		        		break;
+	        	
+	        }
+    	}
+    	
+    	//rank media items with default method
+    	if(defaultOperation){
+    		Map<Double,Item> rankedItems = new TreeMap<Double,Item>(Collections.reverseOrder());
+    		for(Map.Entry<Double, Item> entry : scoredItems.entrySet()){
+    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000) *(entry.getValue().getLikes() 
+    					+ entry.getValue().getShares() + entry.getValue().getComments().length+1);
+    			System.out.println("Rank media item : "+entry.getValue().getId()+" with score : "+res);
+    			rankedItems.put(res, entry.getValue());
+    		}
+    		
+    		for(Item it : rankedItems.values())
+    			items.add(it);
+    	}
+    	return items;
+    }
+    
+    
+    private Queue<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries,SocialNetworkSource source, RankingValue orderBy,int size){
+    	boolean defaultOperation = false;
+    	double aggregatedScore = 0;
+    	Queue<Item> items = new LinkedList<Item>();
+    	
+    	Map<Double,Item> scoredItems = new TreeMap<Double,Item>(Collections.reverseOrder());
+    	
+    	if(queries.isEmpty())
+    		return items;
+    
+    	//Retrieve multimedia content that is stored in solr
+    	for(eu.socialsensor.framework.common.domain.Query query : queries){
+    		String queryForRequest = "(title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+"))";
+    		
+    		//Set source filters in case they exist exist
+        	if(!source.equals(SocialNetworkSource.All)){
+        		if(source.equals(SocialNetworkSource.Twitter))
+        			queryForRequest += " AND (streamId : Twitter)";
+        		if(source.equals(SocialNetworkSource.Facebook))
+        			queryForRequest += " AND (streamId : Facebook)";
+        		if(source.equals(SocialNetworkSource.Flickr))
+        			queryForRequest += " AND (streamId : Flickr)";
+        		if(source.equals(SocialNetworkSource.GooglePlus))
+        			queryForRequest += " AND (streamId : GooglePlus)";
+        		if(source.equals(SocialNetworkSource.Tumblr))
+        			queryForRequest += " AND (streamId : Tumblr)";
+        		if(source.equals(SocialNetworkSource.Instagram))
+        			queryForRequest += " AND (streamId : Instagram)";
+        		if(source.equals(SocialNetworkSource.Youtube))
+        			queryForRequest += " AND (streamId : Youtube)";
+        	}
+        	
+        	
+        	SolrQuery solrQuery = new SolrQuery(queryForRequest);
+        	
+        	solrQuery.setRows(200);
+        	
+        	if(orderBy.equals(RankingValue.Relevance))
+        		solrQuery.setSortField("score", ORDER.desc);
+        	if(orderBy.equals(RankingValue.Recency))
+        		solrQuery.setSortField("publicationTime", ORDER.desc);
+        	if(orderBy.equals(RankingValue.Popularity))
+        		solrQuery.setSortField("popularity", ORDER.desc);
+        	if(orderBy.equals(RankingValue.Default)){
+        		solrQuery.setSortField("score", ORDER.desc);
+        		defaultOperation = true;
+        	}
+        	
+        	
+        	Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+        	
+        	SearchEngineResponse<Item> response = solrItemHandler.findItems(solrQuery);
+        	if(response != null){
+        		List<Item> results = response.getResults();
+        		
+    	        for(Item it : results) {
+    
+	        		if(defaultOperation){
+	        			aggregatedScore++;
+	        			scoredItems.put(aggregatedScore * query.getScore(), it);
+	        		}
+	        		else
+	        			items.add(it);
+		        	
+		        		
+		        	
+		        	
+		        	if(items.size() >= size || scoredItems.size() >=size)
+		        		break;
+    	        	
+    	        }
+        	}
+    	}
+    	
+    	
+    	//rank media items with default method
+    	if(defaultOperation){
+    		Map<Double,Item> rankedItems = new TreeMap<Double,Item>(Collections.reverseOrder());
+    		for(Map.Entry<Double, Item> entry : scoredItems.entrySet()){
+    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/100000) *(entry.getValue().getLikes()
+    					 + entry.getValue().getShares() + entry.getValue().getComments().length+1);
+    			
+    			rankedItems.put(res, entry.getValue());
+    		}
+    		
+    		for(Item it : rankedItems.values())
+    			items.add(it);
+    	}
+    	
+    	return items;
+    }
+    
+   
     private Queue<MediaItem> collectMediaItems(String query, String type, SocialNetworkSource source, RankingValue orderBy, int size){
     	boolean defaultOperation = false;
     	double aggregatedScore = 0;
@@ -603,7 +784,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		        		urls.add(mi.getUrl());
     		        	}
     		        	
-    		        	if(mediaItems.size() >= size)
+    		        	if((mediaItems.size() >= size) || scoredMediaItems.size() >= size)
     		        		break;
     	        	//}
     	        }
