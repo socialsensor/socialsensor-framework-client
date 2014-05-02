@@ -4,6 +4,8 @@ import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.domain.RankingValue;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
@@ -135,7 +137,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findVideos(Dysco dysco, int size);
+	List<MediaItem> findVideos(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size);
 	/**
 	 * Retrieve multimedia content that are videos based on a solr
 	 * query
@@ -143,7 +145,8 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findVideos(String query, int size);
+	
+	List<MediaItem> findVideos(String query,SocialNetworkSource source, RankingValue orderBy, int size);
 
 	/**
 	 * Retrieve multimedia content tha is images based on dysco's
@@ -152,7 +155,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findImages(Dysco dysco, int size);
+	List<MediaItem> findImages(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, int size);
 	/**
 	 * Retrieve multimedia content that is images based on a solr 
 	 * query
@@ -160,7 +163,15 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findImages(String query, int size);
+	List<MediaItem> findImages(String query, SocialNetworkSource source, RankingValue orderBy, int size);
+	
+	List<MediaItem> findImagesByLocation(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, String location, int size);
+	
+	List<MediaItem> findImagesByLocation(String query,SocialNetworkSource source, RankingValue orderBy,String location, int size);
+	
+	List<MediaItem> findImagesByConcept(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, String concept, int size);
+	
+	List<MediaItem> findImagesByConcept(String query,SocialNetworkSource source, RankingValue orderBy, String concept, int size);
 
 	List<WebPage> findHealines(Dysco dysco, int size);
 	

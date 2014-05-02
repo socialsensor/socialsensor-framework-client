@@ -11,6 +11,8 @@ import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrWebPageHandler;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.domain.RankingValue;
+import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -303,48 +306,75 @@ public class DyscoDAOImpl implements DyscoDAO {
 
    
     @Override
-    public List<MediaItem> findVideos(String query, int size){
+    public List<MediaItem> findVideos(String query, SocialNetworkSource source, RankingValue orderBy, int size){
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	mediaItems.addAll(collectMediaItems(query,"video",size));
+    	mediaItems.addAll(collectMediaItems(query,"video",source,orderBy,size));
     	return mediaItems;	
     	
     }
     
     @Override
-    public List<MediaItem> findVideos(Dysco dysco, int size) {
+    public List<MediaItem> findVideos(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	String query = dysco.getSolrQueryString();
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	if(queries.isEmpty())
     		queries = dysco.getPrimalSolrQueries(); //temporary
-    	mediaItems.addAll(collectMediaItems(queries,"video",size));
+    	mediaItems.addAll(collectMediaItems(queries,"video",source,orderBy,size));
     	return mediaItems;
     }
     
     
     @Override
-    public List<MediaItem> findImages(String query, int size){
+    public List<MediaItem> findImages(String query, SocialNetworkSource source, RankingValue orderBy, int size){
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
-    	mediaItems.addAll(collectMediaItems(query,"image",size));
+    	mediaItems.addAll(collectMediaItems(query,"image",source,orderBy,size));
     	return mediaItems;	
     	
     }
 
     @Override
-    public List<MediaItem> findImages(Dysco dysco, int size) {
+    public List<MediaItem> findImages(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size) {
     	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
     	
     	
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	if(queries.isEmpty())
     		queries = dysco.getPrimalSolrQueries(); //temporary
-    	mediaItems.addAll(collectMediaItems(queries,"image",size));
+    	mediaItems.addAll(collectMediaItems(queries,"image",source,orderBy,size));
     	return mediaItems;
     }
     
+    @Override
+	public List<MediaItem> findImagesByLocation(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, String location, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
+    	return mediaItems;
+    }
+    
+    @Override
+	public List<MediaItem> findImagesByLocation(String query,SocialNetworkSource source, RankingValue orderBy, String location, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
+    	return mediaItems;
+    }
+    
+    @Override
+	public List<MediaItem> findImagesByConcept(String query,SocialNetworkSource source, RankingValue orderBy, String concept, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
+    	return mediaItems;
+    }
+    
+    @Override
+	public List<MediaItem> findImagesByConcept(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, String concept, int size){
+    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+    	
+    	return mediaItems;
+    }
 
     @Override
     public List<WebPage> findHealines(Dysco dysco, int size) {
@@ -410,9 +440,12 @@ public class DyscoDAOImpl implements DyscoDAO {
      * @param size
      * @return
      */
-    private Queue<MediaItem> collectMediaItems(String query, String type , int size){
-    	
+    private Queue<MediaItem> collectMediaItems(String query, String type, SocialNetworkSource source, RankingValue orderBy, int size){
+    	boolean defaultOperation = false;
+    	double aggregatedScore = 0;
     	Queue<MediaItem> mediaItems = new LinkedList<MediaItem>();
+    	
+    	Map<Double,MediaItem> scoredMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
     	
     	if(query.equals(""))
     		return mediaItems;
@@ -422,10 +455,41 @@ public class DyscoDAOImpl implements DyscoDAO {
     	if(!query.contains("title") && !query.contains("description"))
     		query = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
     
+    	//Set source filters in case they exist exist
+    	if(!source.equals(SocialNetworkSource.All)){
+    		if(source.equals(SocialNetworkSource.Twitter))
+    			query += " AND (streamId : Twitter)";
+    		if(source.equals(SocialNetworkSource.Facebook))
+    			query += " AND (streamId : Facebook)";
+    		if(source.equals(SocialNetworkSource.Flickr))
+    			query += " AND (streamId : Flickr)";
+    		if(source.equals(SocialNetworkSource.GooglePlus))
+    			query += " AND (streamId : GooglePlus)";
+    		if(source.equals(SocialNetworkSource.Tumblr))
+    			query += " AND (streamId : Tumblr)";
+    		if(source.equals(SocialNetworkSource.Instagram))
+    			query += " AND (streamId : Instagram)";
+    		if(source.equals(SocialNetworkSource.Youtube))
+    			query += " AND (streamId : Youtube)";
+    	}
+    	
+    	query += " AND (type : "+type+")";
+    	
     	SolrQuery solrQuery = new SolrQuery(query);
+    	
     	solrQuery.setRows(200);
-    	solrQuery.setSortField("score", ORDER.desc);
-    	Logger.getRootLogger().info("final query : " + query);
+    	
+    	if(orderBy.equals(RankingValue.Relevance))
+    		solrQuery.setSortField("score", ORDER.desc);
+    	if(orderBy.equals(RankingValue.Recency))
+    		solrQuery.setSortField("publicationTime", ORDER.desc);
+    	if(orderBy.equals(RankingValue.Popularity))
+    		solrQuery.setSortField("popularity", ORDER.desc);
+    	if(orderBy.equals(RankingValue.Default)){
+    		solrQuery.setSortField("score", ORDER.desc);
+    		defaultOperation = true;
+    	}
+    	Logger.getRootLogger().info("Solr Query : " + query);
     	
     	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
     	if(response != null){
@@ -433,27 +497,47 @@ public class DyscoDAOImpl implements DyscoDAO {
     		Set<String> urls = new HashSet<String>();
 	        for(MediaItem mi : results) {
 	        	
-	        	if(mi.getType().equals(type)){
+	        	
 		        	if(!urls.contains(mi.getUrl())) {
-		        		
-		        		mediaItems.add(mi);
+		        		if(defaultOperation){
+		        			aggregatedScore++;
+		        			System.out.println("Storing media item : "+mi.getId()+" with score : "+aggregatedScore);
+		        			scoredMediaItems.put(aggregatedScore, mi);
+		        		}
+		        		else
+		        			mediaItems.add(mi);
 		        	
 		        		urls.add(mi.getUrl());
 		        	}
 		        	
-		        	if(mediaItems.size() >= size)
+		        	if((mediaItems.size() >= size) || scoredMediaItems.size() >= size)
 		        		break;
-	        	}
+	        	
 	        }
     	}
     	
-    	
+    	//rank media items with default method
+    	if(defaultOperation){
+    		Map<Double,MediaItem> rankedMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
+    		for(Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()){
+    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000) *(entry.getValue().getLikes()
+    					+ entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments()+1);
+    			System.out.println("Rank media item : "+entry.getValue().getId()+" with score : "+res);
+    			rankedMediaItems.put(res, entry.getValue());
+    		}
+    		
+    		for(MediaItem mi : rankedMediaItems.values())
+    			mediaItems.add(mi);
+    	}
     	return mediaItems;
     }
     
-    private Queue<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type , int size){
-    	
+    private Queue<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type,SocialNetworkSource source, RankingValue orderBy,int size){
+    	boolean defaultOperation = false;
+    	double aggregatedScore = 0;
     	Queue<MediaItem> mediaItems = new LinkedList<MediaItem>();
+    	
+    	Map<Double,MediaItem> scoredMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
     	
     	if(queries.isEmpty())
     		return mediaItems;
@@ -461,11 +545,45 @@ public class DyscoDAOImpl implements DyscoDAO {
     	//Retrieve multimedia content that is stored in solr
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		String queryForRequest = "(title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+"))";
-    	
-    		SolrQuery solrQuery = new SolrQuery(queryForRequest);
+    		
+    		//Set source filters in case they exist exist
+        	if(!source.equals(SocialNetworkSource.All)){
+        		if(source.equals(SocialNetworkSource.Twitter))
+        			queryForRequest += " AND (streamId : Twitter)";
+        		if(source.equals(SocialNetworkSource.Facebook))
+        			queryForRequest += " AND (streamId : Facebook)";
+        		if(source.equals(SocialNetworkSource.Flickr))
+        			queryForRequest += " AND (streamId : Flickr)";
+        		if(source.equals(SocialNetworkSource.GooglePlus))
+        			queryForRequest += " AND (streamId : GooglePlus)";
+        		if(source.equals(SocialNetworkSource.Tumblr))
+        			queryForRequest += " AND (streamId : Tumblr)";
+        		if(source.equals(SocialNetworkSource.Instagram))
+        			queryForRequest += " AND (streamId : Instagram)";
+        		if(source.equals(SocialNetworkSource.Youtube))
+        			queryForRequest += " AND (streamId : Youtube)";
+        	}
+        	
+        	
+        	queryForRequest += " AND (type : "+type+")";
+        	
+        	SolrQuery solrQuery = new SolrQuery(queryForRequest);
+        	
         	solrQuery.setRows(200);
-        	solrQuery.setSortField("score", ORDER.desc);
-        	Logger.getRootLogger().info("Final query for request: " + queryForRequest);
+        	
+        	if(orderBy.equals(RankingValue.Relevance))
+        		solrQuery.setSortField("score", ORDER.desc);
+        	if(orderBy.equals(RankingValue.Recency))
+        		solrQuery.setSortField("publicationTime", ORDER.desc);
+        	if(orderBy.equals(RankingValue.Popularity))
+        		solrQuery.setSortField("popularity", ORDER.desc);
+        	if(orderBy.equals(RankingValue.Default)){
+        		solrQuery.setSortField("score", ORDER.desc);
+        		defaultOperation = true;
+        	}
+        	
+        	
+        	Logger.getRootLogger().info("Solr Query: " + queryForRequest);
         	
         	SearchEngineResponse<MediaItem> response = solrMediaItemHandler.findItems(solrQuery);
         	if(response != null){
@@ -473,25 +591,38 @@ public class DyscoDAOImpl implements DyscoDAO {
         		Set<String> urls = new HashSet<String>();
     	        for(MediaItem mi : results) {
     	        	
-    	        	if(mi.getType().equals(type)) {
+    	        	//if(mi.getType().equals(type)) {
     		        	if(!urls.contains(mi.getUrl())) {
-    		        		
-    		        		mediaItems.add(mi);
+    		        		if(defaultOperation){
+    		        			aggregatedScore++;
+    		        			scoredMediaItems.put(aggregatedScore * query.getScore(), mi);
+    		        		}
+    		        		else
+    		        			mediaItems.add(mi);
     		        	
     		        		urls.add(mi.getUrl());
     		        	}
     		        	
     		        	if(mediaItems.size() >= size)
     		        		break;
-    	        	}
+    	        	//}
     	        }
         	}
     	}
     	
     	
-    	//print media items
-    	for(MediaItem mItem : mediaItems){
-    		System.out.println("# mitem : "+mItem.getUrl());
+    	//rank media items with default method
+    	if(defaultOperation){
+    		Map<Double,MediaItem> rankedMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
+    		for(Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()){
+    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/100000) *(entry.getValue().getLikes()
+    					+ entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments()+1);
+    			
+    			rankedMediaItems.put(res, entry.getValue());
+    		}
+    		
+    		for(MediaItem mi : rankedMediaItems.values())
+    			mediaItems.add(mi);
     	}
     	
     	return mediaItems;
@@ -503,36 +634,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
    
     public static void main(String[] args) {
-    	try {
-			DyscoDAOImpl dao = new DyscoDAOImpl("xxx.xxx.xxx.xxx", 
-					"Prototype", 
-					"",
-					"http://xxx.xxx.xxx.xxx:8080/solr/Items", 
-					"http://xxx.xxx.xxx.xxx:8080/solr/MediaItems",
-					"http://xxx.xxx.xxx.xxx:8080/solr/WebPages");
-			
-			Dysco dysco = new Dysco();
-			List<eu.socialsensor.framework.common.domain.Query> solrQueries = 
-					new ArrayList<eu.socialsensor.framework.common.domain.Query>();
-			solrQueries.add(new eu.socialsensor.framework.common.domain.Query("Japanese robot", 0.2));
-			
-			dysco.setSolrQueries(solrQueries );
-			
-			long t = System.currentTimeMillis();
-			List<WebPage> webPages = dao.findHealines(dysco, 5);
-			t = System.currentTimeMillis()-t;
-			
-			System.out.println(webPages.size() + " web pages retrieved in " + t + " msecs!");
-			for(WebPage wp : webPages) {
-				System.out.println(wp.getTitle());
-				System.out.println(wp.getDate());
-				System.out.println(wp.getDomain());
-				System.out.println(wp.getShares());
-			}
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	
     }
 }
