@@ -21,6 +21,8 @@ public interface StreamUserDAO {
 
     public void updateStreamUserPopularity(StreamUser user);
 
+    public void updateStreamUserStatistics(StreamUser user);
+    
     public void incStreamUserValue(String id, String field);
     
     public void incStreamUserValue(String id, String field, int value);

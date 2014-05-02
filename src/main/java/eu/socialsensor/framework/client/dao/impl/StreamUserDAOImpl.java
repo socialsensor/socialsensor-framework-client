@@ -74,6 +74,33 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     }
 
     @Override
+    public void updateStreamUserStatistics(StreamUser user) {
+        if (user != null) {
+        	DBObject incs = new BasicDBObject();
+        	boolean update = false;
+        	if(user.getShares()>0) {
+        		update = true;
+        		incs.put("shares", user.getShares());
+        	}
+        	if(user.getMentions()>0) {
+        		update = true;
+        		incs.put("mentions", user.getMentions());
+        	}
+        	
+        	if(user.getItems()>0) {
+        		update = true;
+        		incs.put("items", user.getItems());
+        	}
+        	
+        	if(update) {
+        		DBObject change = new BasicDBObject("$inc", incs);
+        		//Logger.getLogger(StreamUserDAOImpl.class).info("id: " + user.getId() + " =>   " + change.toString());
+            	mongoHandler.update("id", user.getId(), change);
+        	}
+        }
+    }
+    
+    @Override
     public boolean deleteStreamUser(String id) {
         return mongoHandler.delete("userid", id);
     }
