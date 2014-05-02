@@ -584,7 +584,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     
 	        		if(defaultOperation){
 	        			aggregatedScore++;
-	        			scoredItems.put(aggregatedScore * query.getScore(), it);
+	        			double score = 1.0;
+	        			if(query.getScore()!=null)
+	        				score = query.getScore();
+	        			scoredItems.put(aggregatedScore * score, it);
 	        		}
 	        		else
 	        			items.add(it);
@@ -771,7 +774,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     		        	if(!urls.contains(mi.getUrl())) {
     		        		if(defaultOperation){
     		        			aggregatedScore++;
-    		        			scoredMediaItems.put(aggregatedScore * query.getScore(), mi);
+    		        			double score = 1.0;
+    		        			if(query.getScore()!=null)
+    		        				score = query.getScore();
+    		        			scoredMediaItems.put(aggregatedScore * score, mi);
     		        		}
     		        		else
     		        			mediaItems.add(mi);
