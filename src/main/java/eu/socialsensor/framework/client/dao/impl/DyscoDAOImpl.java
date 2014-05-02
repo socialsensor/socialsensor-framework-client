@@ -464,15 +464,14 @@ public class DyscoDAOImpl implements DyscoDAO {
     	//Retrieve multimedia content that is stored in solr
     	
     	if(!query.contains("title") && !query.contains("description"))
-    		query = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
+    		query = "((title : "+query+") OR (description:"+query+") OR (tags:"+query+"))";
     
     	//Set source filters in case they exist exist
-    	if(!source.equals(SocialNetworkSource.All)){
-    		if(source.equals(SocialNetworkSource.Twitter))
-    			query += " AND (streamId : Twitter)";
-    		if(source.equals(SocialNetworkSource.Facebook))
-    			query += " AND (streamId : Facebook)";
-    	}
+    	
+		if(source.equals(SocialNetworkSource.Twitter))
+			query += " AND (streamId:Twitter)";
+		if(source.equals(SocialNetworkSource.Facebook))
+			query += " AND (streamId:Facebook)";
     	
     	SolrQuery solrQuery = new SolrQuery(query);
     	
@@ -515,9 +514,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	if(defaultOperation){
     		Map<Double,Item> rankedItems = new TreeMap<Double,Item>(Collections.reverseOrder());
     		for(Map.Entry<Double, Item> entry : scoredItems.entrySet()){
-    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000) *(entry.getValue().getLikes() 
-    					+ entry.getValue().getShares() + entry.getValue().getComments().length+1);
-    			System.out.println("Rank media item : "+entry.getValue().getId()+" with score : "+res);
+    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000);
     			rankedItems.put(res, entry.getValue());
     		}
     		
@@ -540,24 +537,24 @@ public class DyscoDAOImpl implements DyscoDAO {
     
     	//Retrieve multimedia content that is stored in solr
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
-    		String queryForRequest = "(title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+"))";
+    		String queryForRequest = "((title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+")))";
     		
     		//Set source filters in case they exist exist
         	if(!source.equals(SocialNetworkSource.All)){
         		if(source.equals(SocialNetworkSource.Twitter))
-        			queryForRequest += " AND (streamId : Twitter)";
+        			queryForRequest += " AND (streamId:Twitter)";
         		if(source.equals(SocialNetworkSource.Facebook))
-        			queryForRequest += " AND (streamId : Facebook)";
+        			queryForRequest += " AND (streamId:Facebook)";
         		if(source.equals(SocialNetworkSource.Flickr))
-        			queryForRequest += " AND (streamId : Flickr)";
+        			queryForRequest += " AND (streamId:Flickr)";
         		if(source.equals(SocialNetworkSource.GooglePlus))
-        			queryForRequest += " AND (streamId : GooglePlus)";
+        			queryForRequest += " AND (streamId:GooglePlus)";
         		if(source.equals(SocialNetworkSource.Tumblr))
-        			queryForRequest += " AND (streamId : Tumblr)";
+        			queryForRequest += " AND (streamId:Tumblr)";
         		if(source.equals(SocialNetworkSource.Instagram))
-        			queryForRequest += " AND (streamId : Instagram)";
+        			queryForRequest += " AND (streamId:Instagram)";
         		if(source.equals(SocialNetworkSource.Youtube))
-        			queryForRequest += " AND (streamId : Youtube)";
+        			queryForRequest += " AND (streamId:Youtube)";
         	}
         	
         	
@@ -607,8 +604,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	if(defaultOperation){
     		Map<Double,Item> rankedItems = new TreeMap<Double,Item>(Collections.reverseOrder());
     		for(Map.Entry<Double, Item> entry : scoredItems.entrySet()){
-    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/100000) *(entry.getValue().getLikes()
-    					 + entry.getValue().getShares() + entry.getValue().getComments().length+1);
+    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/100000);
     			
     			rankedItems.put(res, entry.getValue());
     		}
@@ -634,24 +630,24 @@ public class DyscoDAOImpl implements DyscoDAO {
     	//Retrieve multimedia content that is stored in solr
     	
     	if(!query.contains("title") && !query.contains("description"))
-    		query = "(title : "+query+") OR (description:"+query+") OR (tags:"+query+")";
+    		query = "((title : "+query+") OR (description:"+query+") OR (tags:"+query+"))";
     
     	//Set source filters in case they exist exist
     	if(!source.equals(SocialNetworkSource.All)){
     		if(source.equals(SocialNetworkSource.Twitter))
-    			query += " AND (streamId : Twitter)";
+    			query += " AND (streamId:Twitter)";
     		if(source.equals(SocialNetworkSource.Facebook))
-    			query += " AND (streamId : Facebook)";
+    			query += " AND (streamId:Facebook)";
     		if(source.equals(SocialNetworkSource.Flickr))
-    			query += " AND (streamId : Flickr)";
+    			query += " AND (streamId:Flickr)";
     		if(source.equals(SocialNetworkSource.GooglePlus))
-    			query += " AND (streamId : GooglePlus)";
+    			query += " AND (streamId:GooglePlus)";
     		if(source.equals(SocialNetworkSource.Tumblr))
-    			query += " AND (streamId : Tumblr)";
+    			query += " AND (streamId:Tumblr)";
     		if(source.equals(SocialNetworkSource.Instagram))
-    			query += " AND (streamId : Instagram)";
+    			query += " AND (streamId:Instagram)";
     		if(source.equals(SocialNetworkSource.Youtube))
-    			query += " AND (streamId : Youtube)";
+    			query += " AND (streamId:Youtube)";
     	}
     	
     	query += " AND (type : "+type+")";
@@ -682,7 +678,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 		        	if(!urls.contains(mi.getUrl())) {
 		        		if(defaultOperation){
 		        			aggregatedScore++;
-		        			System.out.println("Storing media item : "+mi.getId()+" with score : "+aggregatedScore);
 		        			scoredMediaItems.put(aggregatedScore, mi);
 		        		}
 		        		else
@@ -703,7 +698,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		for(Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()){
     			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000) *(entry.getValue().getLikes()
     					+ entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments()+1);
-    			System.out.println("Rank media item : "+entry.getValue().getId()+" with score : "+res);
+    			
     			rankedMediaItems.put(res, entry.getValue());
     		}
     		
@@ -725,24 +720,24 @@ public class DyscoDAOImpl implements DyscoDAO {
     
     	//Retrieve multimedia content that is stored in solr
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
-    		String queryForRequest = "(title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+"))";
+    		String queryForRequest = "((title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+")))";
     		
     		//Set source filters in case they exist exist
         	if(!source.equals(SocialNetworkSource.All)){
         		if(source.equals(SocialNetworkSource.Twitter))
-        			queryForRequest += " AND (streamId : Twitter)";
+        			queryForRequest += " AND (streamId:Twitter)";
         		if(source.equals(SocialNetworkSource.Facebook))
-        			queryForRequest += " AND (streamId : Facebook)";
+        			queryForRequest += " AND (streamId:Facebook)";
         		if(source.equals(SocialNetworkSource.Flickr))
-        			queryForRequest += " AND (streamId : Flickr)";
+        			queryForRequest += " AND (streamId:Flickr)";
         		if(source.equals(SocialNetworkSource.GooglePlus))
-        			queryForRequest += " AND (streamId : GooglePlus)";
+        			queryForRequest += " AND (streamId:GooglePlus)";
         		if(source.equals(SocialNetworkSource.Tumblr))
-        			queryForRequest += " AND (streamId : Tumblr)";
+        			queryForRequest += " AND (streamId:Tumblr)";
         		if(source.equals(SocialNetworkSource.Instagram))
-        			queryForRequest += " AND (streamId : Instagram)";
+        			queryForRequest += " AND (streamId:Instagram)";
         		if(source.equals(SocialNetworkSource.Youtube))
-        			queryForRequest += " AND (streamId : Youtube)";
+        			queryForRequest += " AND (streamId:Youtube)";
         	}
         	
         	
