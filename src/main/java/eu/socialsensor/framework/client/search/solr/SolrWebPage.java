@@ -8,7 +8,6 @@ import java.util.Date;
 import org.apache.solr.client.solrj.beans.Field;
 
 /**
- *
  * @author etzoannos - e.tzoannos@atc.gr
  */
 public class SolrWebPage {
@@ -46,6 +45,8 @@ public class SolrWebPage {
 	@Field(value = "mediaIds")
 	private String[] mediaIds;	
 	
+	@Field(value = "mediaThumbnail")
+	private String mediaThumbnail;	
 	
 	public SolrWebPage() {
 		
@@ -63,6 +64,7 @@ public class SolrWebPage {
         shares = webPage.getShares();
         media = webPage.getMedia();
         mediaIds = webPage.getMediaIds();
+        mediaThumbnail = webPage.getMediaThumbnail();
     }
 
     public WebPage toWebPage() throws MalformedURLException {
@@ -78,13 +80,21 @@ public class SolrWebPage {
     	webPage.setShares(shares);
     	webPage.setMedia(media);
     	webPage.setMediaIds(mediaIds);
+    	webPage.setMediaThumbnail(mediaThumbnail);
     	
         return webPage;
     }
     
-    
     public String getUrl() {
     	return url;
+	}
+    
+    public String getExpandedUrl() {
+    	return expandedUrl;
+	}
+    
+    public String getDomain() {
+    	return domain;
 	}
     
     public String getTitle() {
@@ -107,4 +117,15 @@ public class SolrWebPage {
     	return shares;
 	}
     
+    public int getNumberOfMedia() {
+    	return media;
+	}
+    
+    public String[] getMediaIds() {
+    	return mediaIds;
+	}
+    
+    public String getMediaThumbnail() {
+    	return mediaThumbnail;
+	}
 }
