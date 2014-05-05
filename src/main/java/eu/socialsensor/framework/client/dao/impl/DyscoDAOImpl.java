@@ -1,6 +1,7 @@
 package eu.socialsensor.framework.client.dao.impl;
 
 import eu.socialsensor.framework.client.dao.DyscoDAO;
+import eu.socialsensor.framework.client.dao.MediaItemDAO;
 import eu.socialsensor.framework.client.dao.WebPageDAO;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
@@ -9,6 +10,9 @@ import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrWebPageHandler;
+import eu.socialsensor.framework.client.search.visual.JsonResultSet;
+import eu.socialsensor.framework.client.search.visual.JsonResultSet.JsonResult;
+import eu.socialsensor.framework.client.search.visual.VisualIndexHandler;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.RankingValue;
@@ -42,29 +46,32 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     SearchEngineHandler searchEngineHandler;
     
-    //private MediaItemDAO mediaItemDAO;
+    private MediaItemDAO mediaItemDAO;
     private WebPageDAO webPageDAO;
-    //private DyscoRequestDAO dyscoRequestDAO;
     
     private SolrItemHandler solrItemHandler;
-    //private SolrDyscoHandler solrDyscoHandler;
     private SolrMediaItemHandler solrMediaItemHandler;
     private SolrWebPageHandler solrWebPageHandler;
 
-    public DyscoDAOImpl(String mongoHost, String webPageDB, 
-    		String solrDyscoCollection, String solrItemCollection, String solrMediaItemCollection, String solrWebPageCollection) 
+    private VisualIndexHandler visualIndexHandler;
+    
+    public DyscoDAOImpl(String mongoHost, String webPageDB, String webPageColl, String mediaItemsDB, String mediaItemsColl,
+    		String solrDyscoCollection, String solrItemCollection, String solrMediaItemCollection, String solrWebPageCollection, 
+    		String visualIndexService, String visualIndexCollection) 
     				throws Exception {
+    	
     	searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
     	
     	try {
-    		//mediaItemDAO = new MediaItemDAOImpl(mongoHost,"Streams","MediaItems");
-    		webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB,"WebPages");
-        	//dyscoRequestDAO = new DyscoRequestDAOImpl(mongoHost,"Streams","Dyscos");
+    		mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
+    		webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
         	
 			solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
-			//solrDyscoHandler = SolrDyscoHandler.getInstance(solrDyscoCollection);
 	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
 	    	solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
+	    	
+	    	visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
+	    	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -100,7 +107,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     @Override
     public SearchEngineResponse findNDyscoItems(String id, int size) {
-
         SearchEngineResponse<Item> response = searchEngineHandler
                 .findNDyscoItems(id, size);
         return response;
@@ -454,7 +460,47 @@ public class DyscoDAOImpl implements DyscoDAO {
     	return webPages.subList(0, Math.min(webPages.size(), size));
     }
     
-  
+    @Override
+    public List<MediaItem> getMediaItemHistory(String mediaItemId) {
+    	List<MediaItem> mItems = new ArrayList<MediaItem>();
+    	
+    	Logger.getRootLogger().info("Get visually similar media items for " + mediaItemId);
+    	
+    	int page = 1;
+    	Set<String> ids = new HashSet<String>();
+    	while(true) {
+    		JsonResultSet similar = visualIndexHandler.getSimilarImages(mediaItemId, page++, 100);
+    		if(similar != null && similar.getResults() != null && similar.getResults().size()>0) {
+    			List<JsonResult> results = similar.getResults();
+    			for(JsonResult result : results) {
+    				String mId = result.getId();
+    				if(!ids.contains(mId)) {
+    					MediaItem mediaItem = mediaItemDAO.getMediaItem(mId);
+    					if(mediaItem != null) {
+    						mItems.add(mediaItem);
+    					}
+    				}
+    			}
+    		}
+    		else {
+    			break;
+    		}
+    	}
+    	
+    	Logger.getRootLogger().info(mItems.size() + "media items retrieved. Re-rank by publication time");
+    	Collections.sort(mItems, new Comparator<MediaItem>() {
+            public int compare(MediaItem mi1, MediaItem mi2) {
+                if(mi1.getPublicationTime()<mi2.getPublicationTime())
+                	return -1;
+                else
+                	return 1;
+            }
+        });
+    	
+    	return mItems;
+    }
+    
+    
     private Queue<Item> collectItems(String query, SocialNetworkSource source, RankingValue orderBy, int size){
     	boolean defaultOperation = false;
     	double aggregatedScore = 0;
@@ -635,7 +681,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		return mediaItems;
     
     	//Retrieve multimedia content that is stored in solr
-    	
+    
     	if(!query.contains("title") && !query.contains("description"))
     		query = "((title : "+query+") OR (description:"+query+") OR (tags:"+query+"))";
     

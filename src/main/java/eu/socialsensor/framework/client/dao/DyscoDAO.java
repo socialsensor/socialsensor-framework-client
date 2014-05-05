@@ -178,5 +178,7 @@ public interface DyscoDAO {
 	List<MediaItem> findImagesByConcept(String query,SocialNetworkSource source, RankingValue orderBy, String concept, int size);
 
 	List<WebPage> findHealines(Dysco dysco, int size);
+
+	List<MediaItem> getMediaItemHistory(String mediaItemId);
 	
 }

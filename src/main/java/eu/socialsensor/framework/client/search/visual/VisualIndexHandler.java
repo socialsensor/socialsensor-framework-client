@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,6 +39,8 @@ import eu.socialsensor.framework.common.domain.MediaItem;
 public class VisualIndexHandler {
 
     private static double default_threshold = 0.75;
+    
+    private Logger _logger = Logger.getLogger(VisualIndexHandler.class);
     
     private String webServiceHost;
     private String collectionName;
@@ -81,15 +83,16 @@ public class VisualIndexHandler {
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(inputStream, writer);
                 response = writer.toString();
-                //System.out.println(response);
+
                 queryMethod.releaseConnection();
 
                 similar = parseResponse(response);
             }
             else {
-            	System.out.println(code);
+            	_logger.error("Http returned code: " + code);
             }
         } catch (Exception e) {
+        	_logger.error("Exception for ID: " + imageId, e);
             response = null;
         } finally {
             if (queryMethod != null) {
@@ -99,6 +102,54 @@ public class VisualIndexHandler {
         return similar;
     }
 
+    /**
+     * Get similar images for a specific media item
+     *
+     * @param imageId
+     * @param threshold
+     * @return
+     */
+    public JsonResultSet getSimilarImages(String imageId, int page, int numResults) {
+
+    	JsonResultSet similar = new JsonResultSet();
+        PostMethod queryMethod = null;
+        String response = null;
+        try {
+
+            Part[] parts = {
+                new StringPart("id", imageId),
+                new StringPart("threshold", String.valueOf(default_threshold)),
+                new StringPart("page", String.valueOf(page)),
+                new StringPart("numResults", String.valueOf(numResults))
+            };
+
+            queryMethod = new PostMethod(webServiceHost + "/rest/visual/query_id/" + collectionName);
+            queryMethod.setRequestEntity(new MultipartRequestEntity(parts, queryMethod.getParams()));
+            int code = httpClient.executeMethod(queryMethod);
+            if (code == 200) {
+                InputStream inputStream = queryMethod.getResponseBodyAsStream();
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(inputStream, writer);
+                response = writer.toString();
+
+                queryMethod.releaseConnection();
+
+                similar = parseResponse(response);
+            }
+            else {
+            	_logger.error("Http returned code: " + code);
+            }
+        } catch (Exception e) {
+        	_logger.error("Exception for ID: " + imageId, e);
+            response = null;
+        } finally {
+            if (queryMethod != null) {
+                queryMethod.releaseConnection();
+            }
+        }
+        return similar;
+    }
+    
     public JsonResultSet getSimilarImages(URL url) {
     	return getSimilarImages(url, default_threshold);
     }
@@ -136,6 +187,7 @@ public class VisualIndexHandler {
             
         } catch (Exception e) {
         	e.printStackTrace();
+        	_logger.error("Exception for URL: " + url, e);
             response = null;
         } finally {
             if (queryMethod != null) {
@@ -187,6 +239,7 @@ public class VisualIndexHandler {
             
         } catch (Exception e) {
         	e.printStackTrace();
+        	_logger.error("Exception for URL: " + url, e);
             response = null;
         } finally {
             if (queryMethod != null) {
@@ -281,6 +334,7 @@ public class VisualIndexHandler {
                 similar = parseResponse(response);
             }
         } catch (Exception e) {
+        	_logger.error("Exception for vector of length " + vector.length, e);
             response = null;
         } finally {
             if (queryMethod != null) {
@@ -312,7 +366,11 @@ public class VisualIndexHandler {
             if (code == 200) {
                 success = true;
             }
+            else {
+            	_logger.error("Http returned code: " + code);
+            }
         } catch (Exception e) {
+        	_logger.error("Exception for id: " + id, e);
         	e.printStackTrace();
         } finally {
             if (indexMethod != null) {
@@ -397,7 +455,7 @@ public class VisualIndexHandler {
     	int k = 0;
     	for(MediaItem mediaItem : mediaItems) {
     		String id = mediaItem.getId();
-    		String url = mediaItem.getUrl();
+    		//String url = mediaItem.getUrl();
 
     		try {
     			//handler.getSimilarImagesAndIndex(id, new URL(url));
