@@ -2,11 +2,13 @@ package eu.socialsensor.framework.client.search.solr;
 
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,9 +19,11 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
 
 /**
  *
@@ -166,6 +170,7 @@ public class SolrMediaItemHandler {
     	solrQuery.setRows(1);
     	
     	 SearchEngineResponse<MediaItem> response = search(solrQuery);
+    	 
          List<MediaItem> items = response.getResults();
          if (!items.isEmpty()) {
              return items.get(0);
@@ -178,6 +183,52 @@ public class SolrMediaItemHandler {
     
     public SearchEngineResponse<MediaItem> findItems(SolrQuery query) {
         return search(query);
+    }
+    
+    public Map<MediaItem,Float> findMediaItemsWithScore(String query){
+    	Map<MediaItem,Float> mitemsByScore = new HashMap<MediaItem,Float>();
+    	
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	solrQuery.setFields("id","title","description","publicationTime","score");
+		solrQuery.addSortField("score", ORDER.desc);
+		
+        QueryResponse rsp = null;
+       
+        
+        try {
+            rsp = server.query(solrQuery);
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+            Logger.getRootLogger().info(e.getMessage());
+            
+        }
+        System.out.println("Found "+rsp.getResults().getNumFound()+" results");
+        List<SolrDocument> retrievedItems = rsp.getResults();
+        
+        for(SolrDocument sDoc : retrievedItems){
+        	Collection<String> fieldNames = sDoc.getFieldNames();
+        	Float score = (Float) sDoc.getFieldValue("score");
+        	String title = (String) sDoc.getFieldValue("title");
+        	String description = (String) sDoc.getFieldValue("description");
+        	String id = (String) sDoc.getFieldValue("id");
+        	Long publicationTime = (Long) sDoc.getFieldValue("publicationTime");
+        	
+        	System.out.println("Solr Document #"+id);
+        	System.out.println("Solr Document Title : "+title);
+        	System.out.println("Solr Document Score : "+description);
+        	System.out.println("Solr Document Score : "+score);
+        	
+        	System.out.println();
+        	MediaItem mitem = new MediaItem();
+        	mitem.setId(id);
+        	mitem.setTitle(title);
+        	mitem.setDescription(description);
+        	mitem.setPublicationTime(publicationTime);
+        	
+        	mitemsByScore.put(mitem, score);
+        }
+        
+        return mitemsByScore;
     }
 
     public SearchEngineResponse<MediaItem> findItemsWithSocialSearch(SolrQuery query) {

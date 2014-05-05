@@ -3,6 +3,7 @@ package eu.socialsensor.framework.client.search.solr;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,10 +14,12 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
 
 import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
@@ -239,7 +242,53 @@ public class SolrItemHandler {
 
         return search(query);
     }
-
+    
+    public Map<Item,Float> findItemsWithScore(String query){
+    	Map<Item,Float> itemsByScore = new HashMap<Item,Float>();
+    	
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	solrQuery.setFields("id","title","description","publicationTime","score");
+		solrQuery.addSortField("score", ORDER.desc);
+		
+        QueryResponse rsp = null;
+       
+        
+        try {
+            rsp = server.query(solrQuery);
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+            Logger.getRootLogger().info(e.getMessage());
+            
+        }
+        System.out.println("Found "+rsp.getResults().getNumFound()+" results");
+        List<SolrDocument> retrievedItems = rsp.getResults();
+        
+        for(SolrDocument sDoc : retrievedItems){
+        	Collection<String> fieldNames = sDoc.getFieldNames();
+        	Float score = (Float) sDoc.getFieldValue("score");
+        	String title = (String) sDoc.getFieldValue("title");
+        	String description = (String) sDoc.getFieldValue("description");
+        	String id = (String) sDoc.getFieldValue("id");
+        	Long publicationTime = (Long) sDoc.getFieldValue("publicationTime");
+        	
+        	System.out.println("Solr Document #"+id);
+        	System.out.println("Solr Document Title : "+title);
+        	System.out.println("Solr Document Score : "+description);
+        	System.out.println("Solr Document Score : "+score);
+        	
+        	System.out.println();
+        	Item item = new Item();
+        	item.setId(id);
+        	item.setTitle(title);
+        	item.setDescription(description);
+        	item.setPublicationTime(publicationTime);
+        	
+        	itemsByScore.put(item, score);
+        }
+        
+        return itemsByScore;
+    }
+    
     public Item findLatestItemByAuthor(String authorId) {
 
         SolrQuery solrQuery = new SolrQuery("author:" + authorId);
