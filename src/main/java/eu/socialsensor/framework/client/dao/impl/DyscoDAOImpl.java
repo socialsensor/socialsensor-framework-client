@@ -402,19 +402,19 @@ public class DyscoDAOImpl implements DyscoDAO {
     	Logger.getRootLogger().info("============ Web Pages Retrieval =============");
     	
     	List<WebPage> webPages = new ArrayList<WebPage>();
-   
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries(); 	
     	if(queries==null || queries.isEmpty()) {
     		return webPages;
     	}
     	
-    	//Retrieve web pages that is stored in solr
+    	// Retrieve web pages from solr index
     	Set<String> uniqueUrls = new HashSet<String>();
+    	Set<String> expandedUrls = new HashSet<String>();
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
     		String queryForRequest = "(title : ("+query.getName()+")) OR (text:("+query.getName()+"))";
     		
     		SolrQuery solrQuery = new SolrQuery(queryForRequest);
-    		solrQuery.setRows(20);
+    		solrQuery.setRows(size);
         	solrQuery.addSortField("score", ORDER.desc);
         	solrQuery.addSortField("date", ORDER.desc);
         	
@@ -425,24 +425,28 @@ public class DyscoDAOImpl implements DyscoDAO {
     	        for(WebPage webPage : results) {
     	        	String url = webPage.getUrl();
     	        	String expandedUrl = webPage.getExpandedUrl(); 	
-    		        if(!uniqueUrls.contains(expandedUrl)) {
-    		        	WebPage updatedWP = webPageDAO.getWebPage(url);
-    		        	webPage.setShares(updatedWP.getShares());
+    		        if(!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+    		        	int shares = webPageDAO.getWebPageShares(url);
+    		        	webPage.setShares(shares);
     		        	
     		        	webPages.add(webPage);
-    		        	uniqueUrls.add(expandedUrl);
+    		        	uniqueUrls.add(url);
+    		        	expandedUrls.add(expandedUrl);
     		        }
     	        }    
         	}
     	}
     	
-    	Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank...");
+    	Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
     	Collections.sort(webPages, new Comparator<WebPage>() {
             public int compare(WebPage wp1, WebPage wp2) {
                 if (wp1.getShares() == wp2.getShares()) {
-                    return 0;
+                	if(wp1.getDate().before(wp2.getDate()))
+                		return 1;
+                	else
+                		return -1;
                 } else {
-                    return wp1.getShares()<=wp2.getShares()?1:-1; 
+                    return wp1.getShares()<wp2.getShares() ? 1 : -1; 
                 }
             }
         });
