@@ -379,7 +379,6 @@ public class SolrWebPageHandler {
 		try {
 			dao = new WebPageDAOImpl("");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
