@@ -6,7 +6,6 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import eu.socialsensor.framework.client.dao.InfluencerDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
-import eu.socialsensor.framework.common.factories.ItemFactory;
 import eu.socialsensor.framework.common.factories.KeywordInfluencersPairFactory;
 import eu.socialsensor.framework.common.influencers.Influencer;
 import eu.socialsensor.framework.common.influencers.KeywordInfluencersPair;
