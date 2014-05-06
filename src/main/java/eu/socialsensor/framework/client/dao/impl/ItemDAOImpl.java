@@ -35,6 +35,7 @@ public class ItemDAOImpl implements ItemDAO {
 
     public ItemDAOImpl(String host, String db, String collection) throws Exception {
 
+    	indexes.add("id");
         indexes.add("publicationTime");
         indexes.add("insertionTime");
 
