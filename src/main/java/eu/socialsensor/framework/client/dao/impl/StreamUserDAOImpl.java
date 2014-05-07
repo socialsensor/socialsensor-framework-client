@@ -17,6 +17,7 @@ import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
+import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
@@ -173,4 +174,17 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 		MongoIterator it = mongoHandler.getIterator(query);
 		return new StreamUserIterator(it);
 	}
+
+	@Override
+	public List<StreamUser> getStreamUsers(DBObject query) {
+		List<StreamUser> streamUsers = new ArrayList<StreamUser>();
+		List<String> results = mongoHandler.findMany(query, -1);
+		
+		for(String json : results) {
+			StreamUser streamUser = ItemFactory.createUser(json);
+			streamUsers.add(streamUser);
+		}
+		return streamUsers;
+	}
+	
 }

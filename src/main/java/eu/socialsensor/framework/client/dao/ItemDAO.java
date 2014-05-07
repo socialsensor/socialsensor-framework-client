@@ -45,6 +45,8 @@ public interface ItemDAO {
 
     public List<Item> getUnindexedItems(int max);
     
+    public List<Item> getItems(DBObject query);
+    
     public ItemIterator getIterator(DBObject query);
 
     public class ItemIterator implements Iterator<Item> {

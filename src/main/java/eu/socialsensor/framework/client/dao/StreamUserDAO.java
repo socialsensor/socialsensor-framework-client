@@ -44,6 +44,8 @@ public interface StreamUserDAO {
     
     public boolean exists(String id);
     
+    public List<StreamUser> getStreamUsers(DBObject query);
+    
     public StreamUserIterator getIterator(DBObject query);
 
     public class StreamUserIterator implements Iterator<StreamUser> {

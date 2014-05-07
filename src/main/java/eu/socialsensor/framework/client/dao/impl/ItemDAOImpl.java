@@ -299,4 +299,16 @@ public class ItemDAOImpl implements ItemDAO {
 		MongoIterator it = mongoHandler.getIterator(query);
 		return new ItemIterator(it);
 	}
+
+	@Override
+	public List<Item> getItems(DBObject query) {
+		List<Item> items = new ArrayList<Item>();
+		List<String> results = mongoHandler.findMany(query, -1);
+		
+		for(String json : results) {
+			Item item = ItemFactory.create(json);
+			items.add(item);
+		}
+		return items;
+	}
 }
