@@ -1,10 +1,17 @@
 package eu.socialsensor.framework.client.dao;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.mongodb.DBObject;
+
+import eu.socialsensor.framework.client.dao.ItemDAO.ItemIterator;
+import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
+import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.domain.StreamUser.Category;
+import eu.socialsensor.framework.common.factories.ItemFactory;
 
 /**
  * Data Access Object for Item
@@ -36,4 +43,29 @@ public interface StreamUserDAO {
     public StreamUser getStreamUserByName(String username);
     
     public boolean exists(String id);
+    
+    public StreamUserIterator getIterator(DBObject query);
+
+    public class StreamUserIterator implements Iterator<StreamUser> {
+
+		private MongoIterator it;
+
+		public StreamUserIterator (MongoIterator it) {
+    		this.it = it;
+    	}
+		
+    	public StreamUser next() {
+    		String json = it.next();
+    		return ItemFactory.createUser(json);
+    	}
+    	
+    	public boolean hasNext() {
+    		return it.hasNext();
+    	}
+
+		@Override
+		public void remove() {
+			it.next();
+		}
+    }
 }

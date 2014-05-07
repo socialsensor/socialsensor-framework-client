@@ -3,9 +3,11 @@ package eu.socialsensor.framework.client.dao.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 import eu.socialsensor.framework.client.dao.ItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
+import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.Item;
@@ -291,4 +293,10 @@ public class ItemDAOImpl implements ItemDAO {
 //
 //        System.out.println("Fetch users and MediaItems in " + t + " msecs");
     }
+
+	@Override
+	public ItemIterator getIterator(DBObject query) {
+		MongoIterator it = mongoHandler.getIterator(query);
+		return new ItemIterator(it);
+	}
 }

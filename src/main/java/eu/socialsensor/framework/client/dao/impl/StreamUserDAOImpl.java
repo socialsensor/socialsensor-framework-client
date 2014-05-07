@@ -14,6 +14,7 @@ import com.mongodb.MongoException;
 
 import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
+import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
@@ -166,4 +167,10 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
 
     }
+
+	@Override
+	public StreamUserIterator getIterator(DBObject query) {
+		MongoIterator it = mongoHandler.getIterator(query);
+		return new StreamUserIterator(it);
+	}
 }

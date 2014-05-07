@@ -4,10 +4,16 @@
  */
 package eu.socialsensor.framework.client.dao;
 
+import java.util.Iterator;
 import java.util.List;
 
+import com.mongodb.DBObject;
+
 import eu.socialsensor.framework.client.mongo.UpdateItem;
+import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
+import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
+import eu.socialsensor.framework.common.factories.ItemFactory;
 
 /**
  *
@@ -58,4 +64,30 @@ public interface MediaItemDAO {
     public List<MediaItem> getMediaItemsForUrls(List<String> urls, String mediaType, int size);
 
     List<MediaItem> getUnindexedItems(int max);
+    
+    public MediaItemIterator getIterator(DBObject query);
+    
+    public class MediaItemIterator implements Iterator<MediaItem> {
+
+		private MongoIterator it;
+
+		public MediaItemIterator (MongoIterator it) {
+    		this.it = it;
+    	}
+		
+    	public MediaItem next() {
+    		String json = it.next();
+    		return ItemFactory.createMediaItem(json);
+    	}
+    	
+    	public boolean hasNext() {
+    		return it.hasNext();
+    	}
+
+		@Override
+		public void remove() {
+			it.next();
+		}
+    }
+    	
 }

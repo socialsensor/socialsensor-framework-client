@@ -2,6 +2,7 @@ package eu.socialsensor.framework.client.dao.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
 import java.net.UnknownHostException;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 
 import eu.socialsensor.framework.client.dao.MediaItemDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
+import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
 import eu.socialsensor.framework.common.domain.Item;
@@ -295,4 +297,10 @@ public class MediaItemDAOImpl implements MediaItemDAO {
 
         return mediaItems;
     }
+
+	@Override
+	public MediaItemIterator getIterator(DBObject query) {
+		MongoIterator it = mongoHandler.getIterator(query);
+		return new MediaItemIterator(it);
+	}
 }

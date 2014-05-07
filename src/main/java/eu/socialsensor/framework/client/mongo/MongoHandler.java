@@ -18,6 +18,7 @@ import eu.socialsensor.framework.common.domain.JSONable;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -469,8 +470,55 @@ public class MongoHandler {
         collection.update(q, newDocument, false, true);
     }
 
-    public static void main(String[] args) throws UnknownHostException {
 
-
+    public MongoIterator getIterator(DBObject query) {
+        DBCursor cursor = collection.find(query);
+        
+        MongoIterator iterator = new MongoIterator(cursor);
+        return iterator;
     }
+    
+    public MongoIterator getIterator(Selector query) {
+        DBObject object = (DBObject) JSON.parse(query.toJSONString());
+        DBCursor cursor = collection.find(object);
+        
+        MongoIterator iterator = new MongoIterator(cursor);
+        return iterator;
+    }
+    
+    public class MongoIterator implements Iterator<String> {
+    	
+    	private DBCursor cursor;
+
+		private MongoIterator (DBCursor cursor) {
+    		this.cursor = cursor;
+    	}
+    	
+		
+    	public String next() {
+    		DBObject next = cursor.next();
+    		return next.toString();
+    	}
+    	
+    	public boolean hasNext() {
+    		return cursor.hasNext();
+    	}
+
+		@Override
+		public void remove() {
+			cursor.next();
+		}
+    }
+    
+    public static void main(String[] args) throws Exception {
+
+    	MongoHandler handler = new MongoHandler("160.40.50.207", "IHU" , "Items", null);
+    	MongoIterator it = handler.getIterator(new BasicDBObject());
+    	
+    	while(it.hasNext()) {
+    		System.out.println(it.next());
+    	}
+    }
+    
+    
 }
