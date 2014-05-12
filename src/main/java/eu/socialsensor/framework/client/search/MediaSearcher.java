@@ -9,54 +9,60 @@ import redis.clients.jedis.JedisPoolConfig;
 public class MediaSearcher {
 
 	public final Logger logger = Logger.getLogger(MediaSearcher.class);
+	private String searcherHostname;
 	public static final String CHANNEL = "searchRequestsChannel";
 	
-	private Jedis publisherJedis;
 	
 	public MediaSearcher(String searcherHostname) {
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-        JedisPool jedisPool = new JedisPool(poolConfig, searcherHostname, 6379, 0);
-        
-        this.publisherJedis = jedisPool.getResource();
+		this.searcherHostname = searcherHostname;
 	}
 	
 	public void search(String message) {
-		try {
-			publisherJedis.publish(CHANNEL, message);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			logger.error(e);
-		}
+		search(message, CHANNEL);
 	}
 	
 	public void delete(String message) {
-		try {
-			publisherJedis.publish(CHANNEL, message);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			logger.error(e);
-		}
+		delete(message, CHANNEL);
 	}
 
 	public void search(String message, String channel) {
+		Jedis publisherJedis = null;
 		try {
+			JedisPoolConfig poolConfig = new JedisPoolConfig();
+	        JedisPool jedisPool = new JedisPool(poolConfig, searcherHostname, 6379, 0);
+	        
+	        publisherJedis = jedisPool.getResource();
+	        
 			publisherJedis.publish(channel, message);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			logger.error(e);
+		}
+		finally {
+			if(publisherJedis != null)
+				publisherJedis.disconnect();
 		}
 	}
 	
 	public void delete(String message, String channel) {
+		
+		Jedis publisherJedis = null;
 		try {
+			JedisPoolConfig poolConfig = new JedisPoolConfig();
+	        JedisPool jedisPool = new JedisPool(poolConfig, searcherHostname, 6379, 0);
+	        
+	        publisherJedis = jedisPool.getResource();
+	        
 			publisherJedis.publish(channel, message);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			logger.error(e);
+		}
+		finally {
+			if(publisherJedis != null)
+				publisherJedis.disconnect();
 		}
 	}
 	

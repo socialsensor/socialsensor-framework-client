@@ -55,7 +55,7 @@ public class VisualIndexHandler {
         MultiThreadedHttpConnectionManager cm = new MultiThreadedHttpConnectionManager();
         HttpConnectionManagerParams params = new HttpConnectionManagerParams();
 		params.setMaxTotalConnections(100);
-		params.setDefaultMaxConnectionsPerHost(10);
+		params.setDefaultMaxConnectionsPerHost(20);
 		params.setConnectionTimeout(5000);
         cm.setParams(params);
         this.httpClient = new HttpClient(cm);
