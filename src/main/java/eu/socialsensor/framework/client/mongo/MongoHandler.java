@@ -15,7 +15,6 @@ import com.mongodb.util.JSON;
 
 import eu.socialsensor.framework.common.domain.JSONable;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -512,7 +511,7 @@ public class MongoHandler {
     
     public static void main(String[] args) throws Exception {
 
-    	MongoHandler handler = new MongoHandler("160.40.50.207", "IHU" , "Items", null);
+    	MongoHandler handler = new MongoHandler("xxx.xxx.xxx", "Streams" , "Items", null);
     	MongoIterator it = handler.getIterator(new BasicDBObject());
     	
     	while(it.hasNext()) {
