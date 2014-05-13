@@ -119,6 +119,15 @@ public class MediaItemDAOImpl implements MediaItemDAO {
     }
 
     @Override
+    public void updateMediaItemShares(String id, int shares) {
+        UpdateItem changes = new UpdateItem();
+        changes.incField("shares", shares);
+        
+        mongoHandler.update("id", id, changes);
+        
+    }
+    
+    @Override
     public void updateMediaItemDyscoId(String url, String dyscoId) {
         UpdateItem changes = new UpdateItem();
 

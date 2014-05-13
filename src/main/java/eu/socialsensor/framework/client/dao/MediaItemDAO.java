@@ -89,5 +89,7 @@ public interface MediaItemDAO {
 			it.next();
 		}
     }
+
+	void updateMediaItemShares(String id, int shares);
     	
 }
