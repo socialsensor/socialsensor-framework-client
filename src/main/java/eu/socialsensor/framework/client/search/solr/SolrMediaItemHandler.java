@@ -1,5 +1,7 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import eu.socialsensor.framework.client.search.Bucket;
+import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
 import eu.socialsensor.framework.common.domain.Item;
@@ -9,6 +11,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +25,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
@@ -478,6 +483,10 @@ public class SolrMediaItemHandler {
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
         QueryResponse rsp;
+        
+        query.setFacet(true);
+        query.addFacetField("concept");
+        query.addFacetField("location");
 
         try {
             rsp = server.query(query);
@@ -487,8 +496,13 @@ public class SolrMediaItemHandler {
             return null;
         }
 
+        
+        response.setNumFound(rsp.getResults().getNumFound());
 
         List<SolrMediaItem> solrItems = rsp.getBeans(SolrMediaItem.class);
+        if (solrItems != null) {
+            Logger.getRootLogger().info("got: " + solrItems.size() + " media items from Solr - total results: " + response.getNumFound());
+        }
 
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
@@ -506,6 +520,61 @@ public class SolrMediaItemHandler {
         }
 
         response.setResults(mediaItems);
+        List<Facet> facets = new ArrayList<Facet>();
+        List<FacetField> solrFacetList = rsp.getFacetFields();
+        FacetField solrFacet;
+
+
+        if (solrFacetList != null) {
+
+            //populate all non-zero facets
+
+            for (int i = 0; i < solrFacetList.size(); i++) {
+
+                Facet facet = new Facet(); //initialize for Arcomem JSF UI
+                List<Bucket> buckets = new ArrayList<Bucket>();
+                solrFacet = solrFacetList.get(i); //get the ones returned from Solr
+                List<FacetField.Count> values = solrFacet.getValues();
+                String solrFacetName = solrFacet.getName();
+                boolean validFacet = false;
+
+                //populate Valid Facets
+                for (int j = 0; j < solrFacet.getValueCount(); j++) {
+
+                    Bucket bucket = new Bucket();
+                    long bucketCount = values.get(j).getCount();
+//                    if ((bucketCount > 0) && (bucketCount != solrItems.size())) { //bucket is neither non-zero length nor the whole set 
+                    validFacet = true; //facet contains at least one non-zero length bucket
+                    bucket.setCount(bucketCount);
+                    bucket.setName(values.get(j).getName());
+                    bucket.setQuery(values.get(j).getAsFilterQuery());
+                    bucket.setFacet(solrFacetName);
+                    buckets.add(bucket);
+//                    }
+                }
+                if (validFacet) { //add the facet only if it is contains at least one non-zero length - excludes the whole set result
+                    facet.setBuckets(buckets);
+                    facet.setName(solrFacetName);
+                    facets.add(facet);
+                }
+            }
+
+            Collections.sort(facets, new Comparator<Facet>() { //anonymous inner class used for sorting
+                @Override
+                public int compare(Facet f1, Facet f2) {
+
+                    String value1 = f1.getName();
+                    String value2 = f2.getName();
+
+                    if (value1.compareTo(value2) > 0) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+        }
+        response.setFacets(facets);
 
         return response;
     }
