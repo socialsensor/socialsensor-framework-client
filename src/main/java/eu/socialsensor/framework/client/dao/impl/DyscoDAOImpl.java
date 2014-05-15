@@ -636,7 +636,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        		else
 	        			items.add(it);
 		   
-		        	if(items.size() >= size || scoredItems.size() >=size)
+		        	if(items.size() >= size)
 		        		break;
     	        	
     	        }
@@ -714,7 +714,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 		        		urls.add(mi.getUrl());
 		        	}
 		        	
-		        	if((mediaItems.size() >= size) || scoredMediaItems.size() >= size)
+		        	if((mediaItems.size() >= size))
 		        		break;
 	        	
 	        }
@@ -792,7 +792,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 		        		urls.add(mi.getUrl());
 		        	}
 		        	
-		        	if((mediaItems.size() >= size) || scoredMediaItems.size() >= size)
+		        	if((mediaItems.size() >= size))
 		        		break;
 	        	
     	        }
