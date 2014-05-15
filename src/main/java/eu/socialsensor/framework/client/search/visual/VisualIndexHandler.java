@@ -450,13 +450,12 @@ public class VisualIndexHandler {
     public static void main(String[] args) throws IOException {
     	
     	
-    	VisualIndexHandler handler = new VisualIndexHandler("http://160.40.50.207:8080/VisualIndex", "prototype");
+    	VisualIndexHandler handler = new VisualIndexHandler("http://xxx.xxx.xxx.xxx:8080/VisualIndexService", "Prototype");
     	
     	MediaItemDAO dao = null;
 		try {
-			dao = new MediaItemDAOImpl("160.40.50.207", "Streams", "MediaItemsFromWP_boilerpipe");
+			dao = new MediaItemDAOImpl("xxx.xxx.xxx.xxx", "Prototype", "MediaItems");
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
     	List<MediaItem> mediaItems = dao.getLastMediaItems(-1);
@@ -464,21 +463,22 @@ public class VisualIndexHandler {
     	int k = 0;
     	for(MediaItem mediaItem : mediaItems) {
     		String id = mediaItem.getId();
-    		//String url = mediaItem.getUrl();
+    		String url = mediaItem.getUrl();
 
     		try {
-    			//handler.getSimilarImagesAndIndex(id, new URL(url));
     			JsonResultSet results = handler.getSimilarImages(id, 0.8);
     			List<JsonResult> list = results.results;
     			if(list.size()>0) {
     				System.out.println(results.toJSON());
-    				k++;
-    				//for(JsonResult nn : list) 
-    				//	System.out.println(nn.toString());
-    			
     				System.out.println("============================");
     			}
     			
+    			results = handler.getSimilarImages(new URL(url));
+    			list = results.results;
+    			if(list.size()>0) {
+    				System.out.println(results.toJSON());
+    				System.out.println("============================");
+    			}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
