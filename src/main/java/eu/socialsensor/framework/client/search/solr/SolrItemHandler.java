@@ -250,6 +250,8 @@ public class SolrItemHandler {
     	solrQuery.setFields("id","title","description","publicationTime","score");
 		solrQuery.addSortField("score", ORDER.desc);
 		
+		solrQuery.setRows(100);
+		
         QueryResponse rsp = null;
        
         
@@ -260,23 +262,23 @@ public class SolrItemHandler {
             Logger.getRootLogger().info(e.getMessage());
             
         }
-        System.out.println("Found "+rsp.getResults().getNumFound()+" results");
+      
         List<SolrDocument> retrievedItems = rsp.getResults();
         
         for(SolrDocument sDoc : retrievedItems){
-        	Collection<String> fieldNames = sDoc.getFieldNames();
+        	
         	Float score = (Float) sDoc.getFieldValue("score");
         	String title = (String) sDoc.getFieldValue("title");
         	String description = (String) sDoc.getFieldValue("description");
         	String id = (String) sDoc.getFieldValue("id");
         	Long publicationTime = (Long) sDoc.getFieldValue("publicationTime");
         	
-        	System.out.println("Solr Document #"+id);
-        	System.out.println("Solr Document Title : "+title);
-        	System.out.println("Solr Document Score : "+description);
-        	System.out.println("Solr Document Score : "+score);
+        	//System.out.println("Solr Document #"+id);
+        	//System.out.println("Solr Document Title : "+title);
+        	//System.out.println("Solr Document Score : "+description);
+        	//System.out.println("Solr Document Score : "+score);
         	
-        	System.out.println();
+        	//System.out.println();
         	Item item = new Item();
         	item.setId(id);
         	item.setTitle(title);
