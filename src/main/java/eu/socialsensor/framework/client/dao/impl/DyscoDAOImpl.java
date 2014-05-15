@@ -6,6 +6,7 @@ import eu.socialsensor.framework.client.dao.WebPageDAO;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
@@ -57,17 +58,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     		String visualIndexService, String visualIndexCollection) 
     				throws Exception {
     	
-    	searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
+    	//searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
     	
     	try {
-    		mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
-    		webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
+    		//mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
+    		//webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
         	
 			solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
 	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
-	    	solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
+	    	//solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
 	    	
-	    	visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
+	    	//visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
 	    	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -609,6 +610,9 @@ public class DyscoDAOImpl implements DyscoDAO {
         	for(String filter : filters)
         		queryForRequest +=" AND "+filter;
         	
+        	if((items.size() >= size))
+        		break;
+        	
         	SolrQuery solrQuery = new SolrQuery(queryForRequest);
         	
         	solrQuery.setRows(200);
@@ -754,6 +758,9 @@ public class DyscoDAOImpl implements DyscoDAO {
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		String queryForRequest = "((title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+")))";
     		
+    		if((mediaItems.size() >= size))
+        		break;
+    		
     		//Set filters in case they exist exist
     		for(String filter : filters)
         		queryForRequest +=" AND "+filter;
@@ -823,6 +830,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
    
     public static void main(String[] args) {
+    	
     	
     	
 		
