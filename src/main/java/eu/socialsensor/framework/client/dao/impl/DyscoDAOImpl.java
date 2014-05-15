@@ -8,6 +8,7 @@ import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
@@ -63,17 +64,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     		String visualIndexService, String visualIndexCollection) 
     				throws Exception {
     	
-    	searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
+    	//searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
     	
     	try {
-    		mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
-    		webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
+    		//mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
+    		//webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
         	
 			solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
 	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
-	    	solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
+	    	//solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
 	    	
-	    	visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
+	    	//visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
 	    	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -796,5 +797,7 @@ public class DyscoDAOImpl implements DyscoDAO {
    
     public static void main(String[] args) {
     	
+    	
+		
     }
 }

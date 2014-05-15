@@ -485,7 +485,7 @@ public class SolrMediaItemHandler {
         QueryResponse rsp;
         
         query.setFacet(true);
-        query.addFacetField("concept");
+        query.addFacetField("concepts");
         query.addFacetField("location");
 
         try {
