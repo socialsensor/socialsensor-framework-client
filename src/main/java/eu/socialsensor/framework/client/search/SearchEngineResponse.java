@@ -14,6 +14,10 @@ public class SearchEngineResponse<T> {
     private List<T> results = new ArrayList<T>();
     private List<Facet> facets = new ArrayList<Facet>();
     private long numFound = 0;
+    
+    public SearchEngineResponse(){
+    	
+    }
 
     public List<T> getResults() {
         return results;

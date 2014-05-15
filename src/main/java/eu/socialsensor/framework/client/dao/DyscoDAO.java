@@ -124,9 +124,9 @@ public interface DyscoDAO {
 
 	List<Item> findTotalItems(List<String> dyscoIdsOfGroup);
 	
-	List<Item> findItems(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size);
+	SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, RankingValue orderBy, int size);
 	
-	List<Item> findItems(String query, SocialNetworkSource source, RankingValue orderBy, int size);
+	SearchEngineResponse<Item> findItems(String query, List<String> filters, RankingValue orderBy, int size);
 
 	List<String> findTotalUrls(List<Item> totalItems);
 
@@ -141,7 +141,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findVideos(Dysco dysco, SocialNetworkSource source, RankingValue orderBy, int size);
+	SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, RankingValue orderBy, int size);
 	/**
 	 * Retrieve multimedia content that are videos based on a solr
 	 * query
@@ -150,7 +150,7 @@ public interface DyscoDAO {
 	 * @return
 	 */
 	
-	List<MediaItem> findVideos(String query,SocialNetworkSource source, RankingValue orderBy, int size);
+	SearchEngineResponse<MediaItem> findVideos(String query,List<String> filters, RankingValue orderBy, int size);
 
 	/**
 	 * Retrieve multimedia content tha is images based on dysco's
@@ -159,7 +159,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findImages(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, int size);
+	SearchEngineResponse<MediaItem> findImages(Dysco dysco,List<String> filters, RankingValue orderBy, int size);
 	/**
 	 * Retrieve multimedia content that is images based on a solr 
 	 * query
@@ -167,15 +167,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	List<MediaItem> findImages(String query, SocialNetworkSource source, RankingValue orderBy, int size);
-	
-	List<MediaItem> findImagesByLocation(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, String location, int size);
-	
-	List<MediaItem> findImagesByLocation(String query,SocialNetworkSource source, RankingValue orderBy,String location, int size);
-	
-	List<MediaItem> findImagesByConcept(Dysco dysco,SocialNetworkSource source, RankingValue orderBy, String concept, int size);
-	
-	List<MediaItem> findImagesByConcept(String query,SocialNetworkSource source, RankingValue orderBy, String concept, int size);
+	SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, RankingValue orderBy, int size);
 
 	List<WebPage> findHealines(Dysco dysco, int size);
 

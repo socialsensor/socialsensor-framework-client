@@ -418,6 +418,7 @@ public class SolrItemHandler {
 //        query.setRows(450);
         query.setFacet(true);
         query.addFacetField("sentiment");
+        query.addFacetField("location");
 //        query.setFacetLimit(4);
 
 //        query.set(FacetParams.FACET_DATE, "creationDate");
