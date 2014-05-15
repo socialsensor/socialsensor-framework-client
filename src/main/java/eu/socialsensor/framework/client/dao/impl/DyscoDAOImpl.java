@@ -3,12 +3,9 @@ package eu.socialsensor.framework.client.dao.impl;
 import eu.socialsensor.framework.client.dao.DyscoDAO;
 import eu.socialsensor.framework.client.dao.MediaItemDAO;
 import eu.socialsensor.framework.client.dao.WebPageDAO;
-import eu.socialsensor.framework.client.search.Bucket;
-import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
@@ -18,8 +15,6 @@ import eu.socialsensor.framework.client.search.visual.JsonResultSet.JsonResult;
 import eu.socialsensor.framework.client.search.visual.VisualIndexHandler;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
-import eu.socialsensor.framework.common.domain.RankingValue;
-import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
@@ -28,19 +23,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.response.FacetField;
+
 
 /**
  *
@@ -64,17 +57,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     		String visualIndexService, String visualIndexCollection) 
     				throws Exception {
     	
-    	//searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
+    	searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
     	
     	try {
-    		//mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
-    		//webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
+    		mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
+    		webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
         	
 			solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
 	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
-	    	//solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
+	    	solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
 	    	
-	    	//visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
+	    	visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
 	    	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -315,14 +308,14 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(String query, List<String> filters, RankingValue orderBy, int size){
+    public SearchEngineResponse<Item> findItems(String query, List<String> filters, String orderBy, int size){
     	
     	return collectItems(query,filters,orderBy,size);
     
     }
     
     @Override
-    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, RankingValue orderBy, int size){
+    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, String orderBy, int size){
     	
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	if(queries.isEmpty())
@@ -334,7 +327,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     
    
     @Override
-    public SearchEngineResponse<MediaItem> findVideos(String query,List<String> filters, RankingValue orderBy, int size){
+    public SearchEngineResponse<MediaItem> findVideos(String query,List<String> filters, String orderBy, int size){
     	
     	
     	return collectMediaItems(query,"video",filters,orderBy,size);
@@ -343,7 +336,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     @Override
-    public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, RankingValue orderBy, int size) {
+    public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, String orderBy, int size) {
     	
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	if(queries.isEmpty())
@@ -355,14 +348,14 @@ public class DyscoDAOImpl implements DyscoDAO {
     
     
     @Override
-    public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, RankingValue orderBy, int size){
+    public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, String orderBy, int size){
     
     	return collectMediaItems(query,"image",filters,orderBy,size);
 
     }
 
     @Override
-    public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, RankingValue orderBy, int size) {
+    public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, String orderBy, int size) {
     	
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	if(queries.isEmpty())
@@ -524,7 +517,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     
-    private SearchEngineResponse<Item> collectItems(String query, List<String>filters, RankingValue orderBy, int size){
+    private SearchEngineResponse<Item> collectItems(String query, List<String>filters, String orderBy, int size){
     	boolean defaultOperation = false;
     	double aggregatedScore = 0;
     	
@@ -551,15 +544,11 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     	solrQuery.setRows(200);
     	
-    	if(orderBy.equals(RankingValue.Relevance))
+    	if(orderBy != null)
+    		solrQuery.setSortField(orderBy, ORDER.desc);
+    	else
     		solrQuery.setSortField("score", ORDER.desc);
-    	if(orderBy.equals(RankingValue.Recency))
-    		solrQuery.setSortField("publicationTime", ORDER.desc);
-    	if(orderBy.equals(RankingValue.Popularity))
-    		solrQuery.setSortField("popularity", ORDER.desc);
-    	if(orderBy.equals(RankingValue.Default)){
-    		solrQuery.setSortField("score", ORDER.desc);
-    	}
+    	
     	Logger.getRootLogger().info("Solr Query : " + query);
     	
     	response = solrItemHandler.findItems(solrQuery);
@@ -599,7 +588,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String>filters, RankingValue orderBy,int size){
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String>filters, String orderBy,int size){
     	boolean defaultOperation = false;
     	double aggregatedScore = 0;
     	
@@ -624,15 +613,10 @@ public class DyscoDAOImpl implements DyscoDAO {
         	
         	solrQuery.setRows(200);
         	
-        	if(orderBy.equals(RankingValue.Relevance))
+        	if(orderBy != null)
+        		solrQuery.setSortField(orderBy, ORDER.desc);
+        	else
         		solrQuery.setSortField("score", ORDER.desc);
-        	if(orderBy.equals(RankingValue.Recency))
-        		solrQuery.setSortField("publicationTime", ORDER.desc);
-        	if(orderBy.equals(RankingValue.Popularity))
-        		solrQuery.setSortField("popularity", ORDER.desc);
-        	if(orderBy.equals(RankingValue.Default)){
-        		solrQuery.setSortField("score", ORDER.desc);
-        	}
         	
         	Logger.getRootLogger().info("Solr Query: " + queryForRequest);
         	
@@ -678,7 +662,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
    
-    private SearchEngineResponse<MediaItem> collectMediaItems(String query, String type, List<String>filters, RankingValue orderBy, int size){
+    private SearchEngineResponse<MediaItem> collectMediaItems(String query, String type, List<String>filters, String orderBy, int size){
     	boolean defaultOperation = false;
     	double aggregatedScore = 0;
     	
@@ -706,15 +690,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     	solrQuery.setRows(200);
     	
-    	if(orderBy.equals(RankingValue.Relevance))
+    	if(orderBy != null)
+    		solrQuery.setSortField(orderBy, ORDER.desc);
+    	else
     		solrQuery.setSortField("score", ORDER.desc);
-    	if(orderBy.equals(RankingValue.Recency))
-    		solrQuery.setSortField("publicationTime", ORDER.desc);
-    	if(orderBy.equals(RankingValue.Popularity))
-    		solrQuery.setSortField("popularity", ORDER.desc);
-    	if(orderBy.equals(RankingValue.Default)){
-    		solrQuery.setSortField("score", ORDER.desc);
-    	}
     	Logger.getRootLogger().info("Solr Query : " + query);
     	
     	response = solrMediaItemHandler.findItems(solrQuery);
@@ -758,7 +737,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	return response;
     }
     
-    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type,List<String>filters, RankingValue orderBy,int size){
+    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type,List<String>filters, String orderBy,int size){
     	boolean defaultOperation = false;
     	double aggregatedScore = 0;
     	
@@ -785,15 +764,10 @@ public class DyscoDAOImpl implements DyscoDAO {
         	
         	solrQuery.setRows(200);
         	
-        	if(orderBy.equals(RankingValue.Relevance))
+        	if(orderBy != null)
+        		solrQuery.setSortField(orderBy, ORDER.desc);
+        	else
         		solrQuery.setSortField("score", ORDER.desc);
-        	if(orderBy.equals(RankingValue.Recency))
-        		solrQuery.setSortField("publicationTime", ORDER.desc);
-        	if(orderBy.equals(RankingValue.Popularity))
-        		solrQuery.setSortField("popularity", ORDER.desc);
-        	if(orderBy.equals(RankingValue.Default)){
-        		solrQuery.setSortField("score", ORDER.desc);
-        	}
         	
         	Logger.getRootLogger().info("Solr Query: " + queryForRequest);
         	
