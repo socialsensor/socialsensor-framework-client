@@ -172,5 +172,7 @@ public interface DyscoDAO {
 	List<WebPage> findHealines(Dysco dysco, int size);
 
 	List<MediaItem> getMediaItemHistory(String mediaItemId);
+
+	List<WebPage> findHealines(String query, int size);
 	
 }

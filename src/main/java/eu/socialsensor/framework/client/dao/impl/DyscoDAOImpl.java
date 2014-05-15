@@ -431,6 +431,59 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
     
     @Override
+    public List<WebPage> findHealines(String query, int size) {
+    	
+    	Logger.getRootLogger().info("============ Web Pages Retrieval =============");
+    	
+    	List<WebPage> webPages = new ArrayList<WebPage>();
+    	
+    	// Retrieve web pages from solr index
+    	Set<String> uniqueUrls = new HashSet<String>();
+    	Set<String> expandedUrls = new HashSet<String>();
+    	
+    	String queryForRequest = "(title : ("+query+")) OR (text:("+query+"))";
+    		
+    	SolrQuery solrQuery = new SolrQuery(queryForRequest);
+    	solrQuery.setRows(size);
+        solrQuery.addSortField("score", ORDER.desc);
+        solrQuery.addSortField("date", ORDER.desc);
+        	
+        Logger.getRootLogger().info("Query : " + query);
+        SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
+        if(response != null) {
+        	List<WebPage> results = response.getResults();
+        	for(WebPage webPage : results) {
+        		String url = webPage.getUrl();
+    	        String expandedUrl = webPage.getExpandedUrl(); 	
+    	        if(!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+    	        	int shares = webPageDAO.getWebPageShares(url);
+    	        	webPage.setShares(shares);
+    		        	
+    		        webPages.add(webPage);
+    		        uniqueUrls.add(url);
+    		        expandedUrls.add(expandedUrl);
+    	        }
+        	}    
+        }
+    	
+    	Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
+    	Collections.sort(webPages, new Comparator<WebPage>() {
+            public int compare(WebPage wp1, WebPage wp2) {
+                if (wp1.getShares() == wp2.getShares()) {
+                	if(wp1.getDate().before(wp2.getDate()))
+                		return 1;
+                	else
+                		return -1;
+                } else {
+                    return wp1.getShares()<wp2.getShares() ? 1 : -1; 
+                }
+            }
+        });
+    	
+    	return webPages.subList(0, Math.min(webPages.size(), size));
+    }
+    
+    @Override
     public List<MediaItem> getMediaItemHistory(String mediaItemId) {
     	List<MediaItem> mItems = new ArrayList<MediaItem>();
     	
