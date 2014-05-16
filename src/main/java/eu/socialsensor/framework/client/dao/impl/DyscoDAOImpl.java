@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 
-
 /**
  *
  * @author etzoannos - e.tzoannos@atc.gr
@@ -43,39 +42,38 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 public class DyscoDAOImpl implements DyscoDAO {
 
     SearchEngineHandler searchEngineHandler;
-    
+
     private MediaItemDAO mediaItemDAO;
     private WebPageDAO webPageDAO;
-    
+
     private SolrItemHandler solrItemHandler;
     private SolrMediaItemHandler solrMediaItemHandler;
     private SolrWebPageHandler solrWebPageHandler;
 
     private VisualIndexHandler visualIndexHandler;
-    
+
     public DyscoDAOImpl(String mongoHost, String webPageDB, String webPageColl, String mediaItemsDB, String mediaItemsColl,
-    		String solrDyscoCollection, String solrItemCollection, String solrMediaItemCollection, String solrWebPageCollection, 
-    		String visualIndexService, String visualIndexCollection) 
-    				throws Exception {
-    	
-    	//searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
-    	
-    	try {
-    		//mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
-    		//webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
-        	
-			solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
-	    	solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
+            String solrDyscoCollection, String solrItemCollection, String solrMediaItemCollection, String solrWebPageCollection,
+            String visualIndexService, String visualIndexCollection)
+            throws Exception {
+
+        searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
+
+        try {
+            //mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
+            //webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
+
+            solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
+            solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
 	    	//solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
-	    	
-	    	//visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
-	    	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	
+
+            //visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
-    
+
     @Override
     public boolean insertDysco(Dysco dysco) {
         return searchEngineHandler.insertDysco(dysco);
@@ -218,7 +216,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //getting items of the whole dysco group 
         //formulating the "find all items of dysco group" query
-
         String totalItemsQuery;
 
         //this means it's a trending Dysco
@@ -245,8 +242,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         totalQuery.setRows(1000);
         //TODO: see if we could minimize the fields returned for totalItems: 
         //links are needed for sure, maybe also sentiment which is used as facet
-        totalQuery.setFields("links","sentiment");
- 
+        totalQuery.setFields("links", "sentiment");
+
         _totalItems = solrItemHandler.findItems(totalQuery).getResults();
 
         return _totalItems;
@@ -258,7 +255,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<String> findTotalUrls(List<Item> totalItems) {
 
         //convert HashSet to ArrayList
-
         Set<String> totalItemsUrls = new HashSet<String>();
 
         for (Item totalItem : totalItems) {
@@ -309,530 +305,541 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(String query, List<String> filters, String orderBy, int size){
-    	
-    	return collectItems(query,filters,orderBy,size);
-    
-    }
-    
-    @Override
-    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, String orderBy, int size){
-    	
-    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-    	if(queries.isEmpty())
-    		queries = dysco.getPrimalSolrQueries(); //temporary
-    	
-    	return collectItems(queries,filters,orderBy,size);
+    public SearchEngineResponse<Item> findItems(String query, List<String> filters, String orderBy, int size) {
+
+        return collectItems(query, filters, orderBy, size);
 
     }
-    
-   
+
     @Override
-    public SearchEngineResponse<MediaItem> findVideos(String query,List<String> filters, String orderBy, int size){
-    	
-    	
-    	return collectMediaItems(query,"video",filters,orderBy,size);
-    
-    	
+    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, String orderBy, int size) {
+
+        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+        if (queries.isEmpty()) {
+            queries = dysco.getPrimalSolrQueries(); //temporary
+        }
+        return collectItems(queries, filters, orderBy, size);
+
     }
-    
+
+    @Override
+    public SearchEngineResponse<MediaItem> findVideos(String query, List<String> filters, String orderBy, int size) {
+
+        return collectMediaItems(query, "video", filters, orderBy, size);
+
+    }
+
     @Override
     public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, String orderBy, int size) {
-    	
-    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-    	if(queries.isEmpty())
-    		queries = dysco.getPrimalSolrQueries(); //temporary
-    	
-    	return collectMediaItems(queries,"video",filters,orderBy,size);
-    	
+
+        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+        if (queries.isEmpty()) {
+            queries = dysco.getPrimalSolrQueries(); //temporary
+        }
+        return collectMediaItems(queries, "video", filters, orderBy, size);
+
     }
-    
-    
+
     @Override
-    public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, String orderBy, int size){
-    
-    	return collectMediaItems(query,"image",filters,orderBy,size);
+    public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, String orderBy, int size) {
+
+        return collectMediaItems(query, "image", filters, orderBy, size);
 
     }
 
     @Override
     public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, String orderBy, int size) {
-    	
-    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-    	if(queries.isEmpty())
-    		queries = dysco.getPrimalSolrQueries(); //temporary
-    	
-    	return collectMediaItems(queries,"image",filters,orderBy,size);
+
+        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+        if (queries.isEmpty()) {
+            queries = dysco.getPrimalSolrQueries(); //temporary
+        }
+        return collectMediaItems(queries, "image", filters, orderBy, size);
 
     }
-    
+
     @Override
     public List<WebPage> findHealines(Dysco dysco, int size) {
-    	
-    	Logger.getRootLogger().info("============ Web Pages Retrieval =============");
-    	
-    	List<WebPage> webPages = new ArrayList<WebPage>();
-    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries(); 	
-    	if(queries==null || queries.isEmpty()) {
-    		return webPages;
-    	}
-    	
-    	// Retrieve web pages from solr index
-    	Set<String> uniqueUrls = new HashSet<String>();
-    	Set<String> expandedUrls = new HashSet<String>();
-    	for(eu.socialsensor.framework.common.domain.Query query : queries) {
-    		String queryForRequest = "(title : ("+query.getName()+")) OR (text:("+query.getName()+"))";
-    		
-    		SolrQuery solrQuery = new SolrQuery(queryForRequest);
-    		solrQuery.setRows(size);
-        	solrQuery.addSortField("score", ORDER.desc);
-        	solrQuery.addSortField("date", ORDER.desc);
-        	
-        	Logger.getRootLogger().info("Query : " + query);
-        	SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
-        	if(response != null) {
-        		List<WebPage> results = response.getResults();
-    	        for(WebPage webPage : results) {
-    	        	String url = webPage.getUrl();
-    	        	String expandedUrl = webPage.getExpandedUrl(); 	
-    		        if(!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
-    		        	int shares = webPageDAO.getWebPageShares(url);
-    		        	webPage.setShares(shares);
-    		        	
-    		        	webPages.add(webPage);
-    		        	uniqueUrls.add(url);
-    		        	expandedUrls.add(expandedUrl);
-    		        }
-    	        }    
-        	}
-    	}
-    	
-    	Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
-    	Collections.sort(webPages, new Comparator<WebPage>() {
+
+        Logger.getRootLogger().info("============ Web Pages Retrieval =============");
+
+        List<WebPage> webPages = new ArrayList<WebPage>();
+        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+        if (queries == null || queries.isEmpty()) {
+            return webPages;
+        }
+
+        // Retrieve web pages from solr index
+        Set<String> uniqueUrls = new HashSet<String>();
+        Set<String> expandedUrls = new HashSet<String>();
+        for (eu.socialsensor.framework.common.domain.Query query : queries) {
+            String queryForRequest = "(title : (" + query.getName() + ")) OR (text:(" + query.getName() + "))";
+
+            SolrQuery solrQuery = new SolrQuery(queryForRequest);
+            solrQuery.setRows(size);
+            solrQuery.addSortField("score", ORDER.desc);
+            solrQuery.addSortField("date", ORDER.desc);
+
+            Logger.getRootLogger().info("Query : " + query);
+            SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
+            if (response != null) {
+                List<WebPage> results = response.getResults();
+                for (WebPage webPage : results) {
+                    String url = webPage.getUrl();
+                    String expandedUrl = webPage.getExpandedUrl();
+                    if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+                        int shares = webPageDAO.getWebPageShares(url);
+                        webPage.setShares(shares);
+
+                        webPages.add(webPage);
+                        uniqueUrls.add(url);
+                        expandedUrls.add(expandedUrl);
+                    }
+                }
+            }
+        }
+
+        Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
+        Collections.sort(webPages, new Comparator<WebPage>() {
             public int compare(WebPage wp1, WebPage wp2) {
                 if (wp1.getShares() == wp2.getShares()) {
-                	if(wp1.getDate().before(wp2.getDate()))
-                		return 1;
-                	else
-                		return -1;
+                    if (wp1.getDate().before(wp2.getDate())) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
                 } else {
-                    return wp1.getShares()<wp2.getShares() ? 1 : -1; 
+                    return wp1.getShares() < wp2.getShares() ? 1 : -1;
                 }
             }
         });
-    	
-    	return webPages.subList(0, Math.min(webPages.size(), size));
+
+        return webPages.subList(0, Math.min(webPages.size(), size));
     }
-    
+
     @Override
     public List<WebPage> findHealines(String query, int size) {
-    	
-    	Logger.getRootLogger().info("============ Web Pages Retrieval =============");
-    	
-    	List<WebPage> webPages = new ArrayList<WebPage>();
-    	
-    	// Retrieve web pages from solr index
-    	Set<String> uniqueUrls = new HashSet<String>();
-    	Set<String> expandedUrls = new HashSet<String>();
-    	
-    	String queryForRequest = "(title : ("+query+")) OR (text:("+query+"))";
-    		
-    	SolrQuery solrQuery = new SolrQuery(queryForRequest);
-    	solrQuery.setRows(size);
+
+        Logger.getRootLogger().info("============ Web Pages Retrieval =============");
+
+        List<WebPage> webPages = new ArrayList<WebPage>();
+
+        // Retrieve web pages from solr index
+        Set<String> uniqueUrls = new HashSet<String>();
+        Set<String> expandedUrls = new HashSet<String>();
+
+        String queryForRequest = "(title : (" + query + ")) OR (text:(" + query + "))";
+
+        SolrQuery solrQuery = new SolrQuery(queryForRequest);
+        solrQuery.setRows(size);
         solrQuery.addSortField("score", ORDER.desc);
         solrQuery.addSortField("date", ORDER.desc);
-        	
+
         Logger.getRootLogger().info("Query : " + query);
         SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
-        if(response != null) {
-        	List<WebPage> results = response.getResults();
-        	for(WebPage webPage : results) {
-        		String url = webPage.getUrl();
-    	        String expandedUrl = webPage.getExpandedUrl(); 	
-    	        if(!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
-    	        	int shares = webPageDAO.getWebPageShares(url);
-    	        	webPage.setShares(shares);
-    		        	
-    		        webPages.add(webPage);
-    		        uniqueUrls.add(url);
-    		        expandedUrls.add(expandedUrl);
-    	        }
-        	}    
+        if (response != null) {
+            List<WebPage> results = response.getResults();
+            for (WebPage webPage : results) {
+                String url = webPage.getUrl();
+                String expandedUrl = webPage.getExpandedUrl();
+                if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+                    int shares = webPageDAO.getWebPageShares(url);
+                    webPage.setShares(shares);
+
+                    webPages.add(webPage);
+                    uniqueUrls.add(url);
+                    expandedUrls.add(expandedUrl);
+                }
+            }
         }
-    	
-    	Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
-    	Collections.sort(webPages, new Comparator<WebPage>() {
+
+        Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
+        Collections.sort(webPages, new Comparator<WebPage>() {
             public int compare(WebPage wp1, WebPage wp2) {
                 if (wp1.getShares() == wp2.getShares()) {
-                	if(wp1.getDate().before(wp2.getDate()))
-                		return 1;
-                	else
-                		return -1;
+                    if (wp1.getDate().before(wp2.getDate())) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
                 } else {
-                    return wp1.getShares()<wp2.getShares() ? 1 : -1; 
+                    return wp1.getShares() < wp2.getShares() ? 1 : -1;
                 }
             }
         });
-    	
-    	return webPages.subList(0, Math.min(webPages.size(), size));
+
+        return webPages.subList(0, Math.min(webPages.size(), size));
     }
-    
+
     @Override
     public List<MediaItem> getMediaItemHistory(String mediaItemId) {
-    	List<MediaItem> mItems = new ArrayList<MediaItem>();
-    	
-    	Logger.getRootLogger().info("Get visually similar media items for " + mediaItemId);
-    	
-    	int page = 1;
-    	Set<String> ids = new HashSet<String>();
-    	while(true) {
-    		JsonResultSet similar = visualIndexHandler.getSimilarImages(mediaItemId, page++, 100);
-    		if(similar != null && similar.getResults() != null && similar.getResults().size()>0) {
-    			List<JsonResult> results = similar.getResults();
-    			for(JsonResult result : results) {
-    				String mId = result.getId();
-    				if(!ids.contains(mId)) {
-    					MediaItem mediaItem = mediaItemDAO.getMediaItem(mId);
-    					if(mediaItem != null) {
-    						mItems.add(mediaItem);
-    					}
-    				}
-    			}
-    		}
-    		else {
-    			break;
-    		}
-    	}
-    	
-    	Logger.getRootLogger().info(mItems.size() + "media items retrieved. Re-rank by publication time");
-    	Collections.sort(mItems, new Comparator<MediaItem>() {
+        List<MediaItem> mItems = new ArrayList<MediaItem>();
+
+        Logger.getRootLogger().info("Get visually similar media items for " + mediaItemId);
+
+        int page = 1;
+        Set<String> ids = new HashSet<String>();
+        while (true) {
+            JsonResultSet similar = visualIndexHandler.getSimilarImages(mediaItemId, page++, 100);
+            if (similar != null && similar.getResults() != null && similar.getResults().size() > 0) {
+                List<JsonResult> results = similar.getResults();
+                for (JsonResult result : results) {
+                    String mId = result.getId();
+                    if (!ids.contains(mId)) {
+                        MediaItem mediaItem = mediaItemDAO.getMediaItem(mId);
+                        if (mediaItem != null) {
+                            mItems.add(mediaItem);
+                        }
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+        Logger.getRootLogger().info(mItems.size() + "media items retrieved. Re-rank by publication time");
+        Collections.sort(mItems, new Comparator<MediaItem>() {
             public int compare(MediaItem mi1, MediaItem mi2) {
-                if(mi1.getPublicationTime()<mi2.getPublicationTime())
-                	return -1;
-                else
-                	return 1;
+                if (mi1.getPublicationTime() < mi2.getPublicationTime()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         });
-    	
-    	return mItems;
+
+        return mItems;
     }
-    
-    
-    private SearchEngineResponse<Item> collectItems(String query, List<String>filters, String orderBy, int size){
-    	boolean defaultOperation = false;
-    	double aggregatedScore = 0;
-    	
-    	List<Item> items = new ArrayList<Item>();
-    	
-    	SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
-    	
-    	Map<Double,Item> scoredItems = new TreeMap<Double,Item>(Collections.reverseOrder());
-    	
-    	if(query.equals(""))
-    		return response;
-    
-    	//Retrieve multimedia content that is stored in solr
-    	
-    	if(!query.contains("title") && !query.contains("description"))
-    		query = "((title : "+query+") OR (description:"+query+") OR (tags:"+query+"))";
-    
-    	//Set source filters in case they exist exist
-    	
-		for(String filter : filters)
-			query +=" AND "+filter;
-    	
-    	SolrQuery solrQuery = new SolrQuery(query);
-    	
-    	solrQuery.setRows(200);
-    	
-    	if(orderBy != null)
-    		solrQuery.setSortField(orderBy, ORDER.desc);
-    	else
-    		solrQuery.setSortField("score", ORDER.desc);
-    	
-    	Logger.getRootLogger().info("Solr Query : " + query);
-    	
-    	response = solrItemHandler.findItems(solrQuery);
-    	if(response != null){
-    		List<Item> results = response.getResults();
-    		
-	        for(Item it : results) {	
-        		if(defaultOperation){
-        			aggregatedScore++;
-        			System.out.println("Storing item : "+it.getId()+" with score : "+aggregatedScore);
-        			scoredItems.put(aggregatedScore, it);
-        		}
-        		else
-        			items.add(it);
-		        	
-		        	if((items.size() >= size) || scoredItems.size() >= size)
-		        		break;
-	        	
-	        }
-    	}
-    	
-    	//rank media items with default method - to be examined
-    	if(defaultOperation){
-    		Map<Double,Item> rankedItems = new TreeMap<Double,Item>(Collections.reverseOrder());
-    		for(Map.Entry<Double, Item> entry : scoredItems.entrySet()){
-    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000);
-    			rankedItems.put(res, entry.getValue());
-    		}
-    		
-    		for(Item it : rankedItems.values())
-    			items.add(it);
-    	}
-    	
-    	response.setResults(items);
-    	
-    	return response;
+
+    private SearchEngineResponse<Item> collectItems(String query, List<String> filters, String orderBy, int size) {
+        boolean defaultOperation = false;
+        double aggregatedScore = 0;
+
+        List<Item> items = new ArrayList<Item>();
+
+        SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
+
+        Map<Double, Item> scoredItems = new TreeMap<Double, Item>(Collections.reverseOrder());
+
+        if (query.equals("")) {
+            return response;
+        }
+
+        //Retrieve multimedia content that is stored in solr
+        if (!query.contains("title") && !query.contains("description")) {
+            query = "((title : " + query + ") OR (description:" + query + ") OR (tags:" + query + "))";
+        }
+
+        //Set source filters in case they exist exist
+        for (String filter : filters) {
+            query += " AND " + filter;
+        }
+
+        SolrQuery solrQuery = new SolrQuery(query);
+
+        solrQuery.setRows(200);
+
+        if (orderBy != null) {
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
+        }
+
+        Logger.getRootLogger().info("Solr Query : " + query);
+
+        response = solrItemHandler.findItems(solrQuery);
+        if (response != null) {
+            List<Item> results = response.getResults();
+
+            for (Item it : results) {
+                if (defaultOperation) {
+                    aggregatedScore++;
+                    System.out.println("Storing item : " + it.getId() + " with score : " + aggregatedScore);
+                    scoredItems.put(aggregatedScore, it);
+                } else {
+                    items.add(it);
+                }
+
+                if ((items.size() >= size) || scoredItems.size() >= size) {
+                    break;
+                }
+
+            }
+        }
+
+        //rank media items with default method - to be examined
+        if (defaultOperation) {
+            Map<Double, Item> rankedItems = new TreeMap<Double, Item>(Collections.reverseOrder());
+            for (Map.Entry<Double, Item> entry : scoredItems.entrySet()) {
+                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 1000000);
+                rankedItems.put(res, entry.getValue());
+            }
+
+            for (Item it : rankedItems.values()) {
+                items.add(it);
+            }
+        }
+
+        response.setResults(items);
+
+        return response;
     }
-    
-    
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String>filters, String orderBy,int size){
-    	boolean defaultOperation = false;
-    	double aggregatedScore = 0;
-    	
-    	List<Item> items = new ArrayList<Item>();
-    	
-    	SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
-    	
-    	Map<Double,Item> scoredItems = new TreeMap<Double,Item>(Collections.reverseOrder());
-    	
-    	if(queries.isEmpty())
-    		return response;
-    
-    	//Retrieve multimedia content that is stored in solr
-    	for(eu.socialsensor.framework.common.domain.Query query : queries){
-    		String queryForRequest = "((title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+")))";
-    		
-    		//Set source filters in case they exist exist
-        	for(String filter : filters)
-        		queryForRequest +=" AND "+filter;
-        	
-        	if((items.size() >= size))
-        		break;
-        	
-        	SolrQuery solrQuery = new SolrQuery(queryForRequest);
-        	
-        	solrQuery.setRows(200);
-        	
-        	if(orderBy != null)
-        		solrQuery.setSortField(orderBy, ORDER.desc);
-        	else
-        		solrQuery.setSortField("score", ORDER.desc);
-        	
-        	Logger.getRootLogger().info("Solr Query: " + queryForRequest);
-        	
-        	response = solrItemHandler.findItems(solrQuery);
-        	if(response != null){
-        		List<Item> results = response.getResults();
-        		
-    	        for(Item it : results) {
-    
-	        		if(defaultOperation){
-	        			aggregatedScore++;
-	        			double score = 1.0;
-	        			if(query.getScore()!=null)
-	        				score = query.getScore();
-	        			scoredItems.put(aggregatedScore * score, it);
-	        		}
-	        		else
-	        			items.add(it);
-		   
-		        	if(items.size() >= size)
-		        		break;
-    	        	
-    	        }
-        	}
-    	}
-    	
-    	
-    	//rank media items with default method
-    	if(defaultOperation){
-    		Map<Double,Item> rankedItems = new TreeMap<Double,Item>(Collections.reverseOrder());
-    		for(Map.Entry<Double, Item> entry : scoredItems.entrySet()){
-    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/100000);
-    			
-    			rankedItems.put(res, entry.getValue());
-    		}
-    		
-    		for(Item it : rankedItems.values())
-    			items.add(it);
-    	}
-    	
-    	response.setResults(items);
-    	return response;
+
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, String orderBy, int size) {
+        boolean defaultOperation = false;
+        double aggregatedScore = 0;
+
+        List<Item> items = new ArrayList<Item>();
+
+        SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
+
+        Map<Double, Item> scoredItems = new TreeMap<Double, Item>(Collections.reverseOrder());
+
+        if (queries.isEmpty()) {
+            return response;
+        }
+
+        //Retrieve multimedia content that is stored in solr
+        for (eu.socialsensor.framework.common.domain.Query query : queries) {
+            String queryForRequest = "((title : (" + query.getName() + ")) OR (description:(" + query.getName() + ")) OR (tags:(" + query.getName() + ")))";
+
+            //Set source filters in case they exist exist
+            for (String filter : filters) {
+                queryForRequest += " AND " + filter;
+            }
+
+            if ((items.size() >= size)) {
+                break;
+            }
+
+            SolrQuery solrQuery = new SolrQuery(queryForRequest);
+
+            solrQuery.setRows(200);
+
+            if (orderBy != null) {
+                solrQuery.setSortField(orderBy, ORDER.desc);
+            } else {
+                solrQuery.setSortField("score", ORDER.desc);
+            }
+
+            Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+
+            response = solrItemHandler.findItems(solrQuery);
+            if (response != null) {
+                List<Item> results = response.getResults();
+
+                for (Item it : results) {
+
+                    if (defaultOperation) {
+                        aggregatedScore++;
+                        double score = 1.0;
+                        if (query.getScore() != null) {
+                            score = query.getScore();
+                        }
+                        scoredItems.put(aggregatedScore * score, it);
+                    } else {
+                        items.add(it);
+                    }
+
+                    if (items.size() >= size) {
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        //rank media items with default method
+        if (defaultOperation) {
+            Map<Double, Item> rankedItems = new TreeMap<Double, Item>(Collections.reverseOrder());
+            for (Map.Entry<Double, Item> entry : scoredItems.entrySet()) {
+                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 100000);
+
+                rankedItems.put(res, entry.getValue());
+            }
+
+            for (Item it : rankedItems.values()) {
+                items.add(it);
+            }
+        }
+
+        response.setResults(items);
+        return response;
     }
-    
-   
-    private SearchEngineResponse<MediaItem> collectMediaItems(String query, String type, List<String>filters, String orderBy, int size){
-    	boolean defaultOperation = false;
-    	double aggregatedScore = 0;
-    	
-    	List<MediaItem> mediaItems = new LinkedList<MediaItem>();
-    	
-    	SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
-    	
-    	Map<Double,MediaItem> scoredMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
-    	
-    	if(query.equals(""))
-    		return response;
-    
-    	//Retrieve multimedia content that is stored in solr
-    
-    	if(!query.contains("title") && !query.contains("description"))
-    		query = "((title : "+query+") OR (description:"+query+") OR (tags:"+query+"))";
-    
-    	//Set filters in case they exist exist
-    	for(String filter : filters)
-    		query +=" AND "+filter;
-    	
-    	query += " AND (type : "+type+")";
-    	
-    	SolrQuery solrQuery = new SolrQuery(query);
-    	
-    	solrQuery.setRows(200);
-    	
-    	if(orderBy != null)
-    		solrQuery.setSortField(orderBy, ORDER.desc);
-    	else
-    		solrQuery.setSortField("score", ORDER.desc);
-    	Logger.getRootLogger().info("Solr Query : " + query);
-    	
-    	response = solrMediaItemHandler.findItems(solrQuery);
-    	if(response != null){
-    		List<MediaItem> results = response.getResults();
-    		Set<String> urls = new HashSet<String>();
-	        for(MediaItem mi : results) {
-	        	
-	        	
-		        	if(!urls.contains(mi.getUrl())) {
-		        		if(defaultOperation){
-		        			aggregatedScore++;
-		        			scoredMediaItems.put(aggregatedScore, mi);
-		        		}
-		        		else
-		        			mediaItems.add(mi);
-		        	
-		        		urls.add(mi.getUrl());
-		        	}
-		        	
-		        	if((mediaItems.size() >= size))
-		        		break;
-	        	
-	        }
-    	}
-    	
-    	//rank media items with default method
-    	if(defaultOperation){
-    		Map<Double,MediaItem> rankedMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
-    		for(Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()){
-    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/1000000) *(entry.getValue().getLikes()
-    					+ entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments()+1);
-    			
-    			rankedMediaItems.put(res, entry.getValue());
-    		}
-    		
-    		for(MediaItem mi : rankedMediaItems.values())
-    			mediaItems.add(mi);
-    	}
-    	response.setResults(mediaItems);
-    	return response;
+
+    private SearchEngineResponse<MediaItem> collectMediaItems(String query, String type, List<String> filters, String orderBy, int size) {
+        boolean defaultOperation = false;
+        double aggregatedScore = 0;
+
+        List<MediaItem> mediaItems = new LinkedList<MediaItem>();
+
+        SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
+
+        Map<Double, MediaItem> scoredMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
+
+        if (query.equals("")) {
+            return response;
+        }
+
+        //Retrieve multimedia content that is stored in solr
+        if (!query.contains("title") && !query.contains("description")) {
+            query = "((title : " + query + ") OR (description:" + query + ") OR (tags:" + query + "))";
+        }
+
+        //Set filters in case they exist exist
+        for (String filter : filters) {
+            query += " AND " + filter;
+        }
+
+        query += " AND (type : " + type + ")";
+
+        SolrQuery solrQuery = new SolrQuery(query);
+
+        solrQuery.setRows(200);
+
+        if (orderBy != null) {
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
+        }
+        Logger.getRootLogger().info("Solr Query : " + query);
+
+        response = solrMediaItemHandler.findItems(solrQuery);
+        if (response != null) {
+            List<MediaItem> results = response.getResults();
+            Set<String> urls = new HashSet<String>();
+            for (MediaItem mi : results) {
+
+                if (!urls.contains(mi.getUrl())) {
+                    if (defaultOperation) {
+                        aggregatedScore++;
+                        scoredMediaItems.put(aggregatedScore, mi);
+                    } else {
+                        mediaItems.add(mi);
+                    }
+
+                    urls.add(mi.getUrl());
+                }
+
+                if ((mediaItems.size() >= size)) {
+                    break;
+                }
+
+            }
+        }
+
+        //rank media items with default method
+        if (defaultOperation) {
+            Map<Double, MediaItem> rankedMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
+            for (Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()) {
+                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 1000000) * (entry.getValue().getLikes()
+                        + entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments() + 1);
+
+                rankedMediaItems.put(res, entry.getValue());
+            }
+
+            for (MediaItem mi : rankedMediaItems.values()) {
+                mediaItems.add(mi);
+            }
+        }
+        response.setResults(mediaItems);
+        return response;
     }
-    
-    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type,List<String>filters, String orderBy,int size){
-    	boolean defaultOperation = false;
-    	double aggregatedScore = 0;
-    	
-    	List<MediaItem> mediaItems = new ArrayList<MediaItem>();
-    	
-    	SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
-    	
-    	Map<Double,MediaItem> scoredMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
-    	
-    	if(queries.isEmpty())
-    		return response;
-    
-    	//Retrieve multimedia content that is stored in solr
-    	for(eu.socialsensor.framework.common.domain.Query query : queries){
-    		String queryForRequest = "((title : ("+query.getName()+")) OR (description:("+query.getName()+")) OR (tags:("+query.getName()+")))";
-    		
-    		if((mediaItems.size() >= size))
-        		break;
-    		
-    		//Set filters in case they exist exist
-    		for(String filter : filters)
-        		queryForRequest +=" AND "+filter;
-        	
-        	queryForRequest += " AND (type : "+type+")";
-        	
-        	SolrQuery solrQuery = new SolrQuery(queryForRequest);
-        	
-        	solrQuery.setRows(200);
-        	
-        	if(orderBy != null)
-        		solrQuery.setSortField(orderBy, ORDER.desc);
-        	else
-        		solrQuery.setSortField("score", ORDER.desc);
-        	
-        	Logger.getRootLogger().info("Solr Query: " + queryForRequest);
-        	
-        	response = solrMediaItemHandler.findItems(solrQuery);
-        	if(response != null){
-        		List<MediaItem> results = response.getResults();
-        		Set<String> urls = new HashSet<String>();
-    	        for(MediaItem mi : results) {
-    	        	
-    	        	
-		        	if(!urls.contains(mi.getUrl())) {
-		        		if(defaultOperation){
-		        			aggregatedScore++;
-		        			double score = 1.0;
-		        			if(query.getScore()!=null)
-		        				score = query.getScore();
-		        			scoredMediaItems.put(aggregatedScore * score, mi);
-		        		}
-		        		else
-		        			mediaItems.add(mi);
-		        	
-		        		urls.add(mi.getUrl());
-		        	}
-		        	
-		        	if((mediaItems.size() >= size))
-		        		break;
-	        	
-    	        }
-        	}
-    	}
-    	
-    	
-    	//rank media items with default method
-    	if(defaultOperation){
-    		Map<Double,MediaItem> rankedMediaItems = new TreeMap<Double,MediaItem>(Collections.reverseOrder());
-    		for(Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()){
-    			Double res = entry.getKey() * (entry.getValue().getPublicationTime()/100000) *(entry.getValue().getLikes()
-    					+ entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments()+1);
-    			
-    			rankedMediaItems.put(res, entry.getValue());
-    		}
-    		
-    		for(MediaItem mi : rankedMediaItems.values())
-    			mediaItems.add(mi);
-    	}
-    	
-    	response.setResults(mediaItems);
-    	return response;
+
+    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, String orderBy, int size) {
+        boolean defaultOperation = false;
+        double aggregatedScore = 0;
+
+        List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+
+        SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
+
+        Map<Double, MediaItem> scoredMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
+
+        if (queries.isEmpty()) {
+            return response;
+        }
+
+        //Retrieve multimedia content that is stored in solr
+        for (eu.socialsensor.framework.common.domain.Query query : queries) {
+            String queryForRequest = "((title : (" + query.getName() + ")) OR (description:(" + query.getName() + ")) OR (tags:(" + query.getName() + ")))";
+
+            if ((mediaItems.size() >= size)) {
+                break;
+            }
+
+            //Set filters in case they exist exist
+            for (String filter : filters) {
+                queryForRequest += " AND " + filter;
+            }
+
+            queryForRequest += " AND (type : " + type + ")";
+
+            SolrQuery solrQuery = new SolrQuery(queryForRequest);
+
+            solrQuery.setRows(200);
+
+            if (orderBy != null) {
+                solrQuery.setSortField(orderBy, ORDER.desc);
+            } else {
+                solrQuery.setSortField("score", ORDER.desc);
+            }
+
+            Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+
+            response = solrMediaItemHandler.findItems(solrQuery);
+            if (response != null) {
+                List<MediaItem> results = response.getResults();
+                Set<String> urls = new HashSet<String>();
+                for (MediaItem mi : results) {
+
+                    if (!urls.contains(mi.getUrl())) {
+                        if (defaultOperation) {
+                            aggregatedScore++;
+                            double score = 1.0;
+                            if (query.getScore() != null) {
+                                score = query.getScore();
+                            }
+                            scoredMediaItems.put(aggregatedScore * score, mi);
+                        } else {
+                            mediaItems.add(mi);
+                        }
+
+                        urls.add(mi.getUrl());
+                    }
+
+                    if ((mediaItems.size() >= size)) {
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        //rank media items with default method
+        if (defaultOperation) {
+            Map<Double, MediaItem> rankedMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
+            for (Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()) {
+                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 100000) * (entry.getValue().getLikes()
+                        + entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments() + 1);
+
+                rankedMediaItems.put(res, entry.getValue());
+            }
+
+            for (MediaItem mi : rankedMediaItems.values()) {
+                mediaItems.add(mi);
+            }
+        }
+
+        response.setResults(mediaItems);
+        return response;
     }
-    
+
     public List<MediaItem> requestThumbnails(Dysco dysco, int size) {
-    	return null;
+        return null;
     }
-   
+
     public static void main(String[] args) {
-    	
-    	
-    	
-		
+
     }
 }
