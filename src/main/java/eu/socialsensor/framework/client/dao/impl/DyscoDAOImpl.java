@@ -60,14 +60,14 @@ public class DyscoDAOImpl implements DyscoDAO {
         searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
 
         try {
-            //mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
-            //webPageDAO = new WebPageDAOImpl(mongoHost,webPageDB, webPageColl);
+            mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
+            webPageDAO = new WebPageDAOImpl(mongoHost, webPageDB, webPageColl);
 
             solrItemHandler = SolrItemHandler.getInstance(solrItemCollection);
             solrMediaItemHandler = SolrMediaItemHandler.getInstance(solrMediaItemCollection);
-	    	//solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
+            solrWebPageHandler = SolrWebPageHandler.getInstance(solrWebPageCollection);
 
-            //visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
+            visualIndexHandler = new VisualIndexHandler(visualIndexService, visualIndexCollection);
         } catch (Exception e) {
             e.printStackTrace();
         }
