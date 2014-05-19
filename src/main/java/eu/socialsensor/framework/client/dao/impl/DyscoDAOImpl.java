@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             String visualIndexService, String visualIndexCollection)
             throws Exception {
 
-        searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
+    		searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
 
         try {
             mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
@@ -318,6 +319,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         if (queries.isEmpty()) {
             queries = dysco.getPrimalSolrQueries(); //temporary
         }
+        
         return collectItems(queries, filters, orderBy, size);
 
     }
@@ -354,6 +356,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         if (queries.isEmpty()) {
             queries = dysco.getPrimalSolrQueries(); //temporary
         }
+   
         return collectMediaItems(queries, "image", filters, orderBy, size);
 
     }
@@ -577,16 +580,18 @@ public class DyscoDAOImpl implements DyscoDAO {
         //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	
-        	if(first){
-        		allQueriesToOne += query.getName();
-        		first = false;
+        	if(query.getScore() > 0.5){
+        		if(first){
+            		allQueriesToOne += "("+query.getName()+")";
+            		first = false;
+            	}
+            	else
+            		allQueriesToOne += " OR ("+query.getName()+")";
         	}
-        	else
-        		allQueriesToOne += " OR "+query.getName();
+        	
         	 
         }
-        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")) OR (tags:(" + allQueriesToOne + ")))";
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
 
         //Set source filters in case they exist exist
         for (String filter : filters) {
@@ -697,17 +702,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     	//Retrieve multimedia content that is stored in solr
         String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	
-        	if(first){
-        		allQueriesToOne += query.getName();
-        		first = false;
-        	}
-        	else
-        		allQueriesToOne += " OR "+query.getName();
-        	 
+        	if(query.getScore() > 0.5){
+        		if(first){
+            		allQueriesToOne += "("+query.getName()+")";
+            		first = false;
+            	}
+            	else
+            		allQueriesToOne += " OR ("+query.getName()+")";
+        	} 
         }
         
-        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")) OR (tags:(" + allQueriesToOne + ")))";
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
         
         
         //Set filters in case they exist exist
@@ -757,6 +762,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) {
-    
+    	
+    	
     }
 }
