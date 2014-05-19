@@ -512,14 +512,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     private SearchEngineResponse<Item> collectItems(String query, List<String> filters, String orderBy, int size) {
-        boolean defaultOperation = false;
-        double aggregatedScore = 0;
-
+     
         List<Item> items = new ArrayList<Item>();
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
-
-        Map<Double, Item> scoredItems = new TreeMap<Double, Item>(Collections.reverseOrder());
 
         if (query.equals("")) {
             return response;
@@ -552,31 +548,13 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<Item> results = response.getResults();
 
             for (Item it : results) {
-                if (defaultOperation) {
-                    aggregatedScore++;
-                    System.out.println("Storing item : " + it.getId() + " with score : " + aggregatedScore);
-                    scoredItems.put(aggregatedScore, it);
-                } else {
-                    items.add(it);
-                }
-
-                if ((items.size() >= size) || scoredItems.size() >= size) {
+               
+                items.add(it);
+            
+                if ((items.size() >= size)) {
                     break;
                 }
 
-            }
-        }
-
-        //rank media items with default method - to be examined
-        if (defaultOperation) {
-            Map<Double, Item> rankedItems = new TreeMap<Double, Item>(Collections.reverseOrder());
-            for (Map.Entry<Double, Item> entry : scoredItems.entrySet()) {
-                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 1000000);
-                rankedItems.put(res, entry.getValue());
-            }
-
-            for (Item it : rankedItems.values()) {
-                items.add(it);
             }
         }
 
@@ -586,90 +564,67 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, String orderBy, int size) {
-        boolean defaultOperation = false;
-        double aggregatedScore = 0;
+        boolean first = true;
 
         List<Item> items = new ArrayList<Item>();
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
-
-        Map<Double, Item> scoredItems = new TreeMap<Double, Item>(Collections.reverseOrder());
 
         if (queries.isEmpty()) {
             return response;
         }
 
         //Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-            String queryForRequest = "((title : (" + query.getName() + ")) OR (description:(" + query.getName() + ")) OR (tags:(" + query.getName() + ")))";
+        	
+        	if(first){
+        		allQueriesToOne += query.getName();
+        		first = false;
+        	}
+        	else
+        		allQueriesToOne += " OR "+query.getName();
+        	 
+        }
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")) OR (tags:(" + allQueriesToOne + ")))";
 
-            //Set source filters in case they exist exist
-            for (String filter : filters) {
-                queryForRequest += " AND " + filter;
-            }
-
-            if ((items.size() >= size)) {
-                break;
-            }
-
-            SolrQuery solrQuery = new SolrQuery(queryForRequest);
-
-            solrQuery.setRows(200);
-
-            if (orderBy != null) {
-                solrQuery.setSortField(orderBy, ORDER.desc);
-            } else {
-                solrQuery.setSortField("score", ORDER.desc);
-            }
-
-            Logger.getRootLogger().info("Solr Query: " + queryForRequest);
-
-            response = solrItemHandler.findItems(solrQuery);
-            if (response != null) {
-                List<Item> results = response.getResults();
-
-                for (Item it : results) {
-
-                    if (defaultOperation) {
-                        aggregatedScore++;
-                        double score = 1.0;
-                        if (query.getScore() != null) {
-                            score = query.getScore();
-                        }
-                        scoredItems.put(aggregatedScore * score, it);
-                    } else {
-                        items.add(it);
-                    }
-
-                    if (items.size() >= size) {
-                        break;
-                    }
-
-                }
-            }
+        //Set source filters in case they exist exist
+        for (String filter : filters) {
+            queryForRequest += " AND " + filter;
         }
 
-        //rank media items with default method
-        if (defaultOperation) {
-            Map<Double, Item> rankedItems = new TreeMap<Double, Item>(Collections.reverseOrder());
-            for (Map.Entry<Double, Item> entry : scoredItems.entrySet()) {
-                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 100000);
+        SolrQuery solrQuery = new SolrQuery(queryForRequest);
 
-                rankedItems.put(res, entry.getValue());
-            }
+        solrQuery.setRows(200);
 
-            for (Item it : rankedItems.values()) {
+        if (orderBy != null) {
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
+        }
+
+        Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+
+        response = solrItemHandler.findItems(solrQuery);
+        if (response != null) {
+            List<Item> results = response.getResults();
+
+            for (Item it : results) {
+
                 items.add(it);
+               
+                if (items.size() >= size) {
+                    break;
+                }
+
             }
         }
-
+        
         response.setResults(items);
         return response;
     }
 
     private SearchEngineResponse<MediaItem> collectMediaItems(String query, String type, List<String> filters, String orderBy, int size) {
-        boolean defaultOperation = false;
-        double aggregatedScore = 0;
 
         List<MediaItem> mediaItems = new LinkedList<MediaItem>();
 
@@ -711,13 +666,9 @@ public class DyscoDAOImpl implements DyscoDAO {
             for (MediaItem mi : results) {
 
                 if (!urls.contains(mi.getUrl())) {
-                    if (defaultOperation) {
-                        aggregatedScore++;
-                        scoredMediaItems.put(aggregatedScore, mi);
-                    } else {
-                        mediaItems.add(mi);
-                    }
-
+                    
+                    mediaItems.add(mi);
+                   
                     urls.add(mi.getUrl());
                 }
 
@@ -728,109 +679,75 @@ public class DyscoDAOImpl implements DyscoDAO {
             }
         }
 
-        //rank media items with default method
-        if (defaultOperation) {
-            Map<Double, MediaItem> rankedMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
-            for (Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()) {
-                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 1000000) * (entry.getValue().getLikes()
-                        + entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments() + 1);
-
-                rankedMediaItems.put(res, entry.getValue());
-            }
-
-            for (MediaItem mi : rankedMediaItems.values()) {
-                mediaItems.add(mi);
-            }
-        }
         response.setResults(mediaItems);
         return response;
     }
 
     private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, String orderBy, int size) {
-        boolean defaultOperation = false;
-        double aggregatedScore = 0;
-
+    	boolean first = true;
+    	
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
 
-        Map<Double, MediaItem> scoredMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
-
         if (queries.isEmpty()) {
             return response;
         }
-
-        //Retrieve multimedia content that is stored in solr
+       
+    	//Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-            String queryForRequest = "((title : (" + query.getName() + ")) OR (description:(" + query.getName() + ")) OR (tags:(" + query.getName() + ")))";
+        	
+        	if(first){
+        		allQueriesToOne += query.getName();
+        		first = false;
+        	}
+        	else
+        		allQueriesToOne += " OR "+query.getName();
+        	 
+        }
+        
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")) OR (tags:(" + allQueriesToOne + ")))";
+        
+        
+        //Set filters in case they exist exist
+        for (String filter : filters) {
+            queryForRequest += " AND " + filter;
+        }
 
-            if ((mediaItems.size() >= size)) {
-                break;
-            }
+        queryForRequest += " AND (type : " + type + ")";
 
-            //Set filters in case they exist exist
-            for (String filter : filters) {
-                queryForRequest += " AND " + filter;
-            }
+        SolrQuery solrQuery = new SolrQuery(queryForRequest);
+        Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+      
+        solrQuery.setRows(200);
+        //solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
+        if (orderBy != null) {
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
+        }     
 
-            queryForRequest += " AND (type : " + type + ")";
+        response = solrMediaItemHandler.findItems(solrQuery);
+        if (response != null) {
+            List<MediaItem> results = response.getResults();
+            Set<String> urls = new HashSet<String>();
+            for (MediaItem mi : results) {
 
-            SolrQuery solrQuery = new SolrQuery(queryForRequest);
-
-            solrQuery.setRows(200);
-
-            if (orderBy != null) {
-                solrQuery.setSortField(orderBy, ORDER.desc);
-            } else {
-                solrQuery.setSortField("score", ORDER.desc);
-            }
-
-            Logger.getRootLogger().info("Solr Query: " + queryForRequest);
-
-            response = solrMediaItemHandler.findItems(solrQuery);
-            if (response != null) {
-                List<MediaItem> results = response.getResults();
-                Set<String> urls = new HashSet<String>();
-                for (MediaItem mi : results) {
-
-                    if (!urls.contains(mi.getUrl())) {
-                        if (defaultOperation) {
-                            aggregatedScore++;
-                            double score = 1.0;
-                            if (query.getScore() != null) {
-                                score = query.getScore();
-                            }
-                            scoredMediaItems.put(aggregatedScore * score, mi);
-                        } else {
-                            mediaItems.add(mi);
-                        }
-
-                        urls.add(mi.getUrl());
-                    }
-
-                    if ((mediaItems.size() >= size)) {
-                        break;
-                    }
-
+                if (!urls.contains(mi.getUrl())) {
+                   
+                    mediaItems.add(mi);
+                   
+                    urls.add(mi.getUrl());
                 }
+
+                if ((mediaItems.size() >= size)) {
+                    break;
+                }
+
             }
         }
-
-        //rank media items with default method
-        if (defaultOperation) {
-            Map<Double, MediaItem> rankedMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
-            for (Map.Entry<Double, MediaItem> entry : scoredMediaItems.entrySet()) {
-                Double res = entry.getKey() * (entry.getValue().getPublicationTime() / 100000) * (entry.getValue().getLikes()
-                        + entry.getValue().getViews() + entry.getValue().getShares() + entry.getValue().getComments() + 1);
-
-                rankedMediaItems.put(res, entry.getValue());
-            }
-
-            for (MediaItem mi : rankedMediaItems.values()) {
-                mediaItems.add(mi);
-            }
-        }
-
+      
         response.setResults(mediaItems);
         return response;
     }
@@ -840,6 +757,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) {
-
+    
     }
 }
