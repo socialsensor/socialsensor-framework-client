@@ -103,6 +103,21 @@ public class SolrDyscoHandler {
             return status;
         }
     }
+    
+     public SolrDysco findSolrDyscoLight(String dyscoId) {
+
+        SolrQuery solrQuery = new SolrQuery("id:" + dyscoId);
+        SearchEngineResponse<SolrDysco> response = findSolrDyscosLight(solrQuery);
+       
+        List<SolrDysco> dyscos = response.getResults();
+        SolrDysco dysco = null;
+        if (dyscos != null) {
+            if (dyscos.size() > 0) {
+                dysco = dyscos.get(0);
+            }
+        }
+        return dysco;
+    }
 
     public Dysco findDyscoLight(String dyscoId) {
 
@@ -118,7 +133,7 @@ public class SolrDyscoHandler {
         }
         return dysco;
     }
-
+    
     public String findDyscosTrendline(String entity, String entityValue) {
 
 
@@ -155,6 +170,35 @@ public class SolrDyscoHandler {
         return gson.toJson(spots);
 
     }
+    
+    public SearchEngineResponse<SolrDysco> findSolrDyscosLight(SolrQuery query) {
+        
+        SearchEngineResponse<SolrDysco> response = new SearchEngineResponse<SolrDysco>();
+
+        QueryResponse rsp;
+        //System.out.println("searching: " + query.toString());
+        try {
+            rsp = server.query(query);
+        } catch (SolrServerException e) {
+            Logger.getRootLogger().info(e.getMessage());
+            return null;
+        }
+
+        List<SolrDysco> resultList = rsp.getBeans(SolrDysco.class);
+        if (resultList != null) {
+           // Logger.getRootLogger().info("got: " + resultList.size() + " dyscos from Solr");
+        }
+
+        List<SolrDysco> dyscos = new ArrayList<SolrDysco>();
+        for (SolrDysco dysco : resultList) {
+            dyscos.add(dysco);
+        }
+
+        response.setResults(dyscos);
+        
+        return response;
+    }
+    
 
     public SearchEngineResponse<Dysco> findDyscosLight(SolrQuery query) {
         
