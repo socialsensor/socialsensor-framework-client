@@ -375,33 +375,54 @@ public class DyscoDAOImpl implements DyscoDAO {
         // Retrieve web pages from solr index
         Set<String> uniqueUrls = new HashSet<String>();
         Set<String> expandedUrls = new HashSet<String>();
+        
+        boolean first = true;
+        String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-            String queryForRequest = "(title : (" + query.getName() + ")) OR (text:(" + query.getName() + "))";
+        	if(query.getScore() != null){
+        		if(query.getScore() > 0.5){
+        			if(first){
+	            		allQueriesToOne += "("+query.getName()+")";
+	            		first = false;
+	            	}
+	            	else
+	            		allQueriesToOne += " OR ("+query.getName()+")";
+	        	} 
+        	}
+        	else{
+        		if(first){
+            		allQueriesToOne += "("+query.getName()+")";
+            		first = false;
+            	}
+            	else
+            		allQueriesToOne += " OR ("+query.getName()+")";
+        	}
+        }
+        
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        
+        SolrQuery solrQuery = new SolrQuery(queryForRequest);
+        solrQuery.setRows(size);
+        solrQuery.addSortField("score", ORDER.desc);
+        solrQuery.addSortField("date", ORDER.desc);
 
-            SolrQuery solrQuery = new SolrQuery(queryForRequest);
-            solrQuery.setRows(size);
-            solrQuery.addSortField("score", ORDER.desc);
-            solrQuery.addSortField("date", ORDER.desc);
+        Logger.getRootLogger().info("Query : " + queryForRequest);
+        SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
+        if (response != null) {
+            List<WebPage> results = response.getResults();
+            for (WebPage webPage : results) {
+                String url = webPage.getUrl();
+                String expandedUrl = webPage.getExpandedUrl();
+                if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+                    int shares = webPageDAO.getWebPageShares(url);
+                    webPage.setShares(shares);
 
-            Logger.getRootLogger().info("Query : " + query);
-            SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
-            if (response != null) {
-                List<WebPage> results = response.getResults();
-                for (WebPage webPage : results) {
-                    String url = webPage.getUrl();
-                    String expandedUrl = webPage.getExpandedUrl();
-                    if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
-                        int shares = webPageDAO.getWebPageShares(url);
-                        webPage.setShares(shares);
-
-                        webPages.add(webPage);
-                        uniqueUrls.add(url);
-                        expandedUrls.add(expandedUrl);
-                    }
+                    webPages.add(webPage);
+                    uniqueUrls.add(url);
+                    expandedUrls.add(expandedUrl);
                 }
             }
         }
-
         Logger.getRootLogger().info(webPages.size() + " web pages retrieved. Re-rank by popularity (#shares)");
         Collections.sort(webPages, new Comparator<WebPage>() {
             public int compare(WebPage wp1, WebPage wp2) {
@@ -580,7 +601,17 @@ public class DyscoDAOImpl implements DyscoDAO {
         //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	if(query.getScore() > 0.5){
+        	if(query.getScore() != null){
+        		if(query.getScore() > 0.5){
+        			if(first){
+	            		allQueriesToOne += "("+query.getName()+")";
+	            		first = false;
+	            	}
+	            	else
+	            		allQueriesToOne += " OR ("+query.getName()+")";
+	        	} 
+        	}
+        	else{
         		if(first){
             		allQueriesToOne += "("+query.getName()+")";
             		first = false;
@@ -588,8 +619,6 @@ public class DyscoDAOImpl implements DyscoDAO {
             	else
             		allQueriesToOne += " OR ("+query.getName()+")";
         	}
-        	
-        	 
         }
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
 
@@ -702,14 +731,24 @@ public class DyscoDAOImpl implements DyscoDAO {
     	//Retrieve multimedia content that is stored in solr
         String allQueriesToOne = "";
         for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	if(query.getScore() > 0.5){
+        	if(query.getScore() != null){
+        		if(query.getScore() > 0.5){
+        			if(first){
+	            		allQueriesToOne += "("+query.getName()+")";
+	            		first = false;
+	            	}
+	            	else
+	            		allQueriesToOne += " OR ("+query.getName()+")";
+	        	} 
+        	}
+        	else{
         		if(first){
             		allQueriesToOne += "("+query.getName()+")";
             		first = false;
             	}
             	else
             		allQueriesToOne += " OR ("+query.getName()+")";
-        	} 
+        	}
         }
         
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
