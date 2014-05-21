@@ -65,24 +65,21 @@ public class SolrItemHandler {
 //            Logger.getRootLogger().info(e.getMessage());
 //        }
 //    }
-    private SolrItemHandler(String collection) throws Exception{
-    	
-       
+    private SolrItemHandler(String collection) throws Exception {
+
 //            ConfigReader configReader = new ConfigReader();
 //            String url = configReader.getSolrHTTP();    
-            server = new HttpSolrServer(collection);
-            server.ping();
-            //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
-            //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
+        server = new HttpSolrServer(collection);
+        server.ping();
+        //Logger.getRootLogger().info("going to create SolrServer: " + ConfigReader.getSolrHome() + "/DyscoMediaItems");
+        //server = new HttpSolrServer( ConfigReader.getSolrHome() + "/DyscoMediaItems");
 
-       
     }
 
-    
-    public void checkServerStatus() throws Exception{
-    	server.ping();
+    public void checkServerStatus() throws Exception {
+        server.ping();
     }
-    
+
 //    //implementing Singleton pattern
 //    public static SolrItemHandler getInstance() {
 //        if (INSTANCE == null) {
@@ -95,7 +92,7 @@ public class SolrItemHandler {
         SolrItemHandler INSTANCE = INSTANCES.get(collection);
         if (INSTANCE == null) {
             INSTANCE = new SolrItemHandler(collection);
-            
+
             INSTANCES.put(collection, INSTANCE);
         }
         return INSTANCE;
@@ -108,14 +105,13 @@ public class SolrItemHandler {
             SolrItem solrItem = new SolrItem(item);
 
 //            server.addBean(solrItem, commitPeriod);
-            server.addBean(solrItem,commitPeriod);
-           
+            server.addBean(solrItem, commitPeriod);
+
             //UpdateResponse response = server.commit();
             //int statusId = response.getStatus();
             //if (statusId == 0) {
             //    status = true;
             //}
-
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
             status = false;
@@ -144,7 +140,6 @@ public class SolrItemHandler {
 //            if (statusId == 0) {
 //                status = true;
 //            }
-
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
             status = false;
@@ -218,79 +213,77 @@ public class SolrItemHandler {
             return status;
         }
     }
-    
-    public boolean deleteItemsOlderThan(long dateTime) {
-    	 boolean status = false;
-    	 try {
-             server.deleteByQuery("publicationTime : [* TO "+dateTime+"]");
-             UpdateResponse response = server.commit();
-             int statusId = response.getStatus();
-             if (statusId == 0) {
-                 status = true;
-             }
 
-         } catch (SolrServerException ex) {
-             logger.error(ex.getMessage());
-         } catch (IOException ex) {
-             logger.error(ex.getMessage());
-         } finally {
-             return status;
-         }
+    public boolean deleteItemsOlderThan(long dateTime) {
+        boolean status = false;
+        try {
+            server.deleteByQuery("publicationTime : [* TO " + dateTime + "]");
+            UpdateResponse response = server.commit();
+            int statusId = response.getStatus();
+            if (statusId == 0) {
+                status = true;
+            }
+
+        } catch (SolrServerException ex) {
+            logger.error(ex.getMessage());
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            return status;
+        }
     }
 
     public SearchEngineResponse<Item> findItems(SolrQuery query) {
 
-        return search(query);
+        return searchWithoutFacet(query);
     }
-    
-    public Map<Item,Float> findItemsWithScore(String query){
-    	Map<Item,Float> itemsByScore = new HashMap<Item,Float>();
-    	
-    	SolrQuery solrQuery = new SolrQuery(query);
-    	solrQuery.setFields("id","title","description","publicationTime","score");
-		solrQuery.addSortField("score", ORDER.desc);
-		
-		solrQuery.setRows(100);
-		
+
+    public Map<Item, Float> findItemsWithScore(String query) {
+        Map<Item, Float> itemsByScore = new HashMap<Item, Float>();
+
+        SolrQuery solrQuery = new SolrQuery(query);
+        solrQuery.setFields("id", "title", "description", "publicationTime", "score");
+        solrQuery.addSortField("score", ORDER.desc);
+
+        solrQuery.setRows(100);
+
         QueryResponse rsp = null;
-       
-        
+
         try {
             rsp = server.query(solrQuery);
         } catch (SolrServerException e) {
             e.printStackTrace();
             Logger.getRootLogger().info(e.getMessage());
-            
+
         }
-      
+
         List<SolrDocument> retrievedItems = rsp.getResults();
-        
-        for(SolrDocument sDoc : retrievedItems){
-        	
-        	Float score = (Float) sDoc.getFieldValue("score");
-        	String title = (String) sDoc.getFieldValue("title");
-        	String description = (String) sDoc.getFieldValue("description");
-        	String id = (String) sDoc.getFieldValue("id");
-        	Long publicationTime = (Long) sDoc.getFieldValue("publicationTime");
-        	
-        	//System.out.println("Solr Document #"+id);
-        	//System.out.println("Solr Document Title : "+title);
-        	//System.out.println("Solr Document Score : "+description);
-        	//System.out.println("Solr Document Score : "+score);
-        	
-        	//System.out.println();
-        	Item item = new Item();
-        	item.setId(id);
-        	item.setTitle(title);
-        	item.setDescription(description);
-        	item.setPublicationTime(publicationTime);
-        	
-        	itemsByScore.put(item, score);
+
+        for (SolrDocument sDoc : retrievedItems) {
+
+            Float score = (Float) sDoc.getFieldValue("score");
+            String title = (String) sDoc.getFieldValue("title");
+            String description = (String) sDoc.getFieldValue("description");
+            String id = (String) sDoc.getFieldValue("id");
+            Long publicationTime = (Long) sDoc.getFieldValue("publicationTime");
+
+            //System.out.println("Solr Document #"+id);
+            //System.out.println("Solr Document Title : "+title);
+            //System.out.println("Solr Document Score : "+description);
+            //System.out.println("Solr Document Score : "+score);
+            //System.out.println();
+            Item item = new Item();
+            item.setId(id);
+            item.setTitle(title);
+            item.setDescription(description);
+            item.setPublicationTime(publicationTime);
+
+            itemsByScore.put(item, score);
         }
-        
+
         return itemsByScore;
     }
-    
+
     public Item findLatestItemByAuthor(String authorId) {
 
         SolrQuery solrQuery = new SolrQuery("author:" + authorId);
@@ -305,27 +298,28 @@ public class SolrItemHandler {
             return null;
         }
     }
-    
-    public Item findLatestItem(){
-    	SolrQuery solrQuery = new SolrQuery("*:*");
-    	solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
-    	solrQuery.setRows(1);
-    	
-    	 SearchEngineResponse<Item> response = search(solrQuery);
-         List<Item> items = response.getResults();
-         if (!items.isEmpty()) {
-             return items.get(0);
-         } else {
-             Logger.getRootLogger().info("no solr found!!");
-             return null;
-         }
+
+    public Item findLatestItem() {
+        SolrQuery solrQuery = new SolrQuery("*:*");
+        solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
+        solrQuery.setRows(1);
+
+        SearchEngineResponse<Item> response = search(solrQuery);
+        List<Item> items = response.getResults();
+        if (!items.isEmpty()) {
+            return items.get(0);
+        } else {
+            Logger.getRootLogger().info("no solr found!!");
+            return null;
+        }
     }
 
     public List<Item> findLatestItemsByAuthor(String authorId) {
 
         SolrQuery solrQuery = new SolrQuery("author:" + authorId);
         solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
-        SearchEngineResponse<Item> response = search(solrQuery);
+        solrQuery.setRows(6);
+        SearchEngineResponse<Item> response = searchWithoutFacet(solrQuery);
         List<Item> items = response.getResults();
         if (!items.isEmpty()) {
             return items;
@@ -334,10 +328,10 @@ public class SolrItemHandler {
             return null;
         }
     }
-    
+
     public List<Item> findItemsRangeTime(long lowerBound, long upperBound) {
-    	SolrQuery solrQuery = new SolrQuery("publicationTime: {" + lowerBound + " TO " + upperBound+"]");
-    	solrQuery.setRows(2000000);
+        SolrQuery solrQuery = new SolrQuery("publicationTime: {" + lowerBound + " TO " + upperBound + "]");
+        solrQuery.setRows(2000000);
         SearchEngineResponse<Item> response = search(solrQuery);
         List<Item> items = response.getResults();
         if (!items.isEmpty()) {
@@ -413,9 +407,10 @@ public class SolrItemHandler {
 
     private SearchEngineResponse<Item> search(SolrQuery query) {
 
+        Long t1 = System.currentTimeMillis();
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
-//        query.setRows(450);
+        
         query.setFacet(true);
         query.addFacetField("sentiment");
         query.addFacetField("location");
@@ -425,7 +420,6 @@ public class SolrItemHandler {
 //        query.set(FacetParams.FACET_DATE_START, "NOW/DAY-5YEARS");
 //        query.set(FacetParams.FACET_DATE_END, "NOW/DAY");
 //        query.set(FacetParams.FACET_DATE_GAP, "+1YEAR");
-
         QueryResponse rsp;
 
         System.out.println("query:  " + query.toString());
@@ -436,6 +430,8 @@ public class SolrItemHandler {
             return null;
         }
 
+        Long t2 = System.currentTimeMillis();
+
         response.setNumFound(rsp.getResults().getNumFound());
 
         List<SolrItem> solrItems = rsp.getBeans(SolrItem.class);
@@ -443,6 +439,7 @@ public class SolrItemHandler {
             Logger.getRootLogger().info("got: " + solrItems.size() + " items from Solr - total results: " + response.getNumFound());
         }
 
+        Long t3 = System.currentTimeMillis();
 
         List<Item> items = new ArrayList<Item>();
         for (SolrItem solrItem : solrItems) {
@@ -453,16 +450,17 @@ public class SolrItemHandler {
             }
         }
 
+        Long t4 = System.currentTimeMillis();
+
         response.setResults(items);
+
         List<Facet> facets = new ArrayList<Facet>();
         List<FacetField> solrFacetList = rsp.getFacetFields();
         FacetField solrFacet;
 
-
         if (solrFacetList != null) {
 
             //populate all non-zero facets
-
             for (int i = 0; i < solrFacetList.size(); i++) {
 
                 Facet facet = new Facet(); //initialize for Arcomem JSF UI
@@ -509,6 +507,119 @@ public class SolrItemHandler {
             });
         }
         response.setFacets(facets);
+
+        Long t5 = System.currentTimeMillis();
+
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: fetching: " + (t2 - t1));
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: getting Beans: " + (t3 - t2));
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: converting to domain object: " + (t4 - t3));
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: calculating facets: " + (t5 - t4));
+
+        return response;
+    }
+    
+    
+    private SearchEngineResponse<Item> searchWithoutFacet(SolrQuery query) {
+
+        Long t1 = System.currentTimeMillis();
+
+        SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
+
+        QueryResponse rsp;
+
+        System.out.println("query:  " + query.toString());
+        try {
+            rsp = server.query(query);
+        } catch (SolrServerException e) {
+            logger.info(e.getMessage());
+            return null;
+        }
+
+        Long t2 = System.currentTimeMillis();
+
+        response.setNumFound(rsp.getResults().getNumFound());
+
+        List<SolrItem> solrItems = rsp.getBeans(SolrItem.class);
+        if (solrItems != null) {
+            Logger.getRootLogger().info("got: " + solrItems.size() + " items from Solr - total results: " + response.getNumFound());
+        }
+
+        Long t3 = System.currentTimeMillis();
+
+        List<Item> items = new ArrayList<Item>();
+        for (SolrItem solrItem : solrItems) {
+            try {
+                items.add(solrItem.toItem());
+            } catch (MalformedURLException ex) {
+                logger.error(ex.getMessage());
+            }
+        }
+
+        Long t4 = System.currentTimeMillis();
+
+        response.setResults(items);
+
+        List<Facet> facets = new ArrayList<Facet>();
+        List<FacetField> solrFacetList = rsp.getFacetFields();
+        FacetField solrFacet;
+
+        if (solrFacetList != null) {
+
+            //populate all non-zero facets
+            for (int i = 0; i < solrFacetList.size(); i++) {
+
+                Facet facet = new Facet(); //initialize for Arcomem JSF UI
+                List<Bucket> buckets = new ArrayList<Bucket>();
+                solrFacet = solrFacetList.get(i); //get the ones returned from Solr
+                List<FacetField.Count> values = solrFacet.getValues();
+                String solrFacetName = solrFacet.getName();
+                boolean validFacet = false;
+
+                //populate Valid Facets
+                for (int j = 0; j < solrFacet.getValueCount(); j++) {
+
+                    Bucket bucket = new Bucket();
+                    long bucketCount = values.get(j).getCount();
+//                    if ((bucketCount > 0) && (bucketCount != solrItems.size())) { //bucket is neither non-zero length nor the whole set 
+                    validFacet = true; //facet contains at least one non-zero length bucket
+                    bucket.setCount(bucketCount);
+                    bucket.setName(values.get(j).getName());
+                    bucket.setQuery(values.get(j).getAsFilterQuery());
+                    bucket.setFacet(solrFacetName);
+                    buckets.add(bucket);
+//                    }
+                }
+                if (validFacet) { //add the facet only if it is contains at least one non-zero length - excludes the whole set result
+                    facet.setBuckets(buckets);
+                    facet.setName(solrFacetName);
+                    facets.add(facet);
+                }
+            }
+
+            Collections.sort(facets, new Comparator<Facet>() { //anonymous inner class used for sorting
+                @Override
+                public int compare(Facet f1, Facet f2) {
+
+                    String value1 = f1.getName();
+                    String value2 = f2.getName();
+
+                    if (value1.compareTo(value2) > 0) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+        }
+        response.setFacets(facets);
+
+        Long t5 = System.currentTimeMillis();
+
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: fetching: " + (t2 - t1));
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: getting Beans: " + (t3 - t2));
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: converting to domain object: " + (t4 - t3));
+        Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: calculating facets: " + (t5 - t4));
+
         return response;
     }
 }
