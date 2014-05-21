@@ -48,6 +48,25 @@ public class MediaItemDAOImpl implements MediaItemDAO {
        
     }
 
+    /**
+     * An implementation of the MediaItemDAO appropriate for a database with enabled authentication
+     *
+     * @param host
+     * @param db
+     * @param collection
+     * @param username
+     * @param password
+     * @throws Exception
+     */
+    public MediaItemDAOImpl(String host, String db, String collection, String username, String password) throws Exception{
+        indexes.add("id");
+        indexes.add("publicationTime");
+        indexes.add("url");
+
+        mongoHandler = new MongoHandler(host, db, collection, indexes, username, password.toCharArray());
+        mongoHandler.sortBy("publicationTime", MongoHandler.DESC);
+    }
+
     @Override
     public void addMediaItem(MediaItem item) {
         mongoHandler.insert(item);
