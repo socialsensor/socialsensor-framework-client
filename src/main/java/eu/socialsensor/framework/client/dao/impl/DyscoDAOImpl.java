@@ -495,9 +495,14 @@ public class DyscoDAOImpl implements DyscoDAO {
         return webPages.subList(0, Math.min(webPages.size(), size));
     }
 
+	@Override
+	public List<MediaItem> getMediaItemHistory(String mediaItemId) {
+		return getMediaItemHistory(mediaItemId, 10);
+	}
+	
     @Override
-    public List<MediaItem> getMediaItemHistory(String mediaItemId) {
-        List<MediaItem> mItems = new ArrayList<MediaItem>();
+    public List<MediaItem> getMediaItemHistory(String mediaItemId, int size) {
+        List<MediaItem> mediaItems = new ArrayList<MediaItem>();
 
         Logger.getRootLogger().info("Get visually similar media items for " + mediaItemId);
 
@@ -512,7 +517,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                     if (!ids.contains(mId)) {
                         MediaItem mediaItem = mediaItemDAO.getMediaItem(mId);
                         if (mediaItem != null) {
-                            mItems.add(mediaItem);
+                        	mediaItems.add(mediaItem);
                         }
                     }
                 }
@@ -521,8 +526,8 @@ public class DyscoDAOImpl implements DyscoDAO {
             }
         }
 
-        Logger.getRootLogger().info(mItems.size() + "media items retrieved. Re-rank by publication time");
-        Collections.sort(mItems, new Comparator<MediaItem>() {
+        Logger.getRootLogger().info(mediaItems.size() + "media items retrieved. Re-rank by publication time");
+        Collections.sort(mediaItems, new Comparator<MediaItem>() {
             public int compare(MediaItem mi1, MediaItem mi2) {
                 if (mi1.getPublicationTime() < mi2.getPublicationTime()) {
                     return -1;
@@ -532,7 +537,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             }
         });
 
-        return mItems;
+        return mediaItems.subList(0, Math.min(size, mediaItems.size()));
     }
 
     private SearchEngineResponse<Item> collectItems(String query, List<String> filters, String orderBy, int size) {
