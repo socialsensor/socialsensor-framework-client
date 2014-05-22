@@ -173,6 +173,10 @@ public interface DyscoDAO {
 
 	List<MediaItem> getMediaItemHistory(String mediaItemId);
 
+	List<MediaItem> getMediaItemHistory(String mediaItemId, int size);
+	
 	List<WebPage> findHealines(String query, int size);
+
+	
 	
 }
