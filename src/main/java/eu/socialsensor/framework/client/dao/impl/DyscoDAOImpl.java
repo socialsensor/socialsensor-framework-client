@@ -399,7 +399,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         	}
         }
         
-        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")))";
         
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         solrQuery.setRows(size);
