@@ -248,7 +248,9 @@ public class SolrHandler implements SearchEngineHandler {
         query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
         query = query + " AND (listId:" + listId+ ")";
         SolrQuery solrQuery = new SolrQuery(query);
-
+        
+        System.out.println("solrQuery for Dysco: " + solrQuery);
+        
         solrQuery.setRows(count);
         solrQuery.setFacet(true);
         solrQuery.setFacetLimit(5);

@@ -2,13 +2,14 @@ package eu.socialsensor.framework.client.search;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
 /**
  *
  * @author etzoannos
  */
 
-public class Bucket {
+public class Bucket implements Serializable{
     @Expose
     @SerializedName(value = "name")
     String name;
