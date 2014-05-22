@@ -77,6 +77,44 @@ public class MongoHandler {
             */
         }
     }
+
+    /**
+     * A MongoHandler for a database with enabled authentication
+     *
+     * @param hostname
+     * @param dbName
+     * @param collectionName
+     * @param indexes
+     * @param username
+     * @param password
+     * @throws Exception
+     */
+    public MongoHandler(String hostname, String dbName, String collectionName, List<String> indexes, String username, char[] password) throws Exception{
+        String connectionKey = hostname + "#" + dbName;
+        db = databases.get(connectionKey);
+
+        if (db == null) {
+            MongoClient mongo = connections.get(hostname);
+
+            if (mongo == null) {
+                mongo = new MongoClient(hostname, options);
+                connections.put(hostname, mongo);
+            }
+            db = mongo.getDB(dbName);
+            if (db.authenticate(username, password)) {
+                databases.put(connectionKey, db);
+            }else{
+                throw new RuntimeException("Could not login to "+dbName+" database with user "+username);
+            }
+        }
+        collection = db.getCollection(collectionName);
+
+        if (indexes != null) {
+            for (String index : indexes) {
+                collection.ensureIndex(index);
+            }
+        }
+    }
     
     public boolean checkConnection(String hostname) {
     	

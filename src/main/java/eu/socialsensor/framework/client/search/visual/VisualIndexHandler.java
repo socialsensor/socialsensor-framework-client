@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.google.gson.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -23,9 +24,6 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import eu.socialsensor.framework.client.dao.MediaItemDAO;
 import eu.socialsensor.framework.client.dao.impl.MediaItemDAOImpl;
@@ -373,7 +371,12 @@ public class VisualIndexHandler {
             
             int code = httpClient.executeMethod(indexMethod);
             if (code == 200) {
-                success = true;
+                JsonParser parser = new JsonParser();
+                JsonObject o = (JsonObject) parser.parse(indexMethod.getResponseBodyAsString());
+                JsonElement e = o.get("success");
+                if (e!=null && !e.isJsonNull()) {
+                    success = e.getAsBoolean();
+                }
             }
             else {
             	_logger.error("Http returned code: " + code);
