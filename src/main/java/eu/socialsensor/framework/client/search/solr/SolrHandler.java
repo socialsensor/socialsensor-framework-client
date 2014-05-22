@@ -19,17 +19,17 @@ import org.apache.solr.client.solrj.SolrServerException;
  * @author etzoannos
  */
 public class SolrHandler implements SearchEngineHandler {
-    
+
     private final static Logger LOGGER = Logger.getLogger(SolrHandler.class.getName());
 
-    private SolrDyscoHandler solrDyscoHandler; 
+    private SolrDyscoHandler solrDyscoHandler;
     private SolrItemHandler solrItemHandler;
 
-    public  SolrHandler(String dyscosCollection, String itemsCollection) throws Exception {
-    	solrDyscoHandler = SolrDyscoHandler.getInstance(dyscosCollection);
-    	solrItemHandler = SolrItemHandler.getInstance(itemsCollection);
+    public SolrHandler(String dyscosCollection, String itemsCollection) throws Exception {
+        solrDyscoHandler = SolrDyscoHandler.getInstance(dyscosCollection);
+        solrItemHandler = SolrItemHandler.getInstance(itemsCollection);
     }
-    
+
     @Override
     public boolean insertItem(Item item, String dyscoId) {
 
@@ -79,8 +79,6 @@ public class SolrHandler implements SearchEngineHandler {
         return solrItemHandler.findItems(solrQuery);
     }
 
-   
-
     @Override
     public SearchEngineResponse<Item> findNItems(Query query, int size) {
 
@@ -111,10 +109,10 @@ public class SolrHandler implements SearchEngineHandler {
     }
 
     /**
-     * 
+     *
      * @param size result size
      * @param filterQuery filter query
-     * @return 
+     * @return
      */
     @Override
     public SearchEngineResponse<Item> findNMostRetweetedItems(int size, String filterQuery) {
@@ -122,7 +120,7 @@ public class SolrHandler implements SearchEngineHandler {
         if ((filterQuery != null) && (!"".equals(filterQuery))) {
             query.addFilterQuery(filterQuery);
         }
-        
+
         query.setRows(size);
         query.addSortField("retweetsCount", ORDER.desc);
         LOGGER.log(Level.INFO, null, query.toString());
@@ -193,7 +191,6 @@ public class SolrHandler implements SearchEngineHandler {
     public boolean insertDysco(Dysco dysco) {
 
         // insert items to Solr Items collection
-
         boolean status2 = false;
         LOGGER.log(Level.INFO, "inserting {0} dysco items to Solr", dysco.getItems().size());
 
@@ -208,7 +205,6 @@ public class SolrHandler implements SearchEngineHandler {
         boolean status1 = false;
 
         // insert Dysco to Solr Dysco collection
-
         if (status2) {
             LOGGER.log(Level.INFO, "Inserting dysco to Solr {0}", dysco.getId());
             status1 = solrDyscoHandler.insertDysco(dysco);
@@ -232,9 +228,26 @@ public class SolrHandler implements SearchEngineHandler {
     public SearchEngineResponse<Dysco> findDyscosLight(String query,
             String timeframe, int count) {
 
-//        query = query + " AND evolution:latest";
+        query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
+
         SolrQuery solrQuery = new SolrQuery(query);
-        solrQuery.addFilterQuery("creationDate:[NOW-" + timeframe + " TO NOW]");
+//        solrQuery.addFilterQuery("creationDate:[NOW-" + timeframe + " TO NOW]");
+
+        solrQuery.setRows(count);
+        solrQuery.setFacet(true);
+        solrQuery.setFacetLimit(5);
+        solrQuery.addSortField("dyscoScore", SolrQuery.ORDER.desc);
+        solrQuery.addFacetField("persons");
+        solrQuery.addFacetField("organizations");
+        return solrDyscoHandler.findDyscosLight(solrQuery);
+    }
+
+    public SearchEngineResponse<Dysco> findDyscosLight(String query,
+            String timeframe, String listId, int count) {
+
+        query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
+        query = query + " AND (listId:" + listId+ ")";
+        SolrQuery solrQuery = new SolrQuery(query);
 
         solrQuery.setRows(count);
         solrQuery.setFacet(true);
@@ -289,7 +302,6 @@ public class SolrHandler implements SearchEngineHandler {
     }
 
     public static void main(String... args) {
-
 
     }
 

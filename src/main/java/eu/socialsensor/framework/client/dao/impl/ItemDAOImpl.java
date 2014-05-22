@@ -15,6 +15,7 @@ import eu.socialsensor.framework.common.factories.ItemFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -37,7 +38,7 @@ public class ItemDAOImpl implements ItemDAO {
 
     public ItemDAOImpl(String host, String db, String collection) throws Exception {
 
-    	indexes.add("id");
+        indexes.add("id");
         indexes.add("publicationTime");
         indexes.add("insertionTime");
 
@@ -69,7 +70,6 @@ public class ItemDAOImpl implements ItemDAO {
     public void setIndexedStatusTrue(String itemId) {
         UpdateItem changes = new UpdateItem();
         changes.setField("indexed", Boolean.TRUE);
-
 
         mongoHandler.update("id", itemId, changes);
     }
@@ -104,7 +104,6 @@ public class ItemDAOImpl implements ItemDAO {
 //        }
 //        return results;
     //}
-    
     @Override
     public List<Item> getItemsSince(long date) {
         Selector query = new Selector();
@@ -114,7 +113,7 @@ public class ItemDAOImpl implements ItemDAO {
         l = System.currentTimeMillis() - l;
         System.out.println("Fetch time: " + l + " msecs");
         l = System.currentTimeMillis() - l;
-        
+
         List<Item> results = new ArrayList<Item>();
         for (String json : jsonItems) {
             results.add(ItemFactory.create(json));
@@ -231,21 +230,43 @@ public class ItemDAOImpl implements ItemDAO {
             items.add(item);
         }
 
-
         return items;
     }
 
     public static void main(String... args) {
 
         ItemDAO dao = null;
-		try {
-			dao = new ItemDAOImpl("social1.atc.gr", "Streams", "Items");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            dao = new ItemDAOImpl("social1.atc.gr", "Streams", "Items");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-        List<Item> items = dao.getUnindexedItems(10);
+        List<Item> items = dao.getUnindexedItems(100);
+
+        Logger.getRootLogger().info("splitting in lists");
+
+        List<Item> list1 = new ArrayList<Item>();
+        List<Item> list2 = new ArrayList<Item>();
+        List<Item> list3 = new ArrayList<Item>();
+
+        for (Item _item : items) {
+
+            String[] lists = _item.getList();
+
+            for (String aList : lists) {
+
+                if (aList.equals("1")) {
+                    list1.add(_item);
+                } else if (aList.equals("2")) {
+                    list2.add(_item);
+                } else if (aList.equals("3")) {
+                    list3.add(_item);
+                }
+
+            }
+        }
 
         for (Item item : items) {
 
@@ -260,7 +281,6 @@ public class ItemDAOImpl implements ItemDAO {
         }
 
         System.out.println("finished");
-
 
 //        ItemDAO dao = new ItemDAOImpl("160.40.50.207");
 //        MediaItemDAO mDao = new MediaItemDAOImpl("160.40.50.207");
@@ -294,21 +314,24 @@ public class ItemDAOImpl implements ItemDAO {
 //        System.out.println("Fetch users and MediaItems in " + t + " msecs");
     }
 
-	@Override
-	public ItemIterator getIterator(DBObject query) {
-		MongoIterator it = mongoHandler.getIterator(query);
-		return new ItemIterator(it);
-	}
+    @Override
+    public ItemIterator getIterator(DBObject query
+    ) {
+        MongoIterator it = mongoHandler.getIterator(query);
+        return new ItemIterator(it);
+    }
 
-	@Override
-	public List<Item> getItems(DBObject query) {
-		List<Item> items = new ArrayList<Item>();
-		List<String> results = mongoHandler.findMany(query, -1);
-		
-		for(String json : results) {
-			Item item = ItemFactory.create(json);
-			items.add(item);
-		}
-		return items;
-	}
+    @Override
+    public List<Item> getItems(DBObject query
+    ) {
+        List<Item> items = new ArrayList<Item>();
+        List<String> results = mongoHandler.findMany(query, -1);
+
+        for (String json : results) {
+            Item item = ItemFactory.create(json);
+            items.add(item);
+        }
+        return items;
+    }
+
 }
