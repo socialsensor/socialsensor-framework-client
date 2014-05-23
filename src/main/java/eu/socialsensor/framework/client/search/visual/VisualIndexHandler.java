@@ -372,7 +372,9 @@ public class VisualIndexHandler {
             int code = httpClient.executeMethod(indexMethod);
             if (code == 200) {
                 JsonParser parser = new JsonParser();
-                JsonObject o = (JsonObject) parser.parse(indexMethod.getResponseBodyAsString());
+                InputStream responseStream = indexMethod.getResponseBodyAsStream();
+                String rawJson = IOUtils.toString(responseStream);
+                JsonObject o = (JsonObject) parser.parse(rawJson);
                 JsonElement e = o.get("success");
                 if (e!=null && !e.isJsonNull()) {
                     success = e.getAsBoolean();
