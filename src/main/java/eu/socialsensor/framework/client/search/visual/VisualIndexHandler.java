@@ -379,6 +379,10 @@ public class VisualIndexHandler {
                 if (e!=null && !e.isJsonNull()) {
                     success = e.getAsBoolean();
                 }
+                
+                if(!success) {
+                	_logger.error("Indexing failed: " + rawJson);
+                }
             }
             else {
             	_logger.error("Http returned code: " + code);
