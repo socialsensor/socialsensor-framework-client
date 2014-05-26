@@ -324,8 +324,8 @@ public class SolrItemHandler {
         if (!items.isEmpty()) {
             return items;
         } else {
-            Logger.getRootLogger().info("no tweet for this user found!!");
-            return null;
+            //no tweets found, return empty list (to avoid null pointer exceptions)
+            return new ArrayList<Item>();
         }
     }
 
@@ -410,7 +410,7 @@ public class SolrItemHandler {
         Long t1 = System.currentTimeMillis();
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
-        
+
         query.setFacet(true);
         query.addFacetField("sentiment");
         query.addFacetField("location");
@@ -517,8 +517,7 @@ public class SolrItemHandler {
 
         return response;
     }
-    
-    
+
     private SearchEngineResponse<Item> searchWithoutFacet(SolrQuery query) {
 
         Long t1 = System.currentTimeMillis();
