@@ -306,21 +306,21 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(String query, List<String> filters, String orderBy, int size) {
+    public SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, int size) {
 
-        return collectItems(query, filters, orderBy, size);
+        return collectItems(query, filters, facets, orderBy, size);
 
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, String orderBy, int size) {
+    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy, int size) {
 
         List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
         if (queries.isEmpty()) {
             queries = dysco.getPrimalSolrQueries(); //temporary
         }
         
-        return collectItems(queries, filters, orderBy, size);
+        return collectItems(queries, filters, facets, orderBy, size);
 
     }
 
@@ -540,7 +540,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return mediaItems.subList(0, Math.min(size, mediaItems.size()));
     }
 
-    private SearchEngineResponse<Item> collectItems(String query, List<String> filters, String orderBy, int size) {
+    private SearchEngineResponse<Item> collectItems(String query, List<String> filters, List<String>facets, String orderBy, int size) {
      
         List<Item> items = new ArrayList<Item>();
 
@@ -564,6 +564,11 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         solrQuery.setRows(200);
 
+        //Set facets if necessary
+        for(String facet : facets){
+        	solrQuery.addFacetField(facet);
+        }
+        
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
@@ -592,7 +597,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, String orderBy, int size) {
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy, int size) {
         boolean first = true;
 
         List<Item> items = new ArrayList<Item>();
@@ -636,6 +641,11 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         solrQuery.setRows(200);
 
+        //Set facets if necessary
+        for(String facet : facets){
+        	solrQuery.addFacetField(facet);
+        }
+        
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {

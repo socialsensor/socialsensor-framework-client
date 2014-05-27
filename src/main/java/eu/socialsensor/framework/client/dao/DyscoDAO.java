@@ -124,9 +124,9 @@ public interface DyscoDAO {
 
 	List<Item> findTotalItems(List<String> dyscoIdsOfGroup);
 	
-	SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, String orderBy, int size);
+	SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy, int size);
 	
-	SearchEngineResponse<Item> findItems(String query, List<String> filters, String orderBy, int size);
+	SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, int size);
 
 	List<String> findTotalUrls(List<Item> totalItems);
 
