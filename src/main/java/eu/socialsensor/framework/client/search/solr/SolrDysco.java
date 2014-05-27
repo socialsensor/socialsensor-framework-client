@@ -196,7 +196,7 @@ public class SolrDysco {
             if (solrQueriesScore.get(i).equals("NaN")) {
                 query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
             } else {
-                query.setScore(0d);
+                query.setScore(0.6);
             }
             queries.add(query);
         }
