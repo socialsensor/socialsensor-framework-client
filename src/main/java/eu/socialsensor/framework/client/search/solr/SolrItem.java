@@ -61,7 +61,6 @@ public class SolrItem {
         //List<String> peopleTemp = extractPeople(item.getTitle());
         //peopleTemp.add("@" + item.getAuthorScreenName());
         //people = peopleTemp;
-
         comments = item.getComments();
         latitude = item.getLatitude();
         longitude = item.getLongitude();
@@ -114,12 +113,10 @@ public class SolrItem {
                 friendsCount = friends.intValue();
             }
 
-
-
         }
 
         lists = new ArrayList<String>();
-        if (item.getList()!= null) {
+        if (item.getList() != null) {
             lists.addAll(Arrays.asList(item.getList()));
         }
 
@@ -166,13 +163,16 @@ public class SolrItem {
                 }
             }
         }
-        
 
         item.setPublicationTime(publicationTime);
 
         item.setComments(comments);
-        item.setLocation(new Location(latitude, longitude, location));
 
+        if (latitude != null && longitude != null) {
+            item.setLocation(new Location(latitude, longitude, location));
+        } else {
+            item.setLocation(new Location(location));
+        }
         //this is a Map<URL, String>
         if (mediaIds != null) {
             List<MediaItem> _mediaItems = new ArrayList<MediaItem>();

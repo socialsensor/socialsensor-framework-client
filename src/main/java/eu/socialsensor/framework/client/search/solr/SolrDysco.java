@@ -23,7 +23,8 @@ import com.google.gson.annotations.SerializedName;
  * @author etzoannos - e.tzoannos@atc.gr
  */
 public class SolrDysco {
-	public final Logger logger = Logger.getLogger(SolrDysco.class);
+
+    public final Logger logger = Logger.getLogger(SolrDysco.class);
 
     //The id of the dysco
     @Field(value = "id")
@@ -78,19 +79,19 @@ public class SolrDysco {
     
     @Field(value = "listId")
     private String listId;
-
+    
     public SolrDysco() {
         id = UUID.randomUUID().toString();
     }
-
-    public SolrDysco(Dysco dysco) {
     
+    public SolrDysco(Dysco dysco) {
+        
         id = dysco.getId();
         creationDate = dysco.getCreationDate();
         title = dysco.getTitle();
         score = dysco.getScore();
         dyscoType = dysco.getDyscoType().toString();
-
+        
         List<Entity> dyscoEntities = dysco.getEntities();
         for (Entity entity : dyscoEntities) {
             if (entity.getType().equals(Type.LOCATION)) {
@@ -103,57 +104,57 @@ public class SolrDysco {
                 organizations.add(entity.getName());
             }
         }
-
+        
         contributors = dysco.getContributors();
-
+        
         for (Map.Entry<String, Double> entry : dysco.getKeywords().entrySet()) {
             keywords.add(entry.getKey());
         }
-
+        
         for (Map.Entry<String, Double> entry : dysco.getHashtags().entrySet()) {
             hashtags.add(entry.getKey());
         }
-
+        
         solrQueryString = dysco.getSolrQueryString();
         
-        for(Query query : dysco.getPrimalSolrQueries()){
+        for (Query query : dysco.getPrimalSolrQueries()) {
         	//logger.info("query name: "+query.getName());
-        	//logger.info("query score: "+query.getScore().toString());
-        	primalSolrQueriesString.add(query.getName());
-        	
+            //logger.info("query score: "+query.getScore().toString());
+            primalSolrQueriesString.add(query.getName());
+            
         }
-        
+
         //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
-        for(Query query : dysco.getSolrQueries()){
+        for (Query query : dysco.getSolrQueries()) {
         	//logger.info("query name: "+query.getName());
-        	//logger.info("query score: "+query.getScore().toString());
-        	solrQueriesString.add(query.getName());
-        	solrQueriesScore.add(query.getScore().toString());
+            //logger.info("query score: "+query.getScore().toString());
+            solrQueriesString.add(query.getName());
+            solrQueriesScore.add(query.getScore().toString());
         }
         
         trending = dysco.getTrending();
-
+        
         updateDate = dysco.getUpdateDate();
-
+        
         listId = dysco.getListId();
-
+        
     }
-
+    
     public Dysco toDysco() {
-
+        
         Dysco dysco = new Dysco();
-
+        
         dysco.setId(id);
         dysco.setCreationDate(creationDate);
         dysco.setTitle(title);
         dysco.setScore(score);
-
+        
         if (dyscoType.equals("CUSTOM")) {
             dysco.setDyscoType(DyscoType.CUSTOM);
         } else {
             dysco.setDyscoType(DyscoType.TRENDING);
         }
-
+        
         if (persons != null) {
             for (String person : persons) {
                 Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
@@ -172,36 +173,40 @@ public class SolrDysco {
                 dysco.addEntity(dyscoEntity);
             }
         }
-
+        
         dysco.setContributors(contributors);
-
+        
         if (keywords != null) {
             for (String keyword : keywords) {
                 dysco.addKeyword(keyword, 0.0);
             }
         }
-
+        
         if (hashtags != null) {
             for (String hashtag : hashtags) {
                 dysco.addHashtag(hashtag, 0.0);
             }
         }
-
+        
         dysco.setSolrQueryString(solrQueryString);
         List<Query> queries = new ArrayList<Query>();
-        for(int i=0;i<solrQueriesString.size();i++){
-        	Query query = new Query();
-        	query.setName(solrQueriesString.get(i));
-        	query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
-        	queries.add(query);
+        for (int i = 0; i < solrQueriesString.size(); i++) {
+            Query query = new Query();
+            query.setName(solrQueriesString.get(i));
+            if (solrQueriesScore.get(i).equals("NaN")) {
+                query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+            } else {
+                query.setScore(0d);
+            }
+            queries.add(query);
         }
         dysco.setSolrQueries(queries);
         
         List<Query> primalQueries = new ArrayList<Query>();
-        for(int i=0;i<primalSolrQueriesString.size();i++){
-        	Query query = new Query();
-        	query.setName(primalSolrQueriesString.get(i));
-        	primalQueries.add(query);
+        for (int i = 0; i < primalSolrQueriesString.size(); i++) {
+            Query query = new Query();
+            query.setName(primalSolrQueriesString.get(i));
+            primalQueries.add(query);
         }
         dysco.setPrimalSolrQueries(primalQueries);
         
@@ -209,9 +214,9 @@ public class SolrDysco {
         dysco.setUpdateDate(updateDate);
         
         dysco.setListId(listId);
-
+        
         return dysco;
-
+        
     }
 
     /**
@@ -416,31 +421,31 @@ public class SolrDysco {
      */
     public void setSolrQueryString(String solrQueryString) {
         this.solrQueryString = solrQueryString;
-
+        
     }
     
-    public List<String> getPrimalSolrQueriesString(){
-    	return primalSolrQueriesString;
+    public List<String> getPrimalSolrQueriesString() {
+        return primalSolrQueriesString;
     }
     
-    public List<String> getSolrQueriesString(){
-    	return solrQueriesString;
+    public List<String> getSolrQueriesString() {
+        return solrQueriesString;
     }
     
-    public List<String> getSolrQueriesScore(){
-    	return solrQueriesScore;
+    public List<String> getSolrQueriesScore() {
+        return solrQueriesScore;
     }
     
-    public void setPrimalSolrQueriesString(List<String> primalSolrQueriesString){
-    	this.primalSolrQueriesString = primalSolrQueriesString;
+    public void setPrimalSolrQueriesString(List<String> primalSolrQueriesString) {
+        this.primalSolrQueriesString = primalSolrQueriesString;
     }
     
-    public void setSolrQueriesString(List<String> solrQueriesString){
-    	this.solrQueriesString = solrQueriesString;
+    public void setSolrQueriesString(List<String> solrQueriesString) {
+        this.solrQueriesString = solrQueriesString;
     }
-
-    public void setSolrQueriesScore(List<String> solrQueriesScore){
-    	this.solrQueriesScore = solrQueriesScore;
+    
+    public void setSolrQueriesScore(List<String> solrQueriesScore) {
+        this.solrQueriesScore = solrQueriesScore;
     }
 
     /**
