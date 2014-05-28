@@ -552,7 +552,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //Retrieve multimedia content that is stored in solr
         if (!query.contains("title") && !query.contains("description")) {
-            query = "((title : " + query + ") OR (description:" + query + ") OR (tags:" + query + "))";
+            query = "((title : " + query + ") OR (description:" + query + "))";
         }
 
         //Set source filters in case they exist exist
@@ -687,7 +687,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //Retrieve multimedia content that is stored in solr
         if (!query.contains("title") && !query.contains("description")) {
-            query = "((title : " + query + ") OR (description:" + query + ") OR (tags:" + query + "))";
+            query = "((title : " + query + ") OR (description:" + query + "))";
         }
 
         //Set filters in case they exist exist
