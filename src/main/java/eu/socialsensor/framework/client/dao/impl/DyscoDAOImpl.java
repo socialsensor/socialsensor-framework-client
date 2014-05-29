@@ -562,7 +562,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SolrQuery solrQuery = new SolrQuery(query);
 
-        solrQuery.setRows(200);
+        solrQuery.setRows(size);
 
         //Set facets if necessary
         for(String facet : facets){
@@ -639,7 +639,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
 
-        solrQuery.setRows(200);
+        solrQuery.setRows(size);
 
         //Set facets if necessary
         for(String facet : facets){
@@ -699,7 +699,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SolrQuery solrQuery = new SolrQuery(query);
 
-        solrQuery.setRows(200);
+        solrQuery.setRows(size);
 
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
@@ -779,7 +779,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         Logger.getRootLogger().info("Solr Query: " + queryForRequest);
       
-        solrQuery.setRows(200);
+        solrQuery.setRows(size);
         //solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
