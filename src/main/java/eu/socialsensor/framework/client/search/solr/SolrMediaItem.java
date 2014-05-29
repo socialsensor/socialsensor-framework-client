@@ -82,6 +82,9 @@ public class SolrMediaItem {
         mediaItem.setPublicationTime(publicationTime);
 
         //popularity needs to be added here
+        
+        mediaItem.setShares(popularity);
+        
         if (latitude != null && longitude != null && location != null) {
             mediaItem.setLocation(new Location(latitude, longitude, location));
         }
