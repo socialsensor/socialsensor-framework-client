@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -196,6 +198,39 @@ public class SolrDyscoHandler {
 
         response.setResults(dyscos);
         
+        return response;
+    }
+    
+    public SearchEngineResponse<Dysco> findDyscosInTimeframe(String date){
+    	SearchEngineResponse<Dysco> response = new SearchEngineResponse<Dysco>();
+    	
+    	QueryResponse rsp;
+    	
+    	String dateQuery = "creationDate:["+date+" TO *]";
+    	System.out.println("Query : "+dateQuery);
+    	
+    	SolrQuery query = new SolrQuery(dateQuery);
+    	query.addSortField("dyscoScore", ORDER.desc);
+    	query.setRows(20);
+    	 try {
+             rsp = server.query(query);
+         } catch (SolrServerException e) {
+             Logger.getRootLogger().info(e.getMessage());
+             return null;
+         }
+    	
+    	 
+    	 List<SolrDysco> resultList = rsp.getBeans(SolrDysco.class);
+         if (resultList != null) {
+            // Logger.getRootLogger().info("got: " + resultList.size() + " dyscos from Solr");
+         }
+
+         List<Dysco> dyscos = new ArrayList<Dysco>();
+         for (SolrDysco dysco : resultList) {
+             dyscos.add(dysco.toDysco());
+         }
+
+         response.setResults(dyscos);
         return response;
     }
     

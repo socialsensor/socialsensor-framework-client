@@ -609,27 +609,27 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = "";
-        for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	if(query.getScore() != null){
-        		if(query.getScore() > 0.5){
-        			if(first){
-	            		allQueriesToOne += "("+query.getName()+")";
-	            		first = false;
-	            	}
-	            	else
-	            		allQueriesToOne += " OR ("+query.getName()+")";
-	        	} 
-        	}
-        	else{
-        		if(first){
-            		allQueriesToOne += "("+query.getName()+")";
-            		first = false;
-            	}
-            	else
-            		allQueriesToOne += " OR ("+query.getName()+")";
-        	}
-        }
+        String allQueriesToOne = buildQueryForSolr(queries);
+//        for (eu.socialsensor.framework.common.domain.Query query : queries) {
+//        	if(query.getScore() != null){
+//        		if(query.getScore() > 0.5){
+//        			if(first){
+//	            		allQueriesToOne += "("+query.getName()+")";
+//	            		first = false;
+//	            	}
+//	            	else
+//	            		allQueriesToOne += " OR ("+query.getName()+")";
+//	        	} 
+//        	}
+//        	else{
+//        		if(first){
+//            		allQueriesToOne += "("+query.getName()+")";
+//            		first = false;
+//            	}
+//            	else
+//            		allQueriesToOne += " OR ("+query.getName()+")";
+//        	}
+//        }
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
 
         //Set source filters in case they exist exist
@@ -744,30 +744,29 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
        
     	//Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = "";
-        for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	if(query.getScore() != null){
-        		if(query.getScore() > 0.5){
-        			if(first){
-	            		allQueriesToOne += "("+query.getName()+")";
-	            		first = false;
-	            	}
-	            	else
-	            		allQueriesToOne += " OR ("+query.getName()+")";
-	        	} 
-        	}
-        	else{
-        		if(first){
-            		allQueriesToOne += "("+query.getName()+")";
-            		first = false;
-            	}
-            	else
-            		allQueriesToOne += " OR ("+query.getName()+")";
-        	}
-        }
+        String allQueriesToOne = buildQueryForSolr(queries);
+//        for (eu.socialsensor.framework.common.domain.Query query : queries) {
+//        	if(query.getScore() != null){
+//        		if(query.getScore() > 0.5){
+//        			if(first){
+//	            		allQueriesToOne += "("+query.getName()+")";
+//	            		first = false;
+//	            	}
+//	            	else
+//	            		allQueriesToOne += " OR ("+query.getName()+")";
+//	        	} 
+//        	}
+//        	else{
+//        		if(first){
+//            		allQueriesToOne += "("+query.getName()+")";
+//            		first = false;
+//            	}
+//            	else
+//            		allQueriesToOne += " OR ("+query.getName()+")";
+//        	}
+//        }
         
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
-        
         
         //Set filters in case they exist exist
         for (String filter : filters) {
@@ -810,13 +809,113 @@ public class DyscoDAOImpl implements DyscoDAO {
         response.setResults(mediaItems);
         return response;
     }
+    
+    private String buildQueryForSolr(List<eu.socialsensor.framework.common.domain.Query> queries){
+    	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
+    	
+    	String solrQuery = null;
+    	
+    	for(eu.socialsensor.framework.common.domain.Query query : queries){
+    		if(query.getName().startsWith("\"") && query.getName().endsWith("\"")){
+    			System.out.println("entity query : "+query.getName());
+    			if(solrQuery == null)
+    				solrQuery = "("+query.getName()+")";
+    			else
+    				solrQuery += " OR ("+query.getName()+")";
+    		}
+    		else{
+    			List<String> entities = new ArrayList<String>();
+    			String restQuery = query.getName();
+    			int start = 0,end=0;
+    			System.out.println("query : "+query.getName());
+    			
+    			while(start != -1 && end != -1){
+    				start = restQuery.indexOf("\"");
+    				System.out.println("start:"+start);
+    				if(start == -1)
+    					break;
+        			String temp = restQuery.substring(start+1);
+        			end = temp.indexOf("\"");
+        			System.out.println("end:"+(end+2));
+        			if(end == -1)
+    					break;
+        			end+=2;
+        			String entity = restQuery.substring(start, end);
+        			System.out.println("entity:"+entity);
+        			restQuery = restQuery.replace(entity, "").trim();
+        			entities.add(entity);
+    			}
+    			
+    			String[] queryWords = restQuery.split(" ");
+    			
+    			for(String entity : entities){
+	    			if(!linkedWords.containsKey(entity)){
+	    				List<String> alreadyIn = new ArrayList<String>();
+	    				for(String qWord : queryWords)
+	    					alreadyIn.add(qWord);
+	    				linkedWords.put(entity, alreadyIn);
+	    			}else{
+	    				List<String> alreadyIn = linkedWords.get(entity);
+	    				for(String qWord : queryWords)
+	    					if(!alreadyIn.contains(qWord))
+	    						alreadyIn.add(qWord);
+	    				linkedWords.put(entity, alreadyIn);
+	    			}
+    			}
+    			
+    			if(entities.isEmpty()){
+    				String resQuery = "";
+    				boolean first = true;
+    				for(String qWord : queryWords){
+    					if(first){
+    						resQuery +=qWord;
+    						first = false;
+    					}
+    					else{
+    						resQuery += " AND "+qWord;
+    					}
+    				}
+    				
+    				if(solrQuery == null)
+        				solrQuery = "("+resQuery+")";
+        			else
+        				solrQuery += " OR ("+resQuery+")";
+    			}
+
+    		}
+    		
+    	}
+    	
+    	for(Map.Entry<String, List<String>> entry : linkedWords.entrySet()){
+    		String resQuery = entry.getKey()+" AND (";
+    		boolean first = true;
+    		for(String lWord : entry.getValue()){
+    			if(first){
+    				resQuery +=lWord;
+    				first = false;
+    			}
+    			else{
+    				resQuery +=" OR "+lWord;
+    			}
+    		}
+    		
+    		resQuery +=")";
+    		
+    		if(solrQuery == null)
+				solrQuery = "("+resQuery+")";
+			else
+				solrQuery += " OR ("+resQuery+")";
+    	}
+    	
+    	return solrQuery;
+    }
 
     public List<MediaItem> requestThumbnails(Dysco dysco, int size) {
         return null;
     }
 
     public static void main(String[] args) {
-    	
+ 
     	
     }
 }
