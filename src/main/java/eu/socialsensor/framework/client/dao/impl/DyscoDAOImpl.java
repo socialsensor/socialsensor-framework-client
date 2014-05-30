@@ -817,7 +817,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		if(query.getName().startsWith("\"") && query.getName().endsWith("\"")){
-    			System.out.println("entity query : "+query.getName());
+    			//System.out.println("entity query : "+query.getName());
     			if(solrQuery == null)
     				solrQuery = "("+query.getName()+")";
     			else
@@ -827,21 +827,21 @@ public class DyscoDAOImpl implements DyscoDAO {
     			List<String> entities = new ArrayList<String>();
     			String restQuery = query.getName();
     			int start = 0,end=0;
-    			System.out.println("query : "+query.getName());
+    			//System.out.println("query : "+query.getName());
     			
     			while(start != -1 && end != -1){
     				start = restQuery.indexOf("\"");
-    				System.out.println("start:"+start);
+    				//System.out.println("start:"+start);
     				if(start == -1)
     					break;
         			String temp = restQuery.substring(start+1);
         			end = temp.indexOf("\"");
-        			System.out.println("end:"+(end+2));
+        			//System.out.println("end:"+(end+2));
         			if(end == -1)
     					break;
         			end+=2;
         			String entity = restQuery.substring(start, end);
-        			System.out.println("entity:"+entity);
+        			//System.out.println("entity:"+entity);
         			restQuery = restQuery.replace(entity, "").trim();
         			entities.add(entity);
     			}
