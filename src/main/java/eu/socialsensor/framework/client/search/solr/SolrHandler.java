@@ -22,8 +22,8 @@ public class SolrHandler implements SearchEngineHandler {
 
     private final static Logger LOGGER = Logger.getLogger(SolrHandler.class.getName());
 
-    private SolrDyscoHandler solrDyscoHandler;
-    private SolrItemHandler solrItemHandler;
+    private final SolrDyscoHandler solrDyscoHandler;
+    private final SolrItemHandler solrItemHandler;
 
     public SolrHandler(String dyscosCollection, String itemsCollection) throws Exception {
         solrDyscoHandler = SolrDyscoHandler.getInstance(dyscosCollection);
@@ -123,7 +123,6 @@ public class SolrHandler implements SearchEngineHandler {
 
         query.setRows(size);
         query.addSortField("retweetsCount", ORDER.desc);
-        LOGGER.log(Level.INFO, null, query.toString());
 
         return solrItemHandler.findItems(query);
     }
@@ -246,11 +245,14 @@ public class SolrHandler implements SearchEngineHandler {
             String timeframe, String listId, int count) {
 
         query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
-        query = query + " AND (listId:" + listId+ ")";
+
+        if (!listId.equals("*")) {
+            query = query + " AND (listId:" + listId + ")";
+        }
         SolrQuery solrQuery = new SolrQuery(query);
-        
+
         System.out.println("solrQuery for Dysco: " + solrQuery);
-        
+
         solrQuery.setRows(count);
         solrQuery.setFacet(true);
         solrQuery.setFacetLimit(5);
