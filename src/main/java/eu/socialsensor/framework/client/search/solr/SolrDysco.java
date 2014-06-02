@@ -1,6 +1,8 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.Query;
+import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
@@ -8,8 +10,10 @@ import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -80,6 +84,21 @@ public class SolrDysco {
     @Field(value = "listId")
     private String listId;
     
+    @Field(value = "twitterUsers")
+	private List<String> twitterUsers;
+	
+    @Field(value = "mentionedUsers")
+	private List<String> mentionedUsers;
+	
+    @Field(value = "listsOfUsers")
+	private List<String> listsOfUsers;
+	
+    @Field(value = "otherSocialNetworks")
+	private List<String> otherSocialNetworks;
+	
+    @Field(value = "nearLocations")
+	private List<String> nearLocations;
+	
     public SolrDysco() {
         id = UUID.randomUUID().toString();
     }
@@ -140,6 +159,28 @@ public class SolrDysco {
         
     }
     
+    public SolrDysco(CustomDysco customDysco) {
+    	this((Dysco)customDysco);
+    	
+    	this.twitterUsers = customDysco.getTwitterUsers();
+    	this.mentionedUsers = customDysco.getMentionedUsers();
+    	this.listsOfUsers = customDysco.getListsOfUsers();
+    	
+    	if(customDysco.getOtherSocialNetworks() != null) {
+    		otherSocialNetworks = new ArrayList<String>();
+    		for(Entry<String, String> e : customDysco.getOtherSocialNetworks().entrySet()) {
+    			otherSocialNetworks.add(e.getValue() + "#" + e.getKey());
+    		}
+    	}
+
+    	if(customDysco.getNearLocations() != null) {
+    		nearLocations = new ArrayList<String>();
+    		for(Location l : customDysco.getNearLocations()) {
+    			nearLocations.add(l.getLatitude()+","+l.getLongitude()+","+l.getRadius());
+    		}
+    	}
+    }
+   
     public Dysco toDysco() {
         
         Dysco dysco = new Dysco();
@@ -220,6 +261,115 @@ public class SolrDysco {
         
     }
 
+ public CustomDysco toCustomDysco() {
+        
+	 	CustomDysco dysco = new CustomDysco();
+        
+        dysco.setId(id);
+        dysco.setCreationDate(creationDate);
+        dysco.setTitle(title);
+        dysco.setScore(score);
+        
+        if (dyscoType.equals("CUSTOM")) {
+            dysco.setDyscoType(DyscoType.CUSTOM);
+        } else {
+            dysco.setDyscoType(DyscoType.TRENDING);
+        }
+        
+        if (persons != null) {
+            for (String person : persons) {
+                Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
+                dysco.addEntity(dyscoEntity);
+            }
+        }
+        if (locations != null) {
+            for (String location : locations) {
+                Entity dyscoEntity = new Entity(location, 0.0, Type.LOCATION);
+                dysco.addEntity(dyscoEntity);
+            }
+        }
+        if (organizations != null) {
+            for (String organization : organizations) {
+                Entity dyscoEntity = new Entity(organization, 0.0, Type.ORGANIZATION);
+                dysco.addEntity(dyscoEntity);
+            }
+        }
+        
+        dysco.setContributors(contributors);
+        
+        if (keywords != null) {
+            for (String keyword : keywords) {
+                dysco.addKeyword(keyword, 0.0);
+            }
+        }
+        
+        if (hashtags != null) {
+            for (String hashtag : hashtags) {
+                dysco.addHashtag(hashtag, 0.0);
+            }
+        }
+        
+        dysco.setSolrQueryString(solrQueryString);
+        List<Query> queries = new ArrayList<Query>();
+        for (int i = 0; i < solrQueriesString.size(); i++) {
+            Query query = new Query();
+            query.setName(solrQueriesString.get(i));
+            //TODO this is temporary - remove this check when NaN issue is fixed
+            if (solrQueriesScore.get(i).equals("NaN")) {
+                query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+            } else {
+                query.setScore(0.6);
+            }
+            queries.add(query);
+        }
+        dysco.setSolrQueries(queries);
+        
+        List<Query> primalQueries = new ArrayList<Query>();
+        for (int i = 0; i < primalSolrQueriesString.size(); i++) {
+            Query query = new Query();
+            query.setName(primalSolrQueriesString.get(i));
+            primalQueries.add(query);
+        }
+        dysco.setPrimalSolrQueries(primalQueries);
+        
+        dysco.setTrending(trending);
+        dysco.setUpdateDate(updateDate);
+        
+        dysco.setListId(listId);
+        
+        dysco.setTwitterUsers(twitterUsers);
+        dysco.setMentionedUsers(mentionedUsers);
+        dysco.setListsOfUsers(listsOfUsers);
+        
+        if(nearLocations != null) {
+        	Map<String, String> _otherSocialNetworks = new HashMap<String, String>();
+        	for(String s : otherSocialNetworks) {
+        		String[] parts = s.split("#");
+        		if(parts.length != 2)
+        			continue;
+
+        		_otherSocialNetworks.put(parts[1], parts[0]);
+        	}
+        	dysco.setOtherSocialNetworks(_otherSocialNetworks);
+        }
+        
+        if(nearLocations != null) {
+        	List<Location> _nearLocations = new ArrayList<Location>();
+        	for(String s : nearLocations) {
+        		String[] parts = s.split(",");
+        		if(parts.length != 3)
+        			continue;
+        		Location l = new Location(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), 
+        				Integer.parseInt(parts[2]));
+        		_nearLocations.add(l);
+        	}
+        	dysco.setNearLocations(_nearLocations);
+        }
+        
+        return dysco;
+        
+    }
+ 
     /**
      * Returns the id of the dysco
      *
