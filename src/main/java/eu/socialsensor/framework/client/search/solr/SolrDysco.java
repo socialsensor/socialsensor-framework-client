@@ -360,7 +360,7 @@ public class SolrDysco {
         		if(parts.length != 3)
         			continue;
         		Location l = new Location(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), 
-        				Integer.parseInt(parts[2]));
+        				Double.parseDouble(parts[2]));
         		_nearLocations.add(l);
         	}
         	dysco.setNearLocations(_nearLocations);
