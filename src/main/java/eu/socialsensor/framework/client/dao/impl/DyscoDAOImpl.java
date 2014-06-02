@@ -377,28 +377,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> expandedUrls = new HashSet<String>();
         
         boolean first = true;
-        String allQueriesToOne = "";
-        for (eu.socialsensor.framework.common.domain.Query query : queries) {
-        	if(query.getScore() != null){
-        		if(query.getScore() > 0.5){
-        			if(first){
-	            		allQueriesToOne += "("+query.getName()+")";
-	            		first = false;
-	            	}
-	            	else
-	            		allQueriesToOne += " OR ("+query.getName()+")";
-	        	} 
-        	}
-        	else{
-        		if(first){
-            		allQueriesToOne += "("+query.getName()+")";
-            		first = false;
-            	}
-            	else
-            		allQueriesToOne += " OR ("+query.getName()+")";
-        	}
-        }
-        
+        String allQueriesToOne = buildQueryForSolr(queries,"AND");
+       
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")))";
         
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
@@ -609,7 +589,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildQueryForSolr(queries,"OR");
+        String allQueriesToOne = buildQueryForSolr(queries,"AND");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -943,7 +923,9 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) {
+    	
     	 
+ 
     	
     }
 }
