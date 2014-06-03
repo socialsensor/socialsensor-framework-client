@@ -140,7 +140,7 @@ public class SolrDysco {
         	//logger.info("query name: "+query.getName());
             //logger.info("query score: "+query.getScore().toString());
             primalSolrQueriesString.add(query.getName());
-            
+            solrQueriesScore.add(query.getScore().toString());
         }
 
         //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
@@ -148,7 +148,7 @@ public class SolrDysco {
         	//logger.info("query name: "+query.getName());
             //logger.info("query score: "+query.getScore().toString());
             solrQueriesString.add(query.getName());
-            solrQueriesScore.add(query.getScore().toString());
+            //solrQueriesScore.add(query.getScore().toString());
         }
         
         trending = dysco.getTrending();
