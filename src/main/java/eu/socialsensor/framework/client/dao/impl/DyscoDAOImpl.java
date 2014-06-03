@@ -829,55 +829,88 @@ public class DyscoDAOImpl implements DyscoDAO {
         			entities.add(entity);
     			}
     			
-    			String[] queryWords = restQuery.split("\\s+");
+    			restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
     			
     			for(String entity : entities){
-	    			if(!linkedWords.containsKey(entity)){
-	    				List<String> alreadyIn = new ArrayList<String>();
-	    				for(String qWord : queryWords){
-	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
-	    					if(!word.equals("//s+") && word.length() > 0)
-	    						alreadyIn.add(qWord);
-	    				}
-	    				linkedWords.put(entity, alreadyIn);
-	    			}else{
-	    				List<String> alreadyIn = linkedWords.get(entity);
-	    				for(String qWord : queryWords){
-	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
-	    					if(!word.equals("//s+") && word.length()>0){
-	    						
-		    					if(alreadyIn.contains(qWord))
-		    						continue;
-		    					
-		    					alreadyIn.add(qWord);
-	    					}
-	    				}
-	    				
-	    				linkedWords.put(entity, alreadyIn);
-	    			}
+    				if(!linkedWords.containsKey(entity)){
+    					List<String> alreadyIn = new ArrayList<String>();
+    					if(query.getScore()!=null)
+    						restQuery+="^"+query.getScore();
+    					alreadyIn.add(restQuery);
+    					linkedWords.put(entity, alreadyIn);
+    				}
+    				else{
+    					List<String> alreadyIn = linkedWords.get(entity);
+    					if(query.getScore()!=null)
+    						restQuery+="^"+query.getScore();
+    					alreadyIn.add(restQuery);
+    					linkedWords.put(entity, alreadyIn);
+    				}
     			}
     			
     			if(entities.isEmpty()){
-    				String resQuery = "";
-    				boolean first = true;
-    				for(String qWord : queryWords){
-    					if(first){
-    						resQuery +=qWord;
-    						first = false;
-    					}
-    					else{
-    						resQuery += " AND "+qWord;
-    					}
-    				}
-    				
     				if(solrQuery == null)
-        				solrQuery = "("+resQuery+")";
+        				solrQuery = "("+restQuery+")^"+query.getScore();
         			else{
-        				if(!solrQuery.contains(resQuery))
-        					solrQuery += " "+liaison+" ("+resQuery+")";
+        				if(!solrQuery.contains(restQuery)){
+        					if(query.getScore()!=null)
+        						solrQuery += " "+liaison+" ("+restQuery+")^"+query.getScore();
+        					else
+        						solrQuery += " "+liaison+" ("+restQuery+")";
+        				}
+        					
         			}
-        				
     			}
+    			
+//    			String[] queryWords = restQuery.split("\\s+");
+//    			
+//    			for(String entity : entities){
+//	    			if(!linkedWords.containsKey(entity)){
+//	    				List<String> alreadyIn = new ArrayList<String>();
+//	    				for(String qWord : queryWords){
+//	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
+//	    					if(!word.equals("//s+") && word.length() > 0)
+//	    						alreadyIn.add(qWord);
+//	    				}
+//	    				linkedWords.put(entity, alreadyIn);
+//	    			}else{
+//	    				List<String> alreadyIn = linkedWords.get(entity);
+//	    				for(String qWord : queryWords){
+//	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
+//	    					if(!word.equals("//s+") && word.length()>0){
+//	    						
+//		    					if(alreadyIn.contains(qWord))
+//		    						continue;
+//		    					
+//		    					alreadyIn.add(qWord);
+//	    					}
+//	    				}
+//	    				
+//	    				linkedWords.put(entity, alreadyIn);
+//	    			}
+//    			}
+    			
+//    			if(entities.isEmpty()){
+//    				String resQuery = "";
+//    				boolean first = true;
+//    				for(String qWord : queryWords){
+//    					if(first){
+//    						resQuery +=qWord;
+//    						first = false;
+//    					}
+//    					else{
+//    						resQuery += " AND "+qWord;
+//    					}
+//    				}
+//    				
+//    				if(solrQuery == null)
+//        				solrQuery = "("+resQuery+")";
+//        			else{
+//        				if(!solrQuery.contains(resQuery))
+//        					solrQuery += " "+liaison+" ("+resQuery+")";
+//        			}
+//        				
+//    			}
 
     		}
     		
@@ -927,9 +960,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) {
-    	
-    	 
- 
+    
     	
     }
 }
