@@ -724,7 +724,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
        
     	//Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildQueryForSolr(queries,"OR");
+        String allQueriesToOne = buildQueryForSolr(queries,"AND");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -835,18 +835,22 @@ public class DyscoDAOImpl implements DyscoDAO {
 	    			if(!linkedWords.containsKey(entity)){
 	    				List<String> alreadyIn = new ArrayList<String>();
 	    				for(String qWord : queryWords){
-	    				
-	    					alreadyIn.add(qWord);
+	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
+	    					if(!word.equals("//s+") && word.length() > 0)
+	    						alreadyIn.add(qWord);
 	    				}
 	    				linkedWords.put(entity, alreadyIn);
 	    			}else{
 	    				List<String> alreadyIn = linkedWords.get(entity);
 	    				for(String qWord : queryWords){
-	    					
-	    					if(alreadyIn.contains(qWord))
-	    						continue;
-	    					
-	    					alreadyIn.add(qWord);
+	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
+	    					if(!word.equals("//s+") && word.length()>0){
+	    						
+		    					if(alreadyIn.contains(qWord))
+		    						continue;
+		    					
+		    					alreadyIn.add(qWord);
+	    					}
 	    				}
 	    				
 	    				linkedWords.put(entity, alreadyIn);
