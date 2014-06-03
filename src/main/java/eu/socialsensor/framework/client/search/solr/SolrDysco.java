@@ -235,7 +235,7 @@ public class SolrDysco {
             Query query = new Query();
             query.setName(solrQueriesString.get(i));
             //TODO this is temporary - remove this check when NaN issue is fixed
-            if (solrQueriesScore.get(i).equals("NaN")) {
+            if (!solrQueriesScore.get(i).equals("NaN")) {
                 query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
             } else {
                 query.setScore(0.6);
