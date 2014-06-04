@@ -137,8 +137,8 @@ public class SolrDysco {
         solrQueryString = dysco.getSolrQueryString();
         
         for (Query query : dysco.getPrimalSolrQueries()) {
-        	//logger.info("query name: "+query.getName());
-            //logger.info("query score: "+query.getScore().toString());
+        	logger.info("[SOLR DYSCO]query name: "+query.getName());
+            logger.info("[SOLR DYSCO]query score: "+query.getScore().toString());
             primalSolrQueriesString.add(query.getName());
             if(query.getScore() != null)
             	solrQueriesScore.add(query.getScore().toString());
