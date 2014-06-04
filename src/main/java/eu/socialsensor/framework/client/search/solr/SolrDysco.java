@@ -235,20 +235,20 @@ public class SolrDysco {
         for (int i = 0; i < solrQueriesString.size(); i++) {
             Query query = new Query();
             query.setName(solrQueriesString.get(i));
-            //TODO this is temporary - remove this check when NaN issue is fixed
-            if (!solrQueriesScore.get(i).equals("NaN")) {
-                query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
-            } else {
-                query.setScore(0.6);
-            }
+            
+            query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+          
             queries.add(query);
         }
         dysco.setSolrQueries(queries);
         
+        //all this is temporary - primal should be merged with solr queries
         List<Query> primalQueries = new ArrayList<Query>();
         for (int i = 0; i < primalSolrQueriesString.size(); i++) {
             Query query = new Query();
             query.setName(primalSolrQueriesString.get(i));
+            if(solrQueriesString.size() == 0 && solrQueriesScore.size()>0) 
+            	query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
             primalQueries.add(query);
         }
         dysco.setPrimalSolrQueries(primalQueries);
