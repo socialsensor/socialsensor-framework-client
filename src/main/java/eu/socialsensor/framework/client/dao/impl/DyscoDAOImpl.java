@@ -306,21 +306,21 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, int size) {
+    public SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, Map<String,String> params,int size) {
 
-        return collectItems(query, filters, facets, orderBy, size);
+        return collectItems(query, filters, facets, orderBy, params, size);
 
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy, int size) {
+    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
 
         List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
         if (queries.isEmpty()) {
             queries = dysco.getPrimalSolrQueries(); //temporary
         }
         
-        return collectItems(queries, filters, facets, orderBy, size);
+        return collectItems(queries, filters, facets, orderBy,params, size);
 
     }
 
@@ -520,7 +520,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return mediaItems.subList(0, Math.min(size, mediaItems.size()));
     }
 
-    private SearchEngineResponse<Item> collectItems(String query, List<String> filters, List<String>facets, String orderBy, int size) {
+    private SearchEngineResponse<Item> collectItems(String query, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
      
         List<Item> items = new ArrayList<Item>();
 
@@ -531,8 +531,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        if (!query.contains("title") && !query.contains("text")) {
-            query = "((title : " + query + ") OR (text:" + query + "))";
+        if (!query.contains("title") && !query.contains("description")) {
+            query = "((title : " + query + ") OR (description:" + query + "))";
         }
 
         //Set source filters in case they exist exist
@@ -543,7 +543,10 @@ public class DyscoDAOImpl implements DyscoDAO {
         SolrQuery solrQuery = new SolrQuery(query);
 
         solrQuery.setRows(size);
-
+        
+        for(Map.Entry<String, String> param : params.entrySet())
+        	solrQuery.add(param.getKey(),param.getValue());
+        
         //Set facets if necessary
         for(String facet : facets){
         	solrQuery.addFacetField(facet);
@@ -577,7 +580,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy, int size) {
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy,Map<String,String> params, int size) {
         boolean first = true;
 
         List<Item> items = new ArrayList<Item>();
@@ -610,7 +613,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 //            		allQueriesToOne += " OR ("+query.getName()+")";
 //        	}
 //        }
-        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")))";
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
 
         //Set source filters in case they exist exist
         for (String filter : filters) {
@@ -621,6 +624,9 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         solrQuery.setRows(size);
 
+        for(Map.Entry<String, String> param : params.entrySet())
+        	solrQuery.add(param.getKey(),param.getValue());
+        
         //Set facets if necessary
         for(String facet : facets){
         	solrQuery.addFacetField(facet);
@@ -818,11 +824,15 @@ public class DyscoDAOImpl implements DyscoDAO {
     				if(start == -1)
     					break;
         			String temp = restQuery.substring(start+1);
-        			end = temp.indexOf("\"");
-        			//System.out.println("end:"+(end+2));
+        			//System.out.println("temp:"+temp);
+        			if(start == 0)
+        				end = temp.indexOf("\"")+start+1;
+        			else
+        				end = temp.indexOf("\"")+start;
+        			//System.out.println("end:"+(end));
         			if(end == -1)
     					break;
-        			end+=2;
+        			end+=1;
         			String entity = restQuery.substring(start, end);
         			//System.out.println("entity:"+entity);
         			restQuery = restQuery.replace(entity, "").trim();
@@ -849,8 +859,12 @@ public class DyscoDAOImpl implements DyscoDAO {
     			}
     			
     			if(entities.isEmpty()){
-    				if(solrQuery == null)
-        				solrQuery = "("+restQuery+")^"+query.getScore();
+    				if(solrQuery == null){
+    					if(query.getScore() != null)
+    						solrQuery = "("+restQuery+")^"+query.getScore();
+    					else
+    						solrQuery = "("+restQuery+")";
+    				}	
         			else{
         				if(!solrQuery.contains(restQuery)){
         					if(query.getScore()!=null)
@@ -960,6 +974,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) {
+    	
     
     	
     }
