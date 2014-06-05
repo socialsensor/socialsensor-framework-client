@@ -825,10 +825,9 @@ public class DyscoDAOImpl implements DyscoDAO {
     					break;
         			String temp = restQuery.substring(start+1);
         			//System.out.println("temp:"+temp);
-        			if(start == 0)
-        				end = temp.indexOf("\"")+start+1;
-        			else
-        				end = temp.indexOf("\"")+start;
+        			
+        			end = temp.indexOf("\"")+start+1;
+        			
         			//System.out.println("end:"+(end));
         			if(end == -1)
     					break;
@@ -975,7 +974,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
     	
-    
+    	
+ 
     	
     }
 }
