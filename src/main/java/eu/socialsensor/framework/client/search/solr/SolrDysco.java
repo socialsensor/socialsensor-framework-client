@@ -239,9 +239,11 @@ public class SolrDysco {
         for (int i = 0; i < solrQueriesString.size(); i++) {
             Query query = new Query();
             query.setName(solrQueriesString.get(i));
-            if(solrQueriesScore.get(i)!=null)
-            	query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
-          
+            if(solrQueriesScore!=null){
+            	if(i<solrQueriesScore.size())
+            		query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+            }
+
             queries.add(query);
         }
         dysco.setSolrQueries(queries);
