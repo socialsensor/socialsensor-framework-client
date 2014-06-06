@@ -805,7 +805,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		//store these queries for later
     		if(query.getName().startsWith("\"") && (query.getName().endsWith("\"") || query.getName().endsWith("\" "))){
-    			//System.out.println("entity query : "+query.getName());
+    			System.out.println("entity query : "+query.getName());
     			if(query.getName().endsWith("\" ")){
     				query.setName(query.getName().substring(0, query.getName().length()-1));
     			}
@@ -816,44 +816,51 @@ public class DyscoDAOImpl implements DyscoDAO {
     			List<String> entities = new ArrayList<String>();
     			String restQuery = query.getName();
     			int start = 0,end=0;
-    			//System.out.println("query : "+query.getName());
+    			System.out.println("query : "+query.getName());
     			
     			while(start != -1 && end != -1){
     				start = restQuery.indexOf("\"");
-    				//System.out.println("start:"+start);
+    				System.out.println("start:"+start);
     				if(start == -1)
     					break;
         			String temp = restQuery.substring(start+1);
-        			//System.out.println("temp:"+temp);
+        			System.out.println("temp:"+temp);
         			
         			end = temp.indexOf("\"")+start+1;
         			
-        			//System.out.println("end:"+(end));
+        			System.out.println("end:"+(end));
         			if(end == -1)
     					break;
         			end+=1;
         			String entity = restQuery.substring(start, end);
-        			//System.out.println("entity:"+entity);
+        			System.out.println("entity:"+entity);
         			restQuery = restQuery.replace(entity, "").trim();
         			entities.add(entity);
     			}
-    			
+    			restQuery = restQuery.replaceAll(" +", " ");
     			restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
     			
+    			System.out.println("rest query: "+restQuery);
     			for(String entity : entities){
+    				String queryToLink = restQuery;
     				if(!linkedWords.containsKey(entity)){
     					List<String> alreadyIn = new ArrayList<String>();
-    					if(query.getScore()!=null)
-    						restQuery+="^"+query.getScore();
-    					alreadyIn.add(restQuery);
-    					linkedWords.put(entity, alreadyIn);
+    					
+						if(query.getScore()!=null)
+							queryToLink+="^"+query.getScore();
+					
+        					alreadyIn.add(queryToLink);
+        					linkedWords.put(entity, alreadyIn);
+    					
     				}
     				else{
     					List<String> alreadyIn = linkedWords.get(entity);
     					if(query.getScore()!=null)
-    						restQuery+="^"+query.getScore();
-    					alreadyIn.add(restQuery);
-    					linkedWords.put(entity, alreadyIn);
+    						queryToLink+="^"+query.getScore();
+    					if(!alreadyIn.contains(queryToLink)){
+    						alreadyIn.add(queryToLink);
+    						linkedWords.put(entity, alreadyIn);
+    					}
     				}
     			}
     			

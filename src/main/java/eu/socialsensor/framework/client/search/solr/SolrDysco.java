@@ -138,10 +138,13 @@ public class SolrDysco {
         
         for (Query query : dysco.getPrimalSolrQueries()) {
         	logger.info("[SOLR DYSCO]query name: "+query.getName());
-            logger.info("[SOLR DYSCO]query score: "+query.getScore().toString());
+            
             primalSolrQueriesString.add(query.getName());
-            if(query.getScore() != null)
+            if(query.getScore() != null){
+            	logger.info("[SOLR DYSCO]query score: "+query.getScore().toString());
             	solrQueriesScore.add(query.getScore().toString());
+            }
+            	
         }
 
         //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
