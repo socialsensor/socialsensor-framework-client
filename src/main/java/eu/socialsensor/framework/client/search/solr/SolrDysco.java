@@ -152,7 +152,8 @@ public class SolrDysco {
         	//logger.info("query name: "+query.getName());
             //logger.info("query score: "+query.getScore().toString());
             solrQueriesString.add(query.getName());
-            solrQueriesScore.add(query.getScore().toString());
+            if(query.getScore() != null)
+            	solrQueriesScore.add(query.getScore().toString());
         }
         
         trending = dysco.getTrending();
