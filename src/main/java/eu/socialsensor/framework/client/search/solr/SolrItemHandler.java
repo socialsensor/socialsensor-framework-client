@@ -1,5 +1,11 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import eu.socialsensor.framework.client.search.Bucket;
+import eu.socialsensor.framework.client.search.Facet;
+import eu.socialsensor.framework.client.search.Query;
+import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.client.util.ConfigReader;
+import eu.socialsensor.framework.common.domain.Item;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -9,24 +15,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
-
-import eu.socialsensor.framework.client.search.Bucket;
-import eu.socialsensor.framework.client.search.Facet;
-import eu.socialsensor.framework.client.search.Query;
-import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.util.ConfigReader;
-import eu.socialsensor.framework.common.domain.Item;
+import org.apache.solr.common.params.SolrParams;
 
 /**
  *
@@ -168,6 +167,8 @@ public class SolrItemHandler {
 
         SolrQuery solrQuery = new SolrQuery(query.getQueryString());
         solrQuery.addFilterQuery(fq);
+   
+        
         return search(solrQuery);
     }
 
