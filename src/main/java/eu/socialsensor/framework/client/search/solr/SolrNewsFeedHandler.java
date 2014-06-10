@@ -35,7 +35,7 @@ public class SolrNewsFeedHandler {
 	     */
 	    SolrServer server;
 	    private static Map<String, SolrNewsFeedHandler> INSTANCES = new HashMap<String, SolrNewsFeedHandler>();
-	    private static int commitPeriod = 1000;
+	    private static int commitPeriod = 10000;
 
 	    // Private constructor prevents instantiation from other classes
 //	    private SolrItemHandler() {
