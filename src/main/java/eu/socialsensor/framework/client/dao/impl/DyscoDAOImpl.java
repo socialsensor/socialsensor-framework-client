@@ -592,7 +592,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildQueryForSolr(queries,"AND");
+        String allQueriesToOne = buildQueryForSolr(queries,"OR");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -981,7 +981,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
     	
-    	
+    
  
     	
     }
