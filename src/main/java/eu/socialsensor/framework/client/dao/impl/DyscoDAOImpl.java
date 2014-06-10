@@ -592,7 +592,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildQueryForSolr(queries,"AND");
+        String allQueriesToOne = buildQueryForSolr(queries,"OR");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -798,7 +798,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     
     private String buildQueryForSolr(List<eu.socialsensor.framework.common.domain.Query> queries,String liaison){
     	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
-    	List<String> swingQueries = new ArrayList<String>();
+    	List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	
     	String solrQuery = null;
     	
@@ -809,7 +809,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     			if(query.getName().endsWith("\" ")){
     				query.setName(query.getName().substring(0, query.getName().length()-1));
     			}
-    			swingQueries.add(query.getName());
+    			swingQueries.add(new eu.socialsensor.framework.common.domain.Query(query.getName(),query.getScore()));
     		
     		}
     		else{
@@ -825,10 +825,9 @@ public class DyscoDAOImpl implements DyscoDAO {
     					break;
         			String temp = restQuery.substring(start+1);
         			//System.out.println("temp:"+temp);
-        			if(start == 0)
-        				end = temp.indexOf("\"")+start+1;
-        			else
-        				end = temp.indexOf("\"")+start;
+        			
+        			end = temp.indexOf("\"")+start+1;
+        			
         			//System.out.println("end:"+(end));
         			if(end == -1)
     					break;
@@ -838,23 +837,30 @@ public class DyscoDAOImpl implements DyscoDAO {
         			restQuery = restQuery.replace(entity, "").trim();
         			entities.add(entity);
     			}
-    			
+    			restQuery = restQuery.replaceAll(" +", " ");
     			restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
     			
+    			System.out.println("rest query: "+restQuery);
     			for(String entity : entities){
+    				String queryToLink = restQuery;
     				if(!linkedWords.containsKey(entity)){
     					List<String> alreadyIn = new ArrayList<String>();
-    					if(query.getScore()!=null)
-    						restQuery+="^"+query.getScore();
-    					alreadyIn.add(restQuery);
-    					linkedWords.put(entity, alreadyIn);
+    					
+						if(query.getScore()!=null)
+							queryToLink+="^"+query.getScore();
+					
+        					alreadyIn.add(queryToLink);
+        					linkedWords.put(entity, alreadyIn);
+    					
     				}
     				else{
     					List<String> alreadyIn = linkedWords.get(entity);
     					if(query.getScore()!=null)
-    						restQuery+="^"+query.getScore();
-    					alreadyIn.add(restQuery);
-    					linkedWords.put(entity, alreadyIn);
+    						queryToLink+="^"+query.getScore();
+    					if(!alreadyIn.contains(queryToLink)){
+    						alreadyIn.add(queryToLink);
+    						linkedWords.put(entity, alreadyIn);
+    					}
     				}
     			}
     			
@@ -956,12 +962,21 @@ public class DyscoDAOImpl implements DyscoDAO {
     		}	
     	}
     	
-    	for(String sQuery : swingQueries){
-    		if(solrQuery == null)
-				solrQuery = "("+sQuery+")";
+    	for(eu.socialsensor.framework.common.domain.Query sQuery : swingQueries){
+    		if(solrQuery == null){
+    			if(sQuery.getScore()!=null)
+    				solrQuery = "("+sQuery.getName()+")^"+sQuery.getScore();
+    			else
+    				solrQuery = "("+sQuery.getName()+")";
+    		}	
 			else{
-				if(!solrQuery.contains(sQuery))
-					solrQuery += " "+liaison+" ("+sQuery+")";
+				if(!solrQuery.contains(sQuery.getName())){
+					if(sQuery.getScore()!=null)
+						solrQuery += " "+liaison+" ("+sQuery.getName()+")^"+sQuery.getScore();
+					else
+						solrQuery += " "+liaison+" ("+sQuery.getName()+")";
+				}
+					
 			}
 				
     	}
@@ -975,7 +990,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
     	
-    
+    	
+ 
     	
     }
 }

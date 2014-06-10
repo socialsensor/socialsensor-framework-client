@@ -9,7 +9,6 @@ import eu.socialsensor.framework.common.domain.Item;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,6 +24,13 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
+
+import eu.socialsensor.framework.client.search.Bucket;
+import eu.socialsensor.framework.client.search.Facet;
+import eu.socialsensor.framework.client.search.Query;
+import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.common.domain.Item;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.params.SolrParams;
 
 /**
@@ -43,7 +49,7 @@ public class SolrItemHandler {
      */
     SolrServer server;
     private static Map<String, SolrItemHandler> INSTANCES = new HashMap<String, SolrItemHandler>();
-    private static int commitPeriod = 1000;
+    private static int commitPeriod = 10000;
 
     // Private constructor prevents instantiation from other classes
 //    private SolrItemHandler() {
@@ -219,11 +225,13 @@ public class SolrItemHandler {
         boolean status = false;
         try {
             server.deleteByQuery("publicationTime : [* TO " + dateTime + "]");
-            UpdateResponse response = server.commit();
-            int statusId = response.getStatus();
-            if (statusId == 0) {
-                status = true;
-            }
+//            UpdateResponse response = server.commit();
+//            int statusId = response.getStatus();
+//            if (statusId == 0) {
+//                status = true;
+//            }
+            
+            return true;
 
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
@@ -612,6 +620,37 @@ public class SolrItemHandler {
             });
         }
         response.setFacets(facets);
+        
+        
+        List<TrendlineSpot> spots = new ArrayList<TrendlineSpot>();
+        
+        List<RangeFacet> solrFacetRangesList = rsp.getFacetRanges();
+        RangeFacet solrRangeFacet;
+        if(solrFacetRangesList != null)
+        {
+            for (int i = 0; i < solrFacetRangesList.size(); i++) {
+                solrRangeFacet = solrFacetRangesList.get(i); //get the ones returned from Solr
+                if(solrRangeFacet.getName().equals("publicationTime"))
+                {
+                    List<RangeFacet.Count> counts =  solrRangeFacet.getCounts();
+                      for (int j = 0; j < counts.size(); j++) {
+                        TrendlineSpot spot = new TrendlineSpot();
+                        spot.setY(counts.get(j).getCount());
+                        spot.setX(Long.parseLong(  counts.get(j).getValue()));
+                        spots.add(spot);
+                    }
+                }
+            }
+       
+        }
+        
+        
+        
+        response.setSpots(spots);
+        
+        
+        
+        
 
         Long t5 = System.currentTimeMillis();
 
