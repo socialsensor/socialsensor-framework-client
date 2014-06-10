@@ -44,7 +44,7 @@ public class SolrItemHandler {
      */
     SolrServer server;
     private static Map<String, SolrItemHandler> INSTANCES = new HashMap<String, SolrItemHandler>();
-    private static int commitPeriod = 1000;
+    private static int commitPeriod = 10000;
 
     // Private constructor prevents instantiation from other classes
 //    private SolrItemHandler() {
