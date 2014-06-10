@@ -798,7 +798,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     
     private String buildQueryForSolr(List<eu.socialsensor.framework.common.domain.Query> queries,String liaison){
     	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
-    	List<String> swingQueries = new ArrayList<String>();
+    	List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	
     	String solrQuery = null;
     	
@@ -809,7 +809,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     			if(query.getName().endsWith("\" ")){
     				query.setName(query.getName().substring(0, query.getName().length()-1));
     			}
-    			swingQueries.add(query.getName());
+    			swingQueries.add(new eu.socialsensor.framework.common.domain.Query(query.getName(),query.getScore()));
     		
     		}
     		else{
@@ -962,12 +962,21 @@ public class DyscoDAOImpl implements DyscoDAO {
     		}	
     	}
     	
-    	for(String sQuery : swingQueries){
-    		if(solrQuery == null)
-				solrQuery = "("+sQuery+")";
+    	for(eu.socialsensor.framework.common.domain.Query sQuery : swingQueries){
+    		if(solrQuery == null){
+    			if(sQuery.getScore()!=null)
+    				solrQuery = "("+sQuery.getName()+")^"+sQuery.getScore();
+    			else
+    				solrQuery = "("+sQuery.getName()+")";
+    		}	
 			else{
-				if(!solrQuery.contains(sQuery))
-					solrQuery += " "+liaison+" ("+sQuery+")";
+				if(!solrQuery.contains(sQuery.getName())){
+					if(sQuery.getScore()!=null)
+						solrQuery += " "+liaison+" ("+sQuery.getName()+")^"+sQuery.getScore();
+					else
+						solrQuery += " "+liaison+" ("+sQuery.getName()+")";
+				}
+					
 			}
 				
     	}
