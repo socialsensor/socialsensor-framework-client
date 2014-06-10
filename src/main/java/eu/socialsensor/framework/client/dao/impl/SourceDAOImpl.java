@@ -132,7 +132,7 @@ public class SourceDAOImpl implements SourceDAO {
 	public List<Source> findTopSources(int n, SocialNetworkSource sourceType) {
 		List<Source> sources = new ArrayList<Source>();
 		
-		List<String> res = mongoHandler.findMany("source", sourceType.toString(), n);
+		List<String> res = mongoHandler.findMany("network", sourceType.toString(), n);
 		for(String json : res) {
 			sources.add(ItemFactory.createSource(json));
 		}
