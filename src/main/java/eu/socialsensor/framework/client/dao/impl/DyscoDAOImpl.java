@@ -805,7 +805,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		//store these queries for later
     		if(query.getName().startsWith("\"") && (query.getName().endsWith("\"") || query.getName().endsWith("\" "))){
-    			System.out.println("entity query : "+query.getName());
+    			//System.out.println("entity query : "+query.getName());
     			if(query.getName().endsWith("\" ")){
     				query.setName(query.getName().substring(0, query.getName().length()-1));
     			}
@@ -816,24 +816,24 @@ public class DyscoDAOImpl implements DyscoDAO {
     			List<String> entities = new ArrayList<String>();
     			String restQuery = query.getName();
     			int start = 0,end=0;
-    			System.out.println("query : "+query.getName());
+    			//System.out.println("query : "+query.getName());
     			
     			while(start != -1 && end != -1){
     				start = restQuery.indexOf("\"");
-    				System.out.println("start:"+start);
+    				//System.out.println("start:"+start);
     				if(start == -1)
     					break;
         			String temp = restQuery.substring(start+1);
-        			System.out.println("temp:"+temp);
+        			//System.out.println("temp:"+temp);
         			
         			end = temp.indexOf("\"")+start+1;
         			
-        			System.out.println("end:"+(end));
+        			//System.out.println("end:"+(end));
         			if(end == -1)
     					break;
         			end+=1;
         			String entity = restQuery.substring(start, end);
-        			System.out.println("entity:"+entity);
+        			//System.out.println("entity:"+entity);
         			restQuery = restQuery.replace(entity, "").trim();
         			entities.add(entity);
     			}
@@ -981,7 +981,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
     	
-    
+    	
  
     	
     }
