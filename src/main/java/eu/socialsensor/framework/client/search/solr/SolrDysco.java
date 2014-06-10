@@ -137,11 +137,14 @@ public class SolrDysco {
         solrQueryString = dysco.getSolrQueryString();
         
         for (Query query : dysco.getPrimalSolrQueries()) {
-        	logger.info("[SOLR DYSCO]query name: "+query.getName());
-            logger.info("[SOLR DYSCO]query score: "+query.getScore().toString());
+        	//logger.info("[SOLR DYSCO]query name: "+query.getName());
+            
             primalSolrQueriesString.add(query.getName());
-            if(query.getScore() != null)
+            if(query.getScore() != null){
+            	//logger.info("[SOLR DYSCO]query score: "+query.getScore().toString());
             	solrQueriesScore.add(query.getScore().toString());
+            }
+            	
         }
 
         //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
@@ -149,7 +152,8 @@ public class SolrDysco {
         	//logger.info("query name: "+query.getName());
             //logger.info("query score: "+query.getScore().toString());
             solrQueriesString.add(query.getName());
-            solrQueriesScore.add(query.getScore().toString());
+            if(query.getScore() != null)
+            	solrQueriesScore.add(query.getScore().toString());
         }
         
         trending = dysco.getTrending();
@@ -235,9 +239,11 @@ public class SolrDysco {
         for (int i = 0; i < solrQueriesString.size(); i++) {
             Query query = new Query();
             query.setName(solrQueriesString.get(i));
-            
-            query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
-          
+            if(solrQueriesScore!=null){
+            	if(i<solrQueriesScore.size())
+            		query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+            }
+
             queries.add(query);
         }
         dysco.setSolrQueries(queries);

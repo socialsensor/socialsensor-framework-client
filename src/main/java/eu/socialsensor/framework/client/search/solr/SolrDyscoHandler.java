@@ -79,6 +79,7 @@ public class SolrDyscoHandler {
         } catch (IOException ex) {
             Logger.getRootLogger().error(ex.getMessage());
         } catch (Exception ex) {
+        	ex.printStackTrace();
             Logger.getRootLogger().error(ex.getMessage());
         } finally {
             return status;
@@ -210,8 +211,8 @@ public class SolrDyscoHandler {
     	System.out.println("Query : "+dateQuery);
     	
     	SolrQuery query = new SolrQuery(dateQuery);
-    	query.addSortField("dyscoScore", ORDER.desc);
-    	query.setRows(20);
+    	query.setSortField("creationDate", ORDER.asc);
+    	query.setRows(200);
     	 try {
              rsp = server.query(query);
          } catch (SolrServerException e) {

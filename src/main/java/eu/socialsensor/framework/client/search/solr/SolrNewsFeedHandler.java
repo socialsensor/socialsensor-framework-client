@@ -35,7 +35,7 @@ public class SolrNewsFeedHandler {
 	     */
 	    SolrServer server;
 	    private static Map<String, SolrNewsFeedHandler> INSTANCES = new HashMap<String, SolrNewsFeedHandler>();
-	    private static int commitPeriod = 1000;
+	    private static int commitPeriod = 10000;
 
 	    // Private constructor prevents instantiation from other classes
 //	    private SolrItemHandler() {
@@ -211,11 +211,13 @@ public class SolrNewsFeedHandler {
 	    	 boolean status = false;
 	    	 try {
 	             server.deleteByQuery("publicationTime : [* TO "+dateTime+"]");
-	             UpdateResponse response = server.commit();
-	             int statusId = response.getStatus();
-	             if (statusId == 0) {
-	                 status = true;
-	             }
+//	             UpdateResponse response = server.commit();
+//	             int statusId = response.getStatus();
+//	             if (statusId == 0) {
+//	                 status = true;
+//	             }
+	             
+	             return true;
 
 	         } catch (SolrServerException ex) {
 	             logger.error(ex.getMessage());
