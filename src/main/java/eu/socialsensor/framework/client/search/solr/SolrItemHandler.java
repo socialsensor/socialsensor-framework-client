@@ -223,6 +223,8 @@ public class SolrItemHandler {
 //            if (statusId == 0) {
 //                status = true;
 //            }
+            
+            return true;
 
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
