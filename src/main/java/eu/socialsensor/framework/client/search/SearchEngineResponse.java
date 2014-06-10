@@ -1,6 +1,7 @@
 
 package eu.socialsensor.framework.client.search;
 
+import eu.socialsensor.framework.client.search.solr.TrendlineSpot;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class SearchEngineResponse<T> {
     
     private List<T> results = new ArrayList<T>();
     private List<Facet> facets = new ArrayList<Facet>();
+    private List<TrendlineSpot> spots = new ArrayList<TrendlineSpot>();
     private long numFound = 0;
     
     public SearchEngineResponse(){
@@ -42,5 +44,15 @@ public class SearchEngineResponse<T> {
     public void setNumFound(long numFound) {
         this.numFound = numFound;
     }
+
+    public List<TrendlineSpot> getSpots() {
+        return spots;
+    }
+
+    public void setSpots(List<TrendlineSpot> spots) {
+        this.spots = spots;
+    }
+    
+    
 
 }

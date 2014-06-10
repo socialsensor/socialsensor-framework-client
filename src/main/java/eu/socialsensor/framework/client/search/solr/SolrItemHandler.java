@@ -3,7 +3,6 @@ package eu.socialsensor.framework.client.search.solr;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,8 +24,8 @@ import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.util.ConfigReader;
 import eu.socialsensor.framework.common.domain.Item;
+import org.apache.solr.client.solrj.response.RangeFacet;
 
 /**
  *
@@ -611,6 +610,37 @@ public class SolrItemHandler {
             });
         }
         response.setFacets(facets);
+        
+        
+        List<TrendlineSpot> spots = new ArrayList<TrendlineSpot>();
+        
+        List<RangeFacet> solrFacetRangesList = rsp.getFacetRanges();
+        RangeFacet solrRangeFacet;
+        if(solrFacetRangesList != null)
+        {
+            for (int i = 0; i < solrFacetRangesList.size(); i++) {
+                solrRangeFacet = solrFacetRangesList.get(i); //get the ones returned from Solr
+                if(solrRangeFacet.getName().equals("publicationTime"))
+                {
+                    List<RangeFacet.Count> counts =  solrRangeFacet.getCounts();
+                      for (int j = 0; j < counts.size(); j++) {
+                        TrendlineSpot spot = new TrendlineSpot();
+                        spot.setY(counts.get(j).getCount());
+                        spot.setX(Long.parseLong(  counts.get(j).getValue()));
+                        spots.add(spot);
+                    }
+                }
+            }
+       
+        }
+        
+        
+        
+        response.setSpots(spots);
+        
+        
+        
+        
 
         Long t5 = System.currentTimeMillis();
 
