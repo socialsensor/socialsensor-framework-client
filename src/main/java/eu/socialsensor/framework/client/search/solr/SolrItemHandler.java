@@ -218,11 +218,11 @@ public class SolrItemHandler {
         boolean status = false;
         try {
             server.deleteByQuery("publicationTime : [* TO " + dateTime + "]");
-            UpdateResponse response = server.commit();
-            int statusId = response.getStatus();
-            if (statusId == 0) {
-                status = true;
-            }
+//            UpdateResponse response = server.commit();
+//            int statusId = response.getStatus();
+//            if (statusId == 0) {
+//                status = true;
+//            }
 
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
