@@ -292,7 +292,7 @@ public class SolrDysco {
         dysco.setItemsCount(itemsCount);
         dysco.setRankerScore(rankerScore);
 
-        if (nearLocations != null) {
+        if (links != null) {
             Map<String, Double> _links = new HashMap<String, Double>();
             for (String s : links) {
                 String[] parts = s.split("@#@#");
@@ -389,7 +389,7 @@ public class SolrDysco {
         dysco.setMentionedUsers(mentionedUsers);
         dysco.setListsOfUsers(listsOfUsers);
 
-        if (nearLocations != null) {
+        if (otherSocialNetworks != null) {
             Map<String, String> _otherSocialNetworks = new HashMap<String, String>();
             for (String s : otherSocialNetworks) {
                 String[] parts = s.split("#");
