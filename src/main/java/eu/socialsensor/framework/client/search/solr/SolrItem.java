@@ -128,16 +128,32 @@ public class SolrItem {
 
         retweetsCount = item.getShares().intValue();
 
+        originalTitle = item.getOriginalTitle();
+
+        popularityComments = item.getNumOfComments();
+        popularityShares = item.getShares();
+        popularityLikes = item.getLikes();
+        if (item.getStreamId().equals("Twitter")) {
+            popularity = item.getShares();
+        } else if (item.getStreamId().equals("Facebook")) {
+            popularity = item.getLikes() * 2L;
+        }
     }
 
     public Item toItem() throws MalformedURLException {
 
         Item item = new Item();
 
+        item.setNumOfComments(popularityComments);
+        item.setLikes(popularityLikes);
+        item.setShares(popularityShares);
+
         item.setValidityScore(validityScore);
         item.setVotes(ItemFactory.createVoteList(validityVotes));
         item.setPositiveVotes(positiveVotes);
         item.setNegativeVotes(negativeVotes);
+
+        item.setOriginalTitle(originalTitle);
 
         item.setId(id);
         item.setStreamId(streamId);
@@ -294,6 +310,57 @@ public class SolrItem {
     private int retweetsCount = 0;
     @Field(value = "lists")
     private List<String> lists;
+    @Field(value = "originalTitle")
+    private String originalTitle;
+    //popularity fields
+    @Field(value = "popularityLikes")
+    private Long popularityLikes = 0L;
+    @Field(value = "popularityShares")
+    private Long popularityShares = 0L;
+    @Field(value = "popularityComments")
+    private Long popularityComments = 0L;
+    @Field(value = "popularity")
+    private Long popularity = 0L;
+
+    public Long getPopularityLikes() {
+        return popularityLikes;
+    }
+
+    public void setPopularityLikes(Long popularityLikes) {
+        this.popularityLikes = popularityLikes;
+    }
+
+    public Long getPopularityShares() {
+        return popularityShares;
+    }
+
+    public void setPopularityShares(Long popularityShares) {
+        this.popularityShares = popularityShares;
+    }
+
+    public Long getPopularityComments() {
+        return popularityComments;
+    }
+
+    public void setPopularityComments(Long popularityComments) {
+        this.popularityComments = popularityComments;
+    }
+
+    public Long getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(Long popularity) {
+        this.popularity = popularity;
+    }
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
 
     public int getPositiveVotes() {
         return positiveVotes;
