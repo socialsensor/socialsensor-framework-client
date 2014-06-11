@@ -96,7 +96,13 @@ public class SolrMediaItem {
         if (concepts != null) {
 
             for (String concept : concepts) {
-                conceptsList.add(new Concept(concept, 0d));
+            	try {
+            		Concept cpt = new Concept(concept, 0d);
+            		conceptsList.add(cpt);
+            	}
+            	catch(Exception e) {
+            		// Undefined concept type.
+            	}
             }
         }
         mediaItem.setConcepts(conceptsList);
