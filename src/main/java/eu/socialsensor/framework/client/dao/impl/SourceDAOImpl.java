@@ -57,7 +57,7 @@ public class SourceDAOImpl implements SourceDAO {
     	Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", source.getName());
         if(sourceType != SocialNetworkSource.All) {
-        	map.put("source", sourceType);
+        	map.put("network", sourceType);
         }
         mongoHandler.delete(map);
 	}
@@ -91,7 +91,7 @@ public class SourceDAOImpl implements SourceDAO {
         map.put("_id", id);
         map.put("name", name);
         map.put("score", score);
-        map.put("source", snSource.toString());
+        map.put("network", snSource.toString());
         map.put("timestamp", System.currentTimeMillis());
         mongoHandler.update("_id", id, map);
 	}
@@ -103,7 +103,7 @@ public class SourceDAOImpl implements SourceDAO {
         map.put("_id", id);
         map.put("name", source.getName());
         map.put("score", source.getScore());
-        map.put("source", source.toString());
+        map.put("network", source.toString());
         map.put("timestamp", System.currentTimeMillis());
         mongoHandler.update("_id", id, map);
 	}
