@@ -569,11 +569,12 @@ public class DyscoDAOImpl implements DyscoDAO {
         Logger.getRootLogger().info("Solr Query : " + query);
 
         response = solrItemHandler.findItems(solrQuery);
+        
         if (response != null) {
             List<Item> results = response.getResults();
 
             for (Item it : results) {
-               
+            	
                 items.add(it);
             
                 if ((items.size() >= size)) {
@@ -707,7 +708,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<MediaItem> results = response.getResults();
             Set<String> urls = new HashSet<String>();
             for (MediaItem mi : results) {
-
+            	System.out.println("Fetched media item: "+mi.getId()+" : "+mi.getSolrScore());
                 if (!urls.contains(mi.getUrl())) {
                     
                     mediaItems.add(mi);
@@ -785,7 +786,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<MediaItem> results = response.getResults();
             Set<String> urls = new HashSet<String>();
             for (MediaItem mi : results) {
-
+            	
                 if (!urls.contains(mi.getUrl())) {
                    
                     mediaItems.add(mi);
@@ -848,7 +849,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     			restQuery = restQuery.replaceAll(" +", " ");
     			restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
     			
-    			System.out.println("rest query: "+restQuery);
+    			//System.out.println("rest query: "+restQuery);
     			for(String entity : entities){
     				String queryToLink = restQuery;
     				if(!linkedWords.containsKey(entity)){
@@ -998,7 +999,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) {
     	
-    	
+    
  
     	
     }

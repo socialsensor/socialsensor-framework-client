@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
 /**
  *
@@ -487,7 +488,7 @@ public class SolrMediaItemHandler {
         query.setFacet(true);
         query.addFacetField("concepts");
         query.addFacetField("location");
-
+        query.setFields("* score");
         try {
             rsp = server.query(query);
         } catch (SolrServerException e) {
@@ -498,13 +499,19 @@ public class SolrMediaItemHandler {
 
         
         response.setNumFound(rsp.getResults().getNumFound());
-
-        List<SolrMediaItem> solrItems = rsp.getBeans(SolrMediaItem.class);
+       
+        List<SolrMediaItem> solrItems = new ArrayList<SolrMediaItem>();
+        
+        SolrDocumentList docs = rsp.getResults();
+        for(SolrDocument doc : docs){
+        	SolrMediaItem solrMediaItem = new SolrMediaItem(doc);
+        	solrItems.add(solrMediaItem);
+        }
+      
         if (solrItems != null) {
             Logger.getRootLogger().info("got: " + solrItems.size() + " media items from Solr - total results: " + response.getNumFound());
         }
-
-
+        
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (SolrMediaItem solrMediaItem : solrItems) {
             try {
