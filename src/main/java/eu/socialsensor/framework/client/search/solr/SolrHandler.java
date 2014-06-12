@@ -256,7 +256,7 @@ public class SolrHandler implements SearchEngineHandler {
         solrQuery.setRows(count);
         solrQuery.setFacet(true);
         solrQuery.setFacetLimit(5);
-        solrQuery.addSortField("dyscoScore", SolrQuery.ORDER.desc);
+        solrQuery.addSortField("rankerScore", SolrQuery.ORDER.desc);
         solrQuery.addFacetField("persons");
         solrQuery.addFacetField("organizations");
         return solrDyscoHandler.findDyscosLight(solrQuery);
