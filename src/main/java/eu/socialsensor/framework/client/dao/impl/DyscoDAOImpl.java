@@ -375,6 +375,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         // Retrieve web pages from solr index
         Set<String> uniqueUrls = new HashSet<String>();
         Set<String> expandedUrls = new HashSet<String>();
+        Set<String> titles = new HashSet<String>();
         
         boolean first = true;
         String allQueriesToOne = buildQueryForSolr(queries,"AND");
@@ -393,13 +394,16 @@ public class DyscoDAOImpl implements DyscoDAO {
             for (WebPage webPage : results) {
                 String url = webPage.getUrl();
                 String expandedUrl = webPage.getExpandedUrl();
-                if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+                String title = webPage.getTitle();
+                if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)
+                		&& titles.contains(title)) {
                     int shares = webPageDAO.getWebPageShares(url);
                     webPage.setShares(shares);
 
                     webPages.add(webPage);
                     uniqueUrls.add(url);
                     expandedUrls.add(expandedUrl);
+                    titles.add(title);
                 }
             }
         }
@@ -431,7 +435,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         // Retrieve web pages from solr index
         Set<String> uniqueUrls = new HashSet<String>();
         Set<String> expandedUrls = new HashSet<String>();
-
+        Set<String> titles = new HashSet<String>();
+        
         String queryForRequest = "(title : (" + query + ")) OR (text:(" + query + "))";
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
@@ -446,13 +451,16 @@ public class DyscoDAOImpl implements DyscoDAO {
             for (WebPage webPage : results) {
                 String url = webPage.getUrl();
                 String expandedUrl = webPage.getExpandedUrl();
-                if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)) {
+                String title = webPage.getTitle();
+                if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)
+                		&& titles.contains(title)) {
                     int shares = webPageDAO.getWebPageShares(url);
                     webPage.setShares(shares);
 
                     webPages.add(webPage);
                     uniqueUrls.add(url);
                     expandedUrls.add(expandedUrl);
+                    titles.add(title);
                 }
             }
         }
