@@ -396,7 +396,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 String expandedUrl = webPage.getExpandedUrl();
                 String title = webPage.getTitle();
                 if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)
-                		&& titles.contains(title)) {
+                		&& !titles.contains(title)) {
                     int shares = webPageDAO.getWebPageShares(url);
                     webPage.setShares(shares);
 
@@ -445,6 +445,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         solrQuery.addSortField("date", ORDER.desc);
 
         Logger.getRootLogger().info("Query : " + query);
+        Logger.getRootLogger().info("Solr Query : " + solrQuery);
         SearchEngineResponse<WebPage> response = solrWebPageHandler.findItems(solrQuery);
         if (response != null) {
             List<WebPage> results = response.getResults();
@@ -453,7 +454,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 String expandedUrl = webPage.getExpandedUrl();
                 String title = webPage.getTitle();
                 if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)
-                		&& titles.contains(title)) {
+                		&& !titles.contains(title)) {
                     int shares = webPageDAO.getWebPageShares(url);
                     webPage.setShares(shares);
 
@@ -997,10 +998,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         return null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
     	
-    
- 
-    	
+
     }
 }
