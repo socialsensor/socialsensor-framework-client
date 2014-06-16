@@ -323,8 +323,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        return collectItemsOnlyByQueries(queries, filters, facets, orderBy,params, size);
     	}
     	else{
-    		CustomDysco customDysco = (CustomDysco) dysco;
-    		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+    		CustomDysco customDysco = new CustomDysco(dysco);
+                List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		List<String> twitterUsers = customDysco.getMentionedUsers();
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
@@ -350,7 +350,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        return collectMediaItemsOnlyByQueries(queries, "video", filters, orderBy, size);
     	}
     	else{
-    		CustomDysco customDysco = (CustomDysco) dysco;
+    		CustomDysco customDysco = new CustomDysco(dysco);
     		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		List<String> twitterUsers = customDysco.getMentionedUsers();
