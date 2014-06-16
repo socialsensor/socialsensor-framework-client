@@ -18,7 +18,9 @@ import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.domain.dimension.Dimension;
+import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
+import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -308,56 +310,79 @@ public class DyscoDAOImpl implements DyscoDAO {
     @Override
     public SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, Map<String,String> params,int size) {
 
-        return collectItems(query, filters, facets, orderBy, params, size);
+        return collectItemsOnlyByQuery(query, filters, facets, orderBy, params, size);
 
     }
 
     @Override
     public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
-
-        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-        if (queries.isEmpty()) {
-            queries = dysco.getPrimalSolrQueries(); //temporary
-        }
         
-        return collectItems(queries, filters, facets, orderBy,params, size);
+    	if(dysco.getDyscoType().equals(DyscoType.TRENDING)){
+	        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+	       
+	        return collectItemsOnlyByQueries(queries, filters, facets, orderBy,params, size);
+    	}
+    	else{
+    		CustomDysco customDysco = (CustomDysco) dysco;
+    		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+    		List<String> twitterMentions = customDysco.getMentionedUsers();
+    		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		List<String> wordsToExclude = customDysco.getWordsToAvoid();
+    		return collectItems(queries,twitterMentions,twitterUsers,wordsToExclude, filters, facets, orderBy,params, size);
+    	}
 
     }
 
     @Override
     public SearchEngineResponse<MediaItem> findVideos(String query, List<String> filters, String orderBy, int size) {
 
-        return collectMediaItems(query, "video", filters, orderBy, size);
+        return collectMediaItemsOnlyByQuery(query, "video", filters, orderBy, size);
 
     }
 
     @Override
     public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, String orderBy, int size) {
-
-        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-        if (queries.isEmpty()) {
-            queries = dysco.getPrimalSolrQueries(); //temporary
-        }
-        return collectMediaItems(queries, "video", filters, orderBy, size);
+    	
+    	
+    	if(dysco.getDyscoType().equals(DyscoType.TRENDING)){
+	        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+	       
+	        return collectMediaItemsOnlyByQueries(queries, "video", filters, orderBy, size);
+    	}
+    	else{
+    		CustomDysco customDysco = (CustomDysco) dysco;
+    		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+    		List<String> twitterMentions = customDysco.getMentionedUsers();
+    		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		List<String> wordsToExclude = customDysco.getWordsToAvoid();
+    		return collectMediaItems(queries,twitterMentions,twitterUsers,wordsToExclude, "video", filters, orderBy, size);
+    	}
 
     }
 
     @Override
     public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, String orderBy, int size) {
 
-        return collectMediaItems(query, "image", filters, orderBy, size);
+        return collectMediaItemsOnlyByQuery(query, "image", filters, orderBy, size);
 
     }
 
     @Override
     public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, String orderBy, int size) {
 
-        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-        if (queries.isEmpty()) {
-            queries = dysco.getPrimalSolrQueries(); //temporary
-        }
-   
-        return collectMediaItems(queries, "image", filters, orderBy, size);
+    	if(dysco.getDyscoType().equals(DyscoType.TRENDING)){
+	        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+	       
+	        return collectMediaItemsOnlyByQueries(queries, "image", filters, orderBy, size);
+    	}
+    	else{
+    		CustomDysco customDysco = (CustomDysco) dysco;
+    		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+    		List<String> twitterMentions = customDysco.getMentionedUsers();
+    		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		List<String> wordsToExclude = customDysco.getWordsToAvoid();
+    		return collectMediaItems(queries,twitterMentions,twitterUsers,wordsToExclude, "image", filters, orderBy, size);
+    	}
 
     }
 
@@ -378,7 +403,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> titles = new HashSet<String>();
         
         boolean first = true;
-        String allQueriesToOne = buildQueryForSolr(queries,"AND");
+        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
        
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")))";
         
@@ -529,7 +554,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return mediaItems.subList(0, Math.min(size, mediaItems.size()));
     }
 
-    private SearchEngineResponse<Item> collectItems(String query, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
+    private SearchEngineResponse<Item> collectItemsOnlyByQuery(String query, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
      
         List<Item> items = new ArrayList<Item>();
 
@@ -590,7 +615,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy,Map<String,String> params, int size) {
+    private SearchEngineResponse<Item> collectItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy,Map<String,String> params, int size) {
         boolean first = true;
 
         List<Item> items = new ArrayList<Item>();
@@ -602,7 +627,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildQueryForSolr(queries,"OR");
+        String allQueriesToOne = buildKeywordSolrQuery(queries,"OR");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -669,7 +694,112 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<MediaItem> collectMediaItems(String query, String type, List<String> filters, String orderBy, int size) {
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String> twitterMentions,
+        	List<String> twitterUsers,List<String>wordsToExclude,  List<String> filters, List<String> facets, String orderBy,Map<String,String> params, int size) {
+        boolean first = true;
+       
+    	String queryForRequest = "";
+
+        List<Item> items = new ArrayList<Item>();
+
+        SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
+
+      //Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
+        
+        //add words to exclude in query
+        if(!wordsToExclude.isEmpty()){
+        	allQueriesToOne+=" NOT (";
+        	for(String eWord : wordsToExclude){
+        		if(first){
+        			allQueriesToOne += eWord;
+        			first = false;
+        		}
+        		else{
+        			allQueriesToOne += " OR "+eWord;
+        		}
+        	}
+        
+        	allQueriesToOne+=")";
+        }
+        first = true;
+        	
+        if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
+        	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        
+        //set Twitter mentions
+        String mentions = "";
+        for(String tMention : twitterMentions){
+        	if(first){
+        		mentions+= tMention;
+        		first = false;
+        	}
+        	else
+        		mentions += " OR "+tMention;
+        }
+        first = true;
+        if(!mentions.isEmpty() && mentions.length()>0)
+        	queryForRequest += "mentions: ("+mentions+")";
+        
+        //set Twitter users
+        String users = "";
+        for(String tUser : twitterUsers){
+        	if(first){
+        		users+= tUser;
+        		first = false;
+        	}
+        	else
+        		users += " OR "+tUser;
+        }
+        first = true;
+        if(!users.isEmpty() && users.length()>0)
+        	queryForRequest += "author: ("+users+")";
+
+        //Set source filters in case they exist exist
+        for (String filter : filters) {
+            queryForRequest += " AND " + filter;
+        }
+
+        SolrQuery solrQuery = new SolrQuery(queryForRequest);
+
+        solrQuery.setRows(size);
+
+        for(Map.Entry<String, String> param : params.entrySet())
+        	solrQuery.add(param.getKey(),param.getValue());
+        
+        //Set facets if necessary
+        for(String facet : facets){
+        	solrQuery.addFacetField(facet);
+        }
+        
+        if (orderBy != null) {
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
+        }
+
+        Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+
+        response = solrItemHandler.findItems(solrQuery);
+        if (response != null) {
+            List<Item> results = response.getResults();
+
+            for (Item it : results) {
+
+                items.add(it);
+               
+                if (items.size() >= size) {
+                    break;
+                }
+
+            }
+        }
+        
+        response.setResults(items);
+        return response;
+    }
+    
+    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQuery(String query, String type, List<String> filters, String orderBy, int size) {
 
         List<MediaItem> mediaItems = new LinkedList<MediaItem>();
 
@@ -728,7 +858,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, String orderBy, int size) {
+    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, String orderBy, int size) {
     	boolean first = true;
     	
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
@@ -740,7 +870,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
        
     	//Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildQueryForSolr(queries,"AND");
+        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -806,7 +936,112 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
     
-    private String buildQueryForSolr(List<eu.socialsensor.framework.common.domain.Query> queries,String liaison){
+    
+    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String> twitterMentions,
+    	List<String> twitterUsers,List<String>wordsToExclude, String type, List<String> filters, String orderBy, int size) {
+    	
+    	boolean first = true;
+    	
+    	String queryForRequest = "";
+    	
+        List<MediaItem> mediaItems = new ArrayList<MediaItem>();
+
+        SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
+       
+    	//Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
+        
+        //add words to exclude in query
+        if(!wordsToExclude.isEmpty()){
+        	allQueriesToOne+=" NOT (";
+        	for(String eWord : wordsToExclude){
+        		if(first){
+        			allQueriesToOne += eWord;
+        			first = false;
+        		}
+        		else{
+        			allQueriesToOne += " OR "+eWord;
+        		}
+        	}
+        
+        	allQueriesToOne+=")";
+        }
+        first = true;
+        	
+        if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
+        	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        
+        //set Twitter mentions
+        String mentions = "";
+        for(String tMention : twitterMentions){
+        	if(first){
+        		mentions+= tMention;
+        		first = false;
+        	}
+        	else
+        		mentions += " OR "+tMention;
+        }
+        first = true;
+        if(!mentions.isEmpty() && mentions.length()>0)
+        	queryForRequest += "mentions: ("+mentions+")";
+        
+        //set Twitter users
+        String users = "";
+        for(String tUser : twitterUsers){
+        	if(first){
+        		users+= tUser;
+        		first = false;
+        	}
+        	else
+        		users += " OR "+tUser;
+        }
+        first = true;
+        if(!users.isEmpty() && users.length()>0)
+        	queryForRequest += "author: ("+users+")";
+        
+        //Set filters in case they exist exist
+        for (String filter : filters) {
+            queryForRequest += " AND " + filter;
+        }
+
+        queryForRequest += " AND (type : " + type + ")";
+
+        SolrQuery solrQuery = new SolrQuery(queryForRequest);
+        Logger.getRootLogger().info("Solr Query: " + queryForRequest);
+      
+        solrQuery.setRows(size);
+        //solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
+        if (orderBy != null) {
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
+        }     
+
+        response = solrMediaItemHandler.findItems(solrQuery);
+        if (response != null) {
+            List<MediaItem> results = response.getResults();
+            Set<String> urls = new HashSet<String>();
+            for (MediaItem mi : results) {
+            	
+                if (!urls.contains(mi.getUrl())) {
+                   
+                    mediaItems.add(mi);
+                   
+                    urls.add(mi.getUrl());
+                }
+
+                if ((mediaItems.size() >= size)) {
+                    break;
+                }
+
+            }
+        }
+      
+        response.setResults(mediaItems);
+        return response;
+    }
+    
+    private String buildKeywordSolrQuery(List<eu.socialsensor.framework.common.domain.Query> queries,String liaison){
     	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
     	List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	
@@ -1000,6 +1235,5 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) throws Exception {
     	
-
     }
 }
