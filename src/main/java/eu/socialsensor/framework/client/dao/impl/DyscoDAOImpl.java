@@ -324,7 +324,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	}
     	else{
     		CustomDysco customDysco = new CustomDysco(dysco);
-                List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+            List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		List<String> twitterUsers = customDysco.getMentionedUsers();
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
@@ -704,6 +704,9 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
 
+        if(queries.isEmpty() && twitterMentions.isEmpty() && twitterUsers.isEmpty() && wordsToExclude.isEmpty())
+    		return response;
+        
       //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
         
@@ -947,6 +950,9 @@ public class DyscoDAOImpl implements DyscoDAO {
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
+        
+        if(queries.isEmpty() && twitterMentions.isEmpty() && twitterUsers.isEmpty() && wordsToExclude.isEmpty())
+    		return response;
        
     	//Retrieve multimedia content that is stored in solr
         String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
