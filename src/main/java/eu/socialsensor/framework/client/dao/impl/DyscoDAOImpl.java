@@ -723,60 +723,68 @@ public class DyscoDAOImpl implements DyscoDAO {
         String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
         
         //add words to exclude in query
-        if(!wordsToExclude.isEmpty()){
-        	allQueriesToOne+=" NOT (";
-        	for(String eWord : wordsToExclude){
-        		if(first){
-        			allQueriesToOne += eWord;
-        			first = false;
-        		}
-        		else{
-        			allQueriesToOne += " OR "+eWord;
-        		}
-        	}
-        
-        	allQueriesToOne+=")";
+        if(wordsToExclude != null){
+        	if(!wordsToExclude.isEmpty()){
+            	allQueriesToOne+=" NOT (";
+            	for(String eWord : wordsToExclude){
+            		if(first){
+            			allQueriesToOne += eWord;
+            			first = false;
+            		}
+            		else{
+            			allQueriesToOne += " OR "+eWord;
+            		}
+            	}
+            
+            	allQueriesToOne+=")";
+            }
         }
+
         first = true;
         	
         if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
         	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
         
         //set Twitter mentions
-        String mentions = "";
-        for(String tMention : twitterMentions){
-        	if(first){
-        		mentions+= tMention;
-        		first = false;
-        	}
-        	else
-        		mentions += " OR "+tMention;
-        }
-        first = true;
-        if(!mentions.isEmpty() && mentions.length()>0){
-        	if(queryForRequest.isEmpty())
-        		queryForRequest += "mentions: ("+mentions+")";
-        	else
-        		queryForRequest += " OR mentions: ("+mentions+")";
+        if(twitterMentions != null){
+	        String mentions = "";
+	        for(String tMention : twitterMentions){
+	        	if(first){
+	        		mentions+= tMention;
+	        		first = false;
+	        	}
+	        	else
+	        		mentions += " OR "+tMention;
+	        }
+	        
+	        first = true;
+	        if(!mentions.isEmpty() && mentions.length()>0){
+	        	if(queryForRequest.isEmpty())
+	        		queryForRequest += "mentions: ("+mentions+")";
+	        	else
+	        		queryForRequest += " OR mentions: ("+mentions+")";
+	        }
         }
         	
-        
+       
         //set Twitter users
-        String users = "";
-        for(String tUser : twitterUsers){
-        	if(first){
-        		users+= tUser;
-        		first = false;
-        	}
-        	else
-        		users += " OR "+tUser;
-        }
-        first = true;
-        if(!users.isEmpty() && users.length()>0){
-        	if(queryForRequest.isEmpty())
-        		queryForRequest += "author: ("+users+")";
-        	else
-        		queryForRequest += "OR author: ("+users+")";
+        if(twitterUsers != null){
+        	String users = "";
+            for(String tUser : twitterUsers){
+            	if(first){
+            		users+= tUser;
+            		first = false;
+            	}
+            	else
+            		users += " OR "+tUser;
+            }
+            first = true;
+            if(!users.isEmpty() && users.length()>0){
+            	if(queryForRequest.isEmpty())
+            		queryForRequest += "author: ("+users+")";
+            	else
+            		queryForRequest += "OR author: ("+users+")";
+            }
         }
         	
         if(queryForRequest.isEmpty())
@@ -982,61 +990,70 @@ public class DyscoDAOImpl implements DyscoDAO {
         String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
         
         //add words to exclude in query
-        if(!wordsToExclude.isEmpty()){
-        	allQueriesToOne+=" NOT (";
-        	for(String eWord : wordsToExclude){
-        		if(first){
-        			allQueriesToOne += eWord;
-        			first = false;
-        		}
-        		else{
-        			allQueriesToOne += " OR "+eWord;
-        		}
-        	}
-        
-        	allQueriesToOne+=")";
+        if(wordsToExclude != null){
+        	if(!wordsToExclude.isEmpty()){
+            	allQueriesToOne+=" NOT (";
+            	for(String eWord : wordsToExclude){
+            		if(first){
+            			allQueriesToOne += eWord;
+            			first = false;
+            		}
+            		else{
+            			allQueriesToOne += " OR "+eWord;
+            		}
+            	}
+            
+            	allQueriesToOne+=")";
+            }
         }
+
         first = true;
         	
         if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
         	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
         
         //set Twitter mentions
-        String mentions = "";
-        for(String tMention : twitterMentions){
-        	if(first){
-        		mentions+= tMention;
-        		first = false;
-        	}
-        	else
-        		mentions += " OR "+tMention;
-        }
-        first = true;
-        if(!mentions.isEmpty() && mentions.length()>0){
-        	if(queryForRequest.isEmpty())
-        		queryForRequest += "mentions: ("+mentions+")";
-        	else
-        		queryForRequest += " OR mentions: ("+mentions+")";
+        if(twitterMentions != null){
+	        String mentions = "";
+	        for(String tMention : twitterMentions){
+	        	if(first){
+	        		mentions+= tMention;
+	        		first = false;
+	        	}
+	        	else
+	        		mentions += " OR "+tMention;
+	        }
+	        
+	        first = true;
+	        if(!mentions.isEmpty() && mentions.length()>0){
+	        	if(queryForRequest.isEmpty())
+	        		queryForRequest += "mentions: ("+mentions+")";
+	        	else
+	        		queryForRequest += " OR mentions: ("+mentions+")";
+	        }
         }
         	
-        
+       
         //set Twitter users
-        String users = "";
-        for(String tUser : twitterUsers){
-        	if(first){
-        		users+= tUser;
-        		first = false;
-        	}
-        	else
-        		users += " OR "+tUser;
+        if(twitterUsers != null){
+        	String users = "";
+            for(String tUser : twitterUsers){
+            	if(first){
+            		users+= tUser;
+            		first = false;
+            	}
+            	else
+            		users += " OR "+tUser;
+            }
+            first = true;
+            if(!users.isEmpty() && users.length()>0){
+            	if(queryForRequest.isEmpty())
+            		queryForRequest += "author: ("+users+")";
+            	else
+            		queryForRequest += "OR author: ("+users+")";
+            }
         }
-        first = true;
-        if(!users.isEmpty() && users.length()>0){
-        	if(queryForRequest.isEmpty())
-        		queryForRequest += "author: ("+users+")";
-        	else
-        		queryForRequest += "OR author: ("+users+")";
-        }
+        
         	
         if(queryForRequest.isEmpty())
         	return response;
