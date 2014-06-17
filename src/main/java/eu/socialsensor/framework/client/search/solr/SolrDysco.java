@@ -256,17 +256,6 @@ public class SolrDysco {
         }
         dysco.setSolrQueries(queries);
 
-        //all this is temporary - primal should be merged with solr queries
-        List<Query> primalQueries = new ArrayList<Query>();
-        for (int i = 0; i < primalSolrQueriesString.size(); i++) {
-            Query query = new Query();
-            query.setName(primalSolrQueriesString.get(i));
-            if (solrQueriesString.size() == 0 && solrQueriesScore.size() > 0) {
-                query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
-            }
-            primalQueries.add(query);
-        }
-
         dysco.setTrending(trending);
         dysco.setUpdateDate(updateDate);
 
@@ -287,7 +276,7 @@ public class SolrDysco {
         if (dyscoType.equals("CUSTOM")) {
             dysco.setDyscoType(DyscoType.CUSTOM);
             
-            CustomDysco customDysco = (CustomDysco) dysco;
+            CustomDysco customDysco = new CustomDysco(dysco);
             customDysco.setTwitterUsers(twitterUsers);
             customDysco.setMentionedUsers(mentionedUsers);
             customDysco.setListsOfUsers(listsOfUsers);
