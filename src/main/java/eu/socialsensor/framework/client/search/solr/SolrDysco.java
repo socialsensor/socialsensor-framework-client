@@ -148,17 +148,6 @@ public class SolrDysco {
 
         solrQueryString = dysco.getSolrQueryString();
 
-        for (Query query : dysco.getPrimalSolrQueries()) {
-        	//logger.info("[SOLR DYSCO]query name: "+query.getName());
-            
-            primalSolrQueriesString.add(query.getName());
-            if(query.getScore() != null){
-            	//logger.info("[SOLR DYSCO]query score: "+query.getScore().toString());
-            	solrQueriesScore.add(query.getScore().toString());
-            }
-            	
-        }
-
         //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
         for (Query query : dysco.getSolrQueries()) {
             //logger.info("query name: "+query.getName());
@@ -188,8 +177,31 @@ public class SolrDysco {
     }
 
     public SolrDysco(CustomDysco customDysco) {
-        this((Dysco) customDysco);
+    	
+    	id = customDysco.getId();
+        creationDate = customDysco.getCreationDate();
+        title = customDysco.getTitle();
+        score = customDysco.getScore();
+        dyscoType = customDysco.getDyscoType().toString();
+        
+        for (Map.Entry<String, Double> entry : customDysco.getKeywords().entrySet()) {
+            keywords.add(entry.getKey());
+        }
 
+        for (Map.Entry<String, Double> entry : customDysco.getHashtags().entrySet()) {
+            hashtags.add(entry.getKey());
+        }
+        
+        //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
+        for (Query query : customDysco.getSolrQueries()) {
+            //logger.info("query name: "+query.getName());
+            //logger.info("query score: "+query.getScore().toString());
+            solrQueriesString.add(query.getName());
+            if(query.getScore() != null)
+            	solrQueriesScore.add(query.getScore().toString());
+        }
+
+        
         this.twitterUsers = customDysco.getTwitterUsers();
         this.mentionedUsers = customDysco.getMentionedUsers();
         this.listsOfUsers = customDysco.getListsOfUsers();
