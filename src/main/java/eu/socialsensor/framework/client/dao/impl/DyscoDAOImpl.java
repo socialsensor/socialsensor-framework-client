@@ -704,7 +704,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
 
-        if(queries.isEmpty() && twitterMentions.isEmpty() && twitterUsers.isEmpty() && wordsToExclude.isEmpty())
+        if(queries.isEmpty() && twitterMentions.isEmpty() && twitterUsers.isEmpty())
     		return response;
         
       //Retrieve multimedia content that is stored in solr
@@ -741,8 +741,13 @@ public class DyscoDAOImpl implements DyscoDAO {
         		mentions += " OR "+tMention;
         }
         first = true;
-        if(!mentions.isEmpty() && mentions.length()>0)
-        	queryForRequest += "mentions: ("+mentions+")";
+        if(!mentions.isEmpty() && mentions.length()>0){
+        	if(queryForRequest.isEmpty())
+        		queryForRequest += "mentions: ("+mentions+")";
+        	else
+        		queryForRequest += " OR mentions: ("+mentions+")";
+        }
+        	
         
         //set Twitter users
         String users = "";
@@ -755,8 +760,15 @@ public class DyscoDAOImpl implements DyscoDAO {
         		users += " OR "+tUser;
         }
         first = true;
-        if(!users.isEmpty() && users.length()>0)
-        	queryForRequest += "author: ("+users+")";
+        if(!users.isEmpty() && users.length()>0){
+        	if(queryForRequest.isEmpty())
+        		queryForRequest += "author: ("+users+")";
+        	else
+        		queryForRequest += "OR author: ("+users+")";
+        }
+        	
+        if(queryForRequest.isEmpty())
+        	return response;
 
         //Set source filters in case they exist exist
         for (String filter : filters) {
@@ -951,7 +963,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
         
-        if(queries.isEmpty() && twitterMentions.isEmpty() && twitterUsers.isEmpty() && wordsToExclude.isEmpty())
+        if(queries.isEmpty() && twitterMentions.isEmpty() && twitterUsers.isEmpty())
     		return response;
        
     	//Retrieve multimedia content that is stored in solr
@@ -988,8 +1000,13 @@ public class DyscoDAOImpl implements DyscoDAO {
         		mentions += " OR "+tMention;
         }
         first = true;
-        if(!mentions.isEmpty() && mentions.length()>0)
-        	queryForRequest += "mentions: ("+mentions+")";
+        if(!mentions.isEmpty() && mentions.length()>0){
+        	if(queryForRequest.isEmpty())
+        		queryForRequest += "mentions: ("+mentions+")";
+        	else
+        		queryForRequest += " OR mentions: ("+mentions+")";
+        }
+        	
         
         //set Twitter users
         String users = "";
@@ -1002,8 +1019,15 @@ public class DyscoDAOImpl implements DyscoDAO {
         		users += " OR "+tUser;
         }
         first = true;
-        if(!users.isEmpty() && users.length()>0)
-        	queryForRequest += "author: ("+users+")";
+        if(!users.isEmpty() && users.length()>0){
+        	if(queryForRequest.isEmpty())
+        		queryForRequest += "author: ("+users+")";
+        	else
+        		queryForRequest += "OR author: ("+users+")";
+        }
+        	
+        if(queryForRequest.isEmpty())
+        	return response;
         
         //Set filters in case they exist exist
         for (String filter : filters) {
