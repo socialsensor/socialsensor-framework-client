@@ -211,38 +211,11 @@ public class SolrDysco {
 
     public Dysco toDysco() {
 
-        Dysco dysco = new Dysco();
+        Dysco dysco = new Dysco(id,creationDate);
 
-        dysco.setId(id);
-        dysco.setCreationDate(creationDate);
         dysco.setTitle(title);
         dysco.setScore(score);
-
-        if (dyscoType.equals("CUSTOM")) {
-            dysco.setDyscoType(DyscoType.CUSTOM);
-        } else {
-            dysco.setDyscoType(DyscoType.TRENDING);
-        }
-
-        if (persons != null) {
-            for (String person : persons) {
-                Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
-                dysco.addEntity(dyscoEntity);
-            }
-        }
-        if (locations != null) {
-            for (String location : locations) {
-                Entity dyscoEntity = new Entity(location, 0.0, Type.LOCATION);
-                dysco.addEntity(dyscoEntity);
-            }
-        }
-        if (organizations != null) {
-            for (String organization : organizations) {
-                Entity dyscoEntity = new Entity(organization, 0.0, Type.ORGANIZATION);
-                dysco.addEntity(dyscoEntity);
-            }
-        }
-
+        
         dysco.setContributors(contributors);
 
         if (keywords != null) {
@@ -281,16 +254,9 @@ public class SolrDysco {
             }
             primalQueries.add(query);
         }
-        dysco.setPrimalSolrQueries(primalQueries);
 
         dysco.setTrending(trending);
         dysco.setUpdateDate(updateDate);
-
-        dysco.setListId(listId);
-
-        //new fields
-        dysco.setItemsCount(itemsCount);
-        dysco.setRankerScore(rankerScore);
 
         if (links != null) {
             Map<String, Double> _links = new HashMap<String, Double>();
@@ -305,43 +271,60 @@ public class SolrDysco {
             dysco.setLinks(_links);
         }
 
+
+        if (dyscoType.equals("CUSTOM")) {
+            dysco.setDyscoType(DyscoType.CUSTOM);
+            
+            CustomDysco customDysco = (CustomDysco) dysco;
+            customDysco.setTwitterUsers(twitterUsers);
+            customDysco.setMentionedUsers(mentionedUsers);
+            customDysco.setListsOfUsers(listsOfUsers);
+            
+            //to be rectified
+            //customDysco.setOtherSocialNetworks(otherSocialNetworks);
+            //customDysco.setNearLocations(nearLocations);
+            
+            return customDysco;
+            
+        } else {
+            dysco.setDyscoType(DyscoType.TRENDING);
+            
+            if (persons != null) {
+                for (String person : persons) {
+                    Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
+                    dysco.addEntity(dyscoEntity);
+                }
+            }
+            if (locations != null) {
+                for (String location : locations) {
+                    Entity dyscoEntity = new Entity(location, 0.0, Type.LOCATION);
+                    dysco.addEntity(dyscoEntity);
+                }
+            }
+            if (organizations != null) {
+                for (String organization : organizations) {
+                    Entity dyscoEntity = new Entity(organization, 0.0, Type.ORGANIZATION);
+                    dysco.addEntity(dyscoEntity);
+                }
+            }
+            
+            dysco.setListId(listId);
+
+            //new fields
+            dysco.setItemsCount(itemsCount);
+            dysco.setRankerScore(rankerScore);
+        }
+        
         return dysco;
 
     }
 
     public CustomDysco toCustomDysco() {
 
-        CustomDysco dysco = new CustomDysco();
+        CustomDysco dysco = new CustomDysco(id,creationDate,DyscoType.CUSTOM);
 
-        dysco.setId(id);
-        dysco.setCreationDate(creationDate);
         dysco.setTitle(title);
         dysco.setScore(score);
-
-        if (dyscoType.equals("CUSTOM")) {
-            dysco.setDyscoType(DyscoType.CUSTOM);
-        } else {
-            dysco.setDyscoType(DyscoType.TRENDING);
-        }
-
-        if (persons != null) {
-            for (String person : persons) {
-                Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
-                dysco.addEntity(dyscoEntity);
-            }
-        }
-        if (locations != null) {
-            for (String location : locations) {
-                Entity dyscoEntity = new Entity(location, 0.0, Type.LOCATION);
-                dysco.addEntity(dyscoEntity);
-            }
-        }
-        if (organizations != null) {
-            for (String organization : organizations) {
-                Entity dyscoEntity = new Entity(organization, 0.0, Type.ORGANIZATION);
-                dysco.addEntity(dyscoEntity);
-            }
-        }
 
         dysco.setContributors(contributors);
 
