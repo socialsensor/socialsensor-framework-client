@@ -325,9 +325,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     	else{
     		CustomDysco customDysco = new CustomDysco(dysco);
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+            for(eu.socialsensor.framework.common.domain.Query q : queries)
+            	Logger.getRootLogger().info("query : "+q.getName());
     		List<String> twitterMentions = customDysco.getMentionedUsers();
+    		for(String m : twitterMentions)
+    			Logger.getRootLogger().info("mentions : "+m);
     		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		for(String u : twitterUsers)
+    			Logger.getRootLogger().info("users : "+u);
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
+    		for(String w : wordsToExclude)
+    			Logger.getRootLogger().info("NOT words : "+w);
     		return collectItems(queries,twitterMentions,twitterUsers,wordsToExclude, filters, facets, orderBy,params, size);
     	}
 
@@ -352,9 +360,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     	else{
     		CustomDysco customDysco = new CustomDysco(dysco);
     		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+            for(eu.socialsensor.framework.common.domain.Query q : queries)
+            	Logger.getRootLogger().info("query : "+q.getName());
     		List<String> twitterMentions = customDysco.getMentionedUsers();
+    		for(String m : twitterMentions)
+    			Logger.getRootLogger().info("mentions : "+m);
     		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		for(String u : twitterUsers)
+    			Logger.getRootLogger().info("users : "+u);
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
+    		for(String w : wordsToExclude)
+    			Logger.getRootLogger().info("NOT words : "+w);
     		return collectMediaItems(queries,twitterMentions,twitterUsers,wordsToExclude, "video", filters, orderBy, size);
     	}
 
@@ -378,9 +394,17 @@ public class DyscoDAOImpl implements DyscoDAO {
     	else{
     		CustomDysco customDysco = new CustomDysco(dysco);
     		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+            for(eu.socialsensor.framework.common.domain.Query q : queries)
+            	Logger.getRootLogger().info("query : "+q.getName());
     		List<String> twitterMentions = customDysco.getMentionedUsers();
+    		for(String m : twitterMentions)
+    			Logger.getRootLogger().info("mentions : "+m);
     		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		for(String u : twitterUsers)
+    			Logger.getRootLogger().info("users : "+u);
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
+    		for(String w : wordsToExclude)
+    			Logger.getRootLogger().info("NOT words : "+w);
     		return collectMediaItems(queries,twitterMentions,twitterUsers,wordsToExclude, "image", filters, orderBy, size);
     	}
 
