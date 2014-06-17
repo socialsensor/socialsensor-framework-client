@@ -323,7 +323,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        return collectItemsOnlyByQueries(queries, filters, facets, orderBy,params, size);
     	}
     	else{
-    		CustomDysco customDysco = new CustomDysco(dysco);
+    		CustomDysco customDysco = (CustomDysco) dysco;
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
             for(eu.socialsensor.framework.common.domain.Query q : queries)
             	Logger.getRootLogger().info("query : "+q.getName());
@@ -358,7 +358,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        return collectMediaItemsOnlyByQueries(queries, "video", filters, orderBy, size);
     	}
     	else{
-    		CustomDysco customDysco = new CustomDysco(dysco);
+    		CustomDysco customDysco = (CustomDysco) dysco;
     		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
             for(eu.socialsensor.framework.common.domain.Query q : queries)
             	Logger.getRootLogger().info("query : "+q.getName());
@@ -392,7 +392,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        return collectMediaItemsOnlyByQueries(queries, "image", filters, orderBy, size);
     	}
     	else{
-    		CustomDysco customDysco = new CustomDysco(dysco);
+    		CustomDysco customDysco = (CustomDysco) dysco;
     		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
             for(eu.socialsensor.framework.common.domain.Query q : queries)
             	Logger.getRootLogger().info("query : "+q.getName());
