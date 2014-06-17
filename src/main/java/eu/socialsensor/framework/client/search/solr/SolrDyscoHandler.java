@@ -24,7 +24,9 @@ import com.google.gson.Gson;
 import eu.socialsensor.framework.client.search.Bucket;
 import eu.socialsensor.framework.client.search.Facet;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
+import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
+import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 
 /**
  *
@@ -63,9 +65,14 @@ public class SolrDyscoHandler {
 
         boolean status = false;
         try {
-        	
-            SolrDysco solrDysco = new SolrDysco(dysco);
-            
+        	SolrDysco solrDysco = null;
+        	if(dysco.getDyscoType().equals(DyscoType.TRENDING))
+        		solrDysco = new SolrDysco(dysco);
+        	else{
+        		CustomDysco customDysco = (CustomDysco) dysco;
+        		solrDysco = new SolrDysco(customDysco);
+        	}
+        		
             server.addBean(solrDysco);
            
             UpdateResponse response = server.commit();
