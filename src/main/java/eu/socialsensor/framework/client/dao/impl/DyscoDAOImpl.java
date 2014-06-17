@@ -376,7 +376,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        return collectMediaItemsOnlyByQueries(queries, "image", filters, orderBy, size);
     	}
     	else{
-    		CustomDysco customDysco = (CustomDysco) dysco;
+    		CustomDysco customDysco = new CustomDysco(dysco);
     		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		List<String> twitterUsers = customDysco.getMentionedUsers();
