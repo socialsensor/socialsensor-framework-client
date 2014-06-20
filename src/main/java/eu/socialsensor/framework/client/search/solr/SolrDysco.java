@@ -192,10 +192,8 @@ public class SolrDysco {
             hashtags.add(entry.getKey());
         }
         
-        //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
+     
         for (Query query : customDysco.getSolrQueries()) {
-            //logger.info("query name: "+query.getName());
-            //logger.info("query score: "+query.getScore().toString());
             solrQueriesString.add(query.getName());
             if(query.getScore() != null)
             	solrQueriesScore.add(query.getScore().toString());
@@ -274,9 +272,11 @@ public class SolrDysco {
 
 
         if (dyscoType.equals("CUSTOM")) {
+
             dysco.setDyscoType(DyscoType.CUSTOM);
             
             CustomDysco customDysco = new CustomDysco(dysco);
+       
             customDysco.setTwitterUsers(twitterUsers);
             customDysco.setMentionedUsers(mentionedUsers);
             customDysco.setListsOfUsers(listsOfUsers);
