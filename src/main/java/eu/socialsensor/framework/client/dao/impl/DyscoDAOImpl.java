@@ -741,13 +741,10 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         first = true;
-        	
-        if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
-        	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
-        
+        String mentions = "";
         //set Twitter mentions
         if(twitterMentions != null){
-	        String mentions = "";
+	     
 	        for(String tMention : twitterMentions){
 	        	if(first){
 	        		mentions+= tMention;
@@ -757,16 +754,14 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        		mentions += " OR "+tMention;
 	        }
 	        
-	        first = true;
-	        if(!mentions.isEmpty() && mentions.length()>0){
-	        	if(queryForRequest.isEmpty())
-	        		queryForRequest += "mentions: ("+mentions+")";
-	        	else
-	        		queryForRequest += " OR mentions: ("+mentions+")";
-	        }
         }
         	
-       
+        if(!mentions.isEmpty())
+        	allQueriesToOne += mentions;
+        
+        if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
+        	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        
         //set Twitter users
         if(twitterUsers != null){
         	String users = "";
@@ -1008,13 +1003,11 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         first = true;
-        	
-        if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
-        	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
         
+        String mentions = "";
         //set Twitter mentions
         if(twitterMentions != null){
-	        String mentions = "";
+	       
 	        for(String tMention : twitterMentions){
 	        	if(first){
 	        		mentions+= tMention;
@@ -1023,17 +1016,15 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        	else
 	        		mentions += " OR "+tMention;
 	        }
-	        
-	        first = true;
-	        if(!mentions.isEmpty() && mentions.length()>0){
-	        	if(queryForRequest.isEmpty())
-	        		queryForRequest += "mentions: ("+mentions+")";
-	        	else
-	        		queryForRequest += " OR mentions: ("+mentions+")";
-	        }
+	       
         }
         	
-       
+        if(!mentions.isEmpty())
+        	allQueriesToOne += mentions;
+        	
+    	 if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
+         	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        
         //set Twitter users
         if(twitterUsers != null){
         	String users = "";

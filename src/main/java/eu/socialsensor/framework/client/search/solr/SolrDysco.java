@@ -356,14 +356,6 @@ public class SolrDysco {
         }
         dysco.setSolrQueries(queries);
 
-        List<Query> primalQueries = new ArrayList<Query>();
-        for (int i = 0; i < primalSolrQueriesString.size(); i++) {
-            Query query = new Query();
-            query.setName(primalSolrQueriesString.get(i));
-            primalQueries.add(query);
-        }
-        dysco.setPrimalSolrQueries(primalQueries);
-
         dysco.setTrending(trending);
         dysco.setUpdateDate(updateDate);
 
