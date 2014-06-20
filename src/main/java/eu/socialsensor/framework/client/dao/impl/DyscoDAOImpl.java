@@ -841,8 +841,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
 
-        Map<Double, MediaItem> scoredMediaItems = new TreeMap<Double, MediaItem>(Collections.reverseOrder());
-
         if (query.equals("")) {
             return response;
         }
@@ -1107,7 +1105,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
     	List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	
-    	String solrQuery = "";
+    	String solrQuery = null;
     	
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		//store these queries for later
@@ -1188,56 +1186,6 @@ public class DyscoDAOImpl implements DyscoDAO {
         					
         			}
     			}
-    			
-//    			String[] queryWords = restQuery.split("\\s+");
-//    			
-//    			for(String entity : entities){
-//	    			if(!linkedWords.containsKey(entity)){
-//	    				List<String> alreadyIn = new ArrayList<String>();
-//	    				for(String qWord : queryWords){
-//	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
-//	    					if(!word.equals("//s+") && word.length() > 0)
-//	    						alreadyIn.add(qWord);
-//	    				}
-//	    				linkedWords.put(entity, alreadyIn);
-//	    			}else{
-//	    				List<String> alreadyIn = linkedWords.get(entity);
-//	    				for(String qWord : queryWords){
-//	    					String word = qWord.replaceAll("[^A-Za-z0-9 ]", "");
-//	    					if(!word.equals("//s+") && word.length()>0){
-//	    						
-//		    					if(alreadyIn.contains(qWord))
-//		    						continue;
-//		    					
-//		    					alreadyIn.add(qWord);
-//	    					}
-//	    				}
-//	    				
-//	    				linkedWords.put(entity, alreadyIn);
-//	    			}
-//    			}
-    			
-//    			if(entities.isEmpty()){
-//    				String resQuery = "";
-//    				boolean first = true;
-//    				for(String qWord : queryWords){
-//    					if(first){
-//    						resQuery +=qWord;
-//    						first = false;
-//    					}
-//    					else{
-//    						resQuery += " AND "+qWord;
-//    					}
-//    				}
-//    				
-//    				if(solrQuery == null)
-//        				solrQuery = "("+resQuery+")";
-//        			else{
-//        				if(!solrQuery.contains(resQuery))
-//        					solrQuery += " "+liaison+" ("+resQuery+")";
-//        			}
-//        				
-//    			}
 
     		}
     		
@@ -1287,7 +1235,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 			}
 				
     	}
-    	
+    	if(solrQuery == null) 
+    		solrQuery ="";
     	return solrQuery;
     }
 
@@ -1296,6 +1245,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) throws Exception {
+    	
     	
     }
 }
