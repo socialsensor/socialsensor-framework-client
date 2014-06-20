@@ -767,6 +767,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
         	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
         
+        first = true;
         //set Twitter users
         if(twitterUsers != null){
         	String users = "";
@@ -778,7 +779,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             	else
             		users += " OR "+tUser;
             }
-            first = true;
+            
             if(!users.isEmpty() && users.length()>0){
             	if(queryForRequest.isEmpty())
             		queryForRequest += "author: ("+users+")";
@@ -1034,10 +1035,12 @@ public class DyscoDAOImpl implements DyscoDAO {
     	 if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
          	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
         
+    	 first = true;
         //set Twitter users
         if(twitterUsers != null){
         	String users = "";
             for(String tUser : twitterUsers){
+            	
             	if(first){
             		users+= tUser;
             		first = false;
@@ -1045,10 +1048,10 @@ public class DyscoDAOImpl implements DyscoDAO {
             	else
             		users += " OR "+tUser;
             }
-            first = true;
+          
             if(!users.isEmpty() && users.length()>0){
             	if(queryForRequest.isEmpty())
-            		queryForRequest += "author: ("+users+")";
+            		queryForRequest += " author: ("+users+")";
             	else
             		queryForRequest += "OR author: ("+users+")";
             }
