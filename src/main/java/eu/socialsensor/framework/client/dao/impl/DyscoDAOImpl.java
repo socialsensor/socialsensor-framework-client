@@ -328,7 +328,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		
-    		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		List<String> twitterUsers = customDysco.getTwitterUsers();
     		
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
     		
@@ -359,7 +359,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		
-    		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		List<String> twitterUsers = customDysco.getTwitterUsers();
     		
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
     		
@@ -389,7 +389,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             
     		List<String> twitterMentions = customDysco.getMentionedUsers();
     		
-    		List<String> twitterUsers = customDysco.getMentionedUsers();
+    		List<String> twitterUsers = customDysco.getTwitterUsers();
     		
     		List<String> wordsToExclude = customDysco.getWordsToAvoid();
     		
