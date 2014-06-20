@@ -756,8 +756,13 @@ public class DyscoDAOImpl implements DyscoDAO {
 	        
         }
         	
-        if(!mentions.isEmpty())
-        	allQueriesToOne += mentions;
+        if(!mentions.isEmpty()){
+        	if(allQueriesToOne.isEmpty())
+        		allQueriesToOne += mentions;
+        	else
+        		allQueriesToOne += " OR "+mentions;
+        }
+        	
         
         if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
         	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
@@ -1019,8 +1024,12 @@ public class DyscoDAOImpl implements DyscoDAO {
 	       
         }
         	
-        if(!mentions.isEmpty())
-        	allQueriesToOne += mentions;
+        if(!mentions.isEmpty()){
+        	if(allQueriesToOne.isEmpty())
+        		allQueriesToOne += mentions;
+        	else
+        		allQueriesToOne += " OR "+mentions;
+        }
         	
     	 if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
          	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
@@ -1095,7 +1104,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
     	List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	
-    	String solrQuery = null;
+    	String solrQuery = "";
     	
     	for(eu.socialsensor.framework.common.domain.Query query : queries){
     		//store these queries for later
