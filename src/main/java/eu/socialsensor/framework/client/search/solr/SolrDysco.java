@@ -196,12 +196,8 @@ public class SolrDysco {
         for (Query query : customDysco.getSolrQueries()) {
             solrQueriesString.add(query.getName());
             if(query.getScore() != null){
-            	if(query.getScore()==0.0){
-            		Double defaultScore = 10.0;
-            		solrQueriesScore.add(defaultScore.toString());
-            	}
-            	else
-            		solrQueriesScore.add(query.getScore().toString());
+            	Double defaultScore = 10.0;
+        		solrQueriesScore.add(defaultScore.toString());
             }
             	
         }
