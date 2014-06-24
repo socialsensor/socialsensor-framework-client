@@ -170,6 +170,22 @@ public class SolrMediaItemHandler {
         }
     }
 
+    public boolean isIndexed(String id) {
+
+        SolrQuery solrQuery = new SolrQuery("id:" + id);
+        QueryResponse rsp;
+		try {
+			rsp = server.query(solrQuery);
+			long nunFound = rsp.getResults().getNumFound();
+			if (nunFound > 0) {
+				return true;
+			}
+			return false;
+		} catch (Exception e) {
+			return false;
+		}
+    }
+    
     public MediaItem findLatestItem(){
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
