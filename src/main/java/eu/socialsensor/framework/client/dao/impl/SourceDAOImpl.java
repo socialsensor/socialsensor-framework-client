@@ -57,7 +57,7 @@ public class SourceDAOImpl implements SourceDAO {
     	Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", source.getName());
         if(sourceType != SocialNetworkSource.All) {
-        	map.put("network", sourceType);
+        	map.put("network", sourceType.name());
         }
         mongoHandler.delete(map);
 	}
@@ -70,7 +70,11 @@ public class SourceDAOImpl implements SourceDAO {
         map.put("name", name);
         map.put("score", score);
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
+        
     }
 
     @Override
@@ -78,10 +82,16 @@ public class SourceDAOImpl implements SourceDAO {
         Map<String, Object> map = new HashMap<String, Object>();
         String id = SocialNetworkSource.All+"::"+source.getName();
         map.put("_id", id);
+        map.put("id", source.getId());
         map.put("name", source.getName());
         map.put("score", source.getScore());
+        map.put("list", source.getList());
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
+
     }
     
     @Override
@@ -93,20 +103,28 @@ public class SourceDAOImpl implements SourceDAO {
         map.put("score", score);
         map.put("network", snSource.toString());
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
-	}
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
+    }
 
     @Override
 	public void insertSource(Source source, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
-    	String id = source.toString()+"::"+source.getName();
+    	String id = sourceType.toString()+"::"+source.getName();
         map.put("_id", id);
+        map.put("id", source.getId());
         map.put("name", source.getName());
         map.put("score", source.getScore());
-        map.put("network", source.toString());
+        map.put("list", source.getList());
+        map.put("network", sourceType.name());
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
-	}
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
+    }
     
     @Override
     public void instertDyscoSource(String dyscoId, String name, float score) {
