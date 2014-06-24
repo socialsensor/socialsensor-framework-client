@@ -10,11 +10,13 @@ import eu.socialsensor.framework.common.domain.Keyword;
 import eu.socialsensor.framework.common.domain.SocialNetworkSource;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  *
@@ -40,7 +42,6 @@ public class KeywordDAOImpl implements KeywordDAO {
             
             mongoHandler.sortBy("score", 1);
         } catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -57,7 +58,7 @@ public class KeywordDAOImpl implements KeywordDAO {
     	Map<String, Object> map = new HashMap<String, Object>();
         map.put("keyword", keyword);
         if(sourceType != SocialNetworkSource.All) {
-        	map.put("source", sourceType);
+        	map.put("network", sourceType);
         }
         mongoHandler.delete(map);
 	}
@@ -70,7 +71,10 @@ public class KeywordDAOImpl implements KeywordDAO {
         map.put("keyword", keyword);
         map.put("score", score);
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
     }
 
     @Override
@@ -80,21 +84,28 @@ public class KeywordDAOImpl implements KeywordDAO {
         map.put("_id", id);
         map.put("keyword", keyword);
         map.put("score", score);
-        map.put("source", sourceType);
+        map.put("network", sourceType);
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
 	}
 
     @Override
 	public void insertKeyword(Keyword keyword, SocialNetworkSource sourceType) {
     	Map<String, Object> map = new HashMap<String, Object>();
-    	String id = sourceType.toString()+"::"+keyword;
+    	String id = sourceType.toString()+"::"+keyword.getName();
         map.put("_id", id);
         map.put("keyword", keyword.getName());
         map.put("score", keyword.getScore());
-        map.put("source", sourceType.toString());
+        map.put("network", sourceType.toString());
+        map.put("label", keyword.getLabel());
         map.put("timestamp", System.currentTimeMillis());
-        mongoHandler.update("_id", id, map);
+        if(mongoHandler.exists("_id", id))
+        	mongoHandler.update("_id", id, map);
+        else
+        	mongoHandler.insert(map);
 	}
     
     @Override
@@ -113,6 +124,20 @@ public class KeywordDAOImpl implements KeywordDAO {
 		List<String> res = mongoHandler.findMany(n);
 		for(String json : res) {
 			keywords.add(ItemFactory.createKeyword(json));
+		}
+		return keywords;
+	}
+
+	@Override
+	public List<Keyword> findKeywords(SocialNetworkSource sourceType) {
+		List<Keyword> keywords = new ArrayList<Keyword>();
+		
+		DBObject query = new BasicDBObject("network", sourceType.toString());
+		
+		List<String> res = mongoHandler.findMany(query, -1);
+		for(String json : res) {
+			Keyword keyword = ItemFactory.createKeyword(json);
+			keywords.add(keyword);
 		}
 		return keywords;
 	}
