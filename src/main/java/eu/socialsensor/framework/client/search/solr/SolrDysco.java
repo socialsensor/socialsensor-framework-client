@@ -70,8 +70,6 @@ public class SolrDysco {
     private String solrQueryString;
     @Field(value = "solrQueriesString")
     private List<String> solrQueriesString = new ArrayList<String>();
-    @Field(value = "primalSolrQueriesString")
-    private List<String> primalSolrQueriesString = new ArrayList<String>();
     @Field(value = "solrQueriesScore")
     private List<String> solrQueriesScore = new ArrayList<String>();
     //The variable can get values 0,1,2 and shows dysco's trending evolution. 
@@ -604,20 +602,12 @@ public class SolrDysco {
 
     }
 
-    public List<String> getPrimalSolrQueriesString() {
-        return primalSolrQueriesString;
-    }
-
     public List<String> getSolrQueriesString() {
         return solrQueriesString;
     }
 
     public List<String> getSolrQueriesScore() {
         return solrQueriesScore;
-    }
-
-    public void setPrimalSolrQueriesString(List<String> primalSolrQueriesString) {
-        this.primalSolrQueriesString = primalSolrQueriesString;
     }
 
     public void setSolrQueriesString(List<String> solrQueriesString) {
