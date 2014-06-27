@@ -103,6 +103,33 @@ public class SolrItemHandler {
         return INSTANCE;
     }
 
+    public List<String> getTopHashtags() {
+
+        List<String> hashtags = new ArrayList<String>();
+
+        SolrQuery solrQuery = new SolrQuery("*:*");
+        solrQuery.addFacetField("tags");
+        solrQuery.setRows(1);
+
+        SearchEngineResponse<Item> response = search(solrQuery);
+
+        List<Facet> facets = response.getFacets();
+
+        for (Facet facet : facets) {
+
+            if (facet.getName().equals("tags")) {
+                List<Bucket> buckets = facet.getBuckets();
+                for (Bucket bucket : buckets) {
+                    if (bucket.getCount() > 0) {
+                        hashtags.add(bucket.getName());
+                    }
+                }
+            }
+        }
+
+        return hashtags;
+    }
+
     public boolean insertItem(Item item) {
 
         boolean status = true;
@@ -173,8 +200,7 @@ public class SolrItemHandler {
 
         SolrQuery solrQuery = new SolrQuery(query.getQueryString());
         solrQuery.addFilterQuery(fq);
-   
-        
+
         return search(solrQuery);
     }
 
@@ -230,7 +256,7 @@ public class SolrItemHandler {
 //            if (statusId == 0) {
 //                status = true;
 //            }
-            
+
             return true;
 
         } catch (SolrServerException ex) {
@@ -620,37 +646,28 @@ public class SolrItemHandler {
             });
         }
         response.setFacets(facets);
-        
-        
+
         List<TrendlineSpot> spots = new ArrayList<TrendlineSpot>();
-        
+
         List<RangeFacet> solrFacetRangesList = rsp.getFacetRanges();
         RangeFacet solrRangeFacet;
-        if(solrFacetRangesList != null)
-        {
+        if (solrFacetRangesList != null) {
             for (int i = 0; i < solrFacetRangesList.size(); i++) {
                 solrRangeFacet = solrFacetRangesList.get(i); //get the ones returned from Solr
-                if(solrRangeFacet.getName().equals("publicationTime"))
-                {
-                    List<RangeFacet.Count> counts =  solrRangeFacet.getCounts();
-                      for (int j = 0; j < counts.size(); j++) {
+                if (solrRangeFacet.getName().equals("publicationTime")) {
+                    List<RangeFacet.Count> counts = solrRangeFacet.getCounts();
+                    for (int j = 0; j < counts.size(); j++) {
                         TrendlineSpot spot = new TrendlineSpot();
                         spot.setY(counts.get(j).getCount());
-                        spot.setX(Long.parseLong(  counts.get(j).getValue()));
+                        spot.setX(Long.parseLong(counts.get(j).getValue()));
                         spots.add(spot);
                     }
                 }
             }
-       
+
         }
-        
-        
-        
+
         response.setSpots(spots);
-        
-        
-        
-        
 
         Long t5 = System.currentTimeMillis();
 
@@ -660,5 +677,16 @@ public class SolrItemHandler {
         Logger.getRootLogger().info("SOLR ITEM HANDLER DURATION: calculating facets: " + (t5 - t4));
 
         return response;
+    }
+
+    public static void main(String... args) throws Exception {
+
+        SolrItemHandler handler =  SolrItemHandler.getInstance("http://socialsensor.atc.gr/solr/items");
+
+        List<String> hashtags = handler.getTopHashtags();
+
+        for (String hashtag : hashtags) {
+            Logger.getRootLogger().info("hashtag: " + hashtag);
+        }
     }
 }
