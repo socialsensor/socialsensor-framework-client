@@ -24,5 +24,7 @@ public interface KeywordDAO {
     public void instertDyscoKeyword(String dyscoId, String keyword, float score);
 
 	public List<Keyword> findTopKeywords(int n);
+	
+	public List<Keyword> findKeywords(SocialNetworkSource sourceType);
     
 }

@@ -70,8 +70,6 @@ public class SolrDysco {
     private String solrQueryString;
     @Field(value = "solrQueriesString")
     private List<String> solrQueriesString = new ArrayList<String>();
-    @Field(value = "primalSolrQueriesString")
-    private List<String> primalSolrQueriesString = new ArrayList<String>();
     @Field(value = "solrQueriesScore")
     private List<String> solrQueriesScore = new ArrayList<String>();
     //The variable can get values 0,1,2 and shows dysco's trending evolution. 
@@ -192,13 +190,14 @@ public class SolrDysco {
             hashtags.add(entry.getKey());
         }
         
-        //logger.info("DYSCO QUERIES : "+dysco.getSolrQueries().size());
+     
         for (Query query : customDysco.getSolrQueries()) {
-            //logger.info("query name: "+query.getName());
-            //logger.info("query score: "+query.getScore().toString());
             solrQueriesString.add(query.getName());
-            if(query.getScore() != null)
-            	solrQueriesScore.add(query.getScore().toString());
+            if(query.getScore() != null){
+            	Double defaultScore = 10.0;
+        		solrQueriesScore.add(defaultScore.toString());
+            }
+            	
         }
 
         
@@ -274,9 +273,11 @@ public class SolrDysco {
 
 
         if (dyscoType.equals("CUSTOM")) {
+
             dysco.setDyscoType(DyscoType.CUSTOM);
             
             CustomDysco customDysco = new CustomDysco(dysco);
+       
             customDysco.setTwitterUsers(twitterUsers);
             customDysco.setMentionedUsers(mentionedUsers);
             customDysco.setListsOfUsers(listsOfUsers);
@@ -355,14 +356,6 @@ public class SolrDysco {
             queries.add(query);
         }
         dysco.setSolrQueries(queries);
-
-        List<Query> primalQueries = new ArrayList<Query>();
-        for (int i = 0; i < primalSolrQueriesString.size(); i++) {
-            Query query = new Query();
-            query.setName(primalSolrQueriesString.get(i));
-            primalQueries.add(query);
-        }
-        dysco.setPrimalSolrQueries(primalQueries);
 
         dysco.setTrending(trending);
         dysco.setUpdateDate(updateDate);
@@ -609,20 +602,12 @@ public class SolrDysco {
 
     }
 
-    public List<String> getPrimalSolrQueriesString() {
-        return primalSolrQueriesString;
-    }
-
     public List<String> getSolrQueriesString() {
         return solrQueriesString;
     }
 
     public List<String> getSolrQueriesScore() {
         return solrQueriesScore;
-    }
-
-    public void setPrimalSolrQueriesString(List<String> primalSolrQueriesString) {
-        this.primalSolrQueriesString = primalSolrQueriesString;
     }
 
     public void setSolrQueriesString(List<String> solrQueriesString) {
