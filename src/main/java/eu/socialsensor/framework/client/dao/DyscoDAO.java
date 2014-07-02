@@ -124,7 +124,7 @@ public interface DyscoDAO {
 
 	List<Item> findTotalItems(List<String> dyscoIdsOfGroup);
 	
-	SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy, Map<String,String> params, int size);
+	SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets,  String orderBy, Map<String,String> params, int size);
 	
 	SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, Map<String,String> params, int size);
 
@@ -141,7 +141,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, String orderBy, int size);
+	SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, List<String> facets, String orderBy, int size);
 	/**
 	 * Retrieve multimedia content that are videos based on a solr
 	 * query
@@ -150,7 +150,7 @@ public interface DyscoDAO {
 	 * @return
 	 */
 	
-	SearchEngineResponse<MediaItem> findVideos(String query,List<String> filters, String orderBy, int size);
+	SearchEngineResponse<MediaItem> findVideos(String query,List<String> filters, List<String> facets, String orderBy, int size);
 
 	/**
 	 * Retrieve multimedia content tha is images based on dysco's
@@ -159,7 +159,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	SearchEngineResponse<MediaItem> findImages(Dysco dysco,List<String> filters, String orderBy, int size);
+	SearchEngineResponse<MediaItem> findImages(Dysco dysco,List<String> filters, List<String> facets, String orderBy, int size);
 	/**
 	 * Retrieve multimedia content that is images based on a solr 
 	 * query
@@ -167,7 +167,7 @@ public interface DyscoDAO {
 	 * @param size
 	 * @return
 	 */
-	SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, String orderBy, int size);
+	SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, List<String> facets, String orderBy, int size);
 
 	List<WebPage> findHealines(Dysco dysco, int size);
 

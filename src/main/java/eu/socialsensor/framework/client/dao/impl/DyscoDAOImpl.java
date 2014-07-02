@@ -60,7 +60,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             String visualIndexService, String visualIndexCollection)
             throws Exception {
 
-    		searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
+        searchEngineHandler = new SolrHandler(solrDyscoCollection, solrItemCollection);
 
         try {
             mediaItemDAO = new MediaItemDAOImpl(mongoHost, mediaItemsDB, mediaItemsColl);
@@ -308,93 +308,89 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String>facets, String orderBy, Map<String,String> params,int size) {
+    public SearchEngineResponse<Item> findItems(String query, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
 
         return collectItemsOnlyByQuery(query, filters, facets, orderBy, params, size);
 
     }
 
     @Override
-    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
-        
-    	if(dysco.getDyscoType().equals(DyscoType.TRENDING)){
-	        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-	       
-	        return collectItemsOnlyByQueries(queries, filters, facets, orderBy,params, size);
-    	}
-    	else{
-    		CustomDysco customDysco = (CustomDysco) dysco;
+    public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
+
+        if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
+            List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+
+            return collectItemsOnlyByQueries(queries, filters, facets, orderBy, params, size);
+        } else {
+            CustomDysco customDysco = (CustomDysco) dysco;
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
-            
-    		List<String> twitterMentions = customDysco.getMentionedUsers();
-    		
-    		List<String> twitterUsers = customDysco.getTwitterUsers();
-    		
-    		List<String> wordsToExclude = customDysco.getWordsToAvoid();
-    		
-    		return collectItems(queries,twitterMentions,twitterUsers,wordsToExclude, filters, facets, orderBy,params, size);
-    	}
+
+            List<String> twitterMentions = customDysco.getMentionedUsers();
+
+            List<String> twitterUsers = customDysco.getTwitterUsers();
+
+            List<String> wordsToExclude = customDysco.getWordsToAvoid();
+
+            return collectItems(queries, twitterMentions, twitterUsers, wordsToExclude, filters, facets, orderBy, params, size);
+        }
 
     }
 
     @Override
-    public SearchEngineResponse<MediaItem> findVideos(String query, List<String> filters, String orderBy, int size) {
+    public SearchEngineResponse<MediaItem> findVideos(String query, List<String> filters, List<String> facets, String orderBy, int size) {
 
-        return collectMediaItemsOnlyByQuery(query, "video", filters, orderBy, size);
-
-    }
-
-    @Override
-    public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, String orderBy, int size) {
-    	
-    	
-    	if(dysco.getDyscoType().equals(DyscoType.TRENDING)){
-	        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-	       
-	        return collectMediaItemsOnlyByQueries(queries, "video", filters, orderBy, size);
-    	}
-    	else{
-    		CustomDysco customDysco = (CustomDysco) dysco;
-    		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
-    	
-    		List<String> twitterMentions = customDysco.getMentionedUsers();
-    		
-    		List<String> twitterUsers = customDysco.getTwitterUsers();
-    		
-    		List<String> wordsToExclude = customDysco.getWordsToAvoid();
-    		
-    		return collectMediaItems(queries,twitterMentions,twitterUsers,wordsToExclude, "video", filters, orderBy, size);
-    	}
+        return collectMediaItemsOnlyByQuery(query, "video", filters, facets, orderBy, size);
 
     }
 
     @Override
-    public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, String orderBy, int size) {
+    public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, List<String> facets, String orderBy, int size) {
 
-        return collectMediaItemsOnlyByQuery(query, "image", filters, orderBy, size);
+        if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
+            List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+
+            return collectMediaItemsOnlyByQueries(queries, "video", filters, facets, orderBy, size);
+        } else {
+            CustomDysco customDysco = (CustomDysco) dysco;
+            List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+
+            List<String> twitterMentions = customDysco.getMentionedUsers();
+
+            List<String> twitterUsers = customDysco.getTwitterUsers();
+
+            List<String> wordsToExclude = customDysco.getWordsToAvoid();
+
+            return collectMediaItems(queries, twitterMentions, twitterUsers, wordsToExclude, "video", filters, facets, orderBy, size);
+        }
 
     }
 
     @Override
-    public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, String orderBy, int size) {
+    public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, List<String> facets, String orderBy, int size) {
 
-    	if(dysco.getDyscoType().equals(DyscoType.TRENDING)){
-	        List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-	       
-	        return collectMediaItemsOnlyByQueries(queries, "image", filters, orderBy, size);
-    	}
-    	else{
-    		CustomDysco customDysco = (CustomDysco) dysco;
-    		List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
-            
-    		List<String> twitterMentions = customDysco.getMentionedUsers();
-    		
-    		List<String> twitterUsers = customDysco.getTwitterUsers();
-    		
-    		List<String> wordsToExclude = customDysco.getWordsToAvoid();
-    		
-    		return collectMediaItems(queries,twitterMentions,twitterUsers,wordsToExclude, "image", filters, orderBy, size);
-    	}
+        return collectMediaItemsOnlyByQuery(query, "image", filters, facets, orderBy, size);
+
+    }
+
+    @Override
+    public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, List<String> facets, String orderBy, int size) {
+
+        if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
+            List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+
+            return collectMediaItemsOnlyByQueries(queries, "image", filters, facets, orderBy, size);
+        } else {
+            CustomDysco customDysco = (CustomDysco) dysco;
+            List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
+
+            List<String> twitterMentions = customDysco.getMentionedUsers();
+
+            List<String> twitterUsers = customDysco.getTwitterUsers();
+
+            List<String> wordsToExclude = customDysco.getWordsToAvoid();
+
+            return collectMediaItems(queries, twitterMentions, twitterUsers, wordsToExclude, "image", filters, facets, orderBy, size);
+        }
 
     }
 
@@ -413,12 +409,12 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> uniqueUrls = new HashSet<String>();
         Set<String> expandedUrls = new HashSet<String>();
         Set<String> titles = new HashSet<String>();
-        
+
         boolean first = true;
-        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
-       
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
+
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")))";
-        
+
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         solrQuery.setRows(size);
         solrQuery.addSortField("score", ORDER.desc);
@@ -433,7 +429,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 String expandedUrl = webPage.getExpandedUrl();
                 String title = webPage.getTitle();
                 if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)
-                		&& !titles.contains(title)) {
+                        && !titles.contains(title)) {
                     int shares = webPageDAO.getWebPageShares(url);
                     webPage.setShares(shares);
 
@@ -473,7 +469,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> uniqueUrls = new HashSet<String>();
         Set<String> expandedUrls = new HashSet<String>();
         Set<String> titles = new HashSet<String>();
-        
+
         String queryForRequest = "(title : (" + query + ")) OR (text:(" + query + "))";
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
@@ -491,7 +487,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 String expandedUrl = webPage.getExpandedUrl();
                 String title = webPage.getTitle();
                 if (!expandedUrls.contains(expandedUrl) && !uniqueUrls.contains(url)
-                		&& !titles.contains(title)) {
+                        && !titles.contains(title)) {
                     int shares = webPageDAO.getWebPageShares(url);
                     webPage.setShares(shares);
 
@@ -521,11 +517,11 @@ public class DyscoDAOImpl implements DyscoDAO {
         return webPages.subList(0, Math.min(webPages.size(), size));
     }
 
-	@Override
-	public List<MediaItem> getMediaItemHistory(String mediaItemId) {
-		return getMediaItemHistory(mediaItemId, 10);
-	}
-	
+    @Override
+    public List<MediaItem> getMediaItemHistory(String mediaItemId) {
+        return getMediaItemHistory(mediaItemId, 10);
+    }
+
     @Override
     public List<MediaItem> getMediaItemHistory(String mediaItemId, int size) {
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
@@ -543,7 +539,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                     if (!ids.contains(mId)) {
                         MediaItem mediaItem = mediaItemDAO.getMediaItem(mId);
                         if (mediaItem != null) {
-                        	mediaItems.add(mediaItem);
+                            mediaItems.add(mediaItem);
                         }
                     }
                 }
@@ -566,8 +562,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         return mediaItems.subList(0, Math.min(size, mediaItems.size()));
     }
 
-    private SearchEngineResponse<Item> collectItemsOnlyByQuery(String query, List<String> filters, List<String>facets, String orderBy,Map<String,String> params, int size) {
-     
+    private SearchEngineResponse<Item> collectItemsOnlyByQuery(String query, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
+
         List<Item> items = new ArrayList<Item>();
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
@@ -589,15 +585,16 @@ public class DyscoDAOImpl implements DyscoDAO {
         SolrQuery solrQuery = new SolrQuery(query);
 
         solrQuery.setRows(size);
-        
-        for(Map.Entry<String, String> param : params.entrySet())
-        	solrQuery.add(param.getKey(),param.getValue());
-        
-        //Set facets if necessary
-        for(String facet : facets){
-        	solrQuery.addFacetField(facet);
+
+        for (Map.Entry<String, String> param : params.entrySet()) {
+            solrQuery.add(param.getKey(), param.getValue());
         }
-        
+
+        //Set facets if necessary
+        for (String facet : facets) {
+            solrQuery.addFacetField(facet);
+        }
+
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
@@ -607,14 +604,14 @@ public class DyscoDAOImpl implements DyscoDAO {
         Logger.getRootLogger().info("Solr Query : " + query);
 
         response = solrItemHandler.findItems(solrQuery);
-        
+
         if (response != null) {
             List<Item> results = response.getResults();
 
             for (Item it : results) {
-            	
+
                 items.add(it);
-            
+
                 if ((items.size() >= size)) {
                     break;
                 }
@@ -627,7 +624,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<Item> collectItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy,Map<String,String> params, int size) {
+    private SearchEngineResponse<Item> collectItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
         boolean first = true;
 
         List<Item> items = new ArrayList<Item>();
@@ -639,7 +636,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildKeywordSolrQuery(queries,"OR");
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -671,14 +668,15 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         solrQuery.setRows(size);
 
-        for(Map.Entry<String, String> param : params.entrySet())
-        	solrQuery.add(param.getKey(),param.getValue());
-        
-        //Set facets if necessary
-        for(String facet : facets){
-        	solrQuery.addFacetField(facet);
+        for (Map.Entry<String, String> param : params.entrySet()) {
+            solrQuery.add(param.getKey(), param.getValue());
         }
-        
+
+        //Set facets if necessary
+        for (String facet : facets) {
+            solrQuery.addFacetField(facet);
+        }
+
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
@@ -694,102 +692,105 @@ public class DyscoDAOImpl implements DyscoDAO {
             for (Item it : results) {
 
                 items.add(it);
-               
+
                 if (items.size() >= size) {
                     break;
                 }
 
             }
         }
-        
+
         response.setResults(items);
         return response;
     }
 
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String> twitterMentions,
-        	List<String> twitterUsers,List<String>wordsToExclude,  List<String> filters, List<String> facets, String orderBy,Map<String,String> params, int size) {
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> twitterMentions,
+            List<String> twitterUsers, List<String> wordsToExclude, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
         boolean first = true;
-       
-    	String queryForRequest = "";
+
+        String queryForRequest = "";
 
         List<Item> items = new ArrayList<Item>();
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
 
-        if(queries==null && twitterMentions==null && twitterUsers==null)
-    		return response;
-        
-      //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
-        
+        if (queries == null && twitterMentions == null && twitterUsers == null) {
+            return response;
+        }
+
+        //Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
+
         //add words to exclude in query
-        if(wordsToExclude != null){
-        	if(!wordsToExclude.isEmpty()){
-            	allQueriesToOne+=" NOT (";
-            	for(String eWord : wordsToExclude){
-            		if(first){
-            			allQueriesToOne += eWord;
-            			first = false;
-            		}
-            		else{
-            			allQueriesToOne += " OR "+eWord;
-            		}
-            	}
-            
-            	allQueriesToOne+=")";
+        if (wordsToExclude != null) {
+            if (!wordsToExclude.isEmpty()) {
+                allQueriesToOne += " NOT (";
+                for (String eWord : wordsToExclude) {
+                    if (first) {
+                        allQueriesToOne += eWord;
+                        first = false;
+                    } else {
+                        allQueriesToOne += " OR " + eWord;
+                    }
+                }
+
+                allQueriesToOne += ")";
             }
         }
 
         first = true;
         String mentions = "";
         //set Twitter mentions
-        if(twitterMentions != null){
-	     
-	        for(String tMention : twitterMentions){
-	        	if(first){
-	        		mentions+= tMention;
-	        		first = false;
-	        	}
-	        	else
-	        		mentions += " OR "+tMention;
-	        }
-	        
+        if (twitterMentions != null) {
+
+            for (String tMention : twitterMentions) {
+                if (first) {
+                    mentions += tMention;
+                    first = false;
+                } else {
+                    mentions += " OR " + tMention;
+                }
+            }
+
         }
-        	
-        if(!mentions.isEmpty()){
-        	if(allQueriesToOne.isEmpty())
-        		allQueriesToOne += mentions;
-        	else
-        		allQueriesToOne += " OR "+mentions;
+
+        if (!mentions.isEmpty()) {
+            if (allQueriesToOne.isEmpty()) {
+                allQueriesToOne += mentions;
+            } else {
+                allQueriesToOne += " OR " + mentions;
+            }
         }
-        	
-        
-        if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
-        	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
-        
+
+        if (allQueriesToOne != null && !allQueriesToOne.isEmpty()) {
+            queryForRequest += "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        }
+
         first = true;
         //set Twitter users
-        if(twitterUsers != null){
-        	String users = "";
-            for(String tUser : twitterUsers){
-            	if(first){
-            		users+= tUser;
-            		first = false;
-            	}
-            	else
-            		users += " OR "+tUser;
+        if (twitterUsers != null) {
+            String users = "";
+            for (String tUser : twitterUsers) {
+                if (first) {
+                    users += tUser;
+                    first = false;
+                } else {
+                    users += " OR " + tUser;
+                }
             }
-            
-            if(!users.isEmpty() && users.length()>0){
-            	if(queryForRequest.isEmpty())
-            		queryForRequest += "author: ("+users+")";
-            	else
-            		queryForRequest += "OR author: ("+users+")";
+
+            if (!users.isEmpty() && users.length() > 0) {
+                if (queryForRequest.isEmpty()) {
+                    queryForRequest += "author: (" + users + ")";
+                } else {
+                    queryForRequest += "OR author: (" + users + ")";
+                }
             }
         }
-        	
-        if(queryForRequest.isEmpty())
-        	return response;
+
+        if (queryForRequest.isEmpty()) {
+            return response;
+        }
 
         //Set source filters in case they exist exist
         for (String filter : filters) {
@@ -800,14 +801,15 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         solrQuery.setRows(size);
 
-        for(Map.Entry<String, String> param : params.entrySet())
-        	solrQuery.add(param.getKey(),param.getValue());
-        
-        //Set facets if necessary
-        for(String facet : facets){
-        	solrQuery.addFacetField(facet);
+        for (Map.Entry<String, String> param : params.entrySet()) {
+            solrQuery.add(param.getKey(), param.getValue());
         }
-        
+
+        //Set facets if necessary
+        for (String facet : facets) {
+            solrQuery.addFacetField(facet);
+        }
+
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
@@ -823,19 +825,19 @@ public class DyscoDAOImpl implements DyscoDAO {
             for (Item it : results) {
 
                 items.add(it);
-               
+
                 if (items.size() >= size) {
                     break;
                 }
 
             }
         }
-        
+
         response.setResults(items);
         return response;
     }
-    
-    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQuery(String query, String type, List<String> filters, String orderBy, int size) {
+
+    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQuery(String query, String type, List<String> filters, List<String> facets, String orderBy, int size) {
 
         List<MediaItem> mediaItems = new LinkedList<MediaItem>();
 
@@ -861,11 +863,18 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         solrQuery.setRows(size);
 
+        for (String facet : facets) {
+            solrQuery.addFacetField(facet);
+        }
+
+        Logger.getRootLogger().info("orderBy: " + orderBy);
+
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
             solrQuery.setSortField("score", ORDER.desc);
         }
+
         Logger.getRootLogger().info("Solr Query : " + query);
 
         response = solrMediaItemHandler.findItems(solrQuery);
@@ -873,11 +882,11 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<MediaItem> results = response.getResults();
             Set<String> urls = new HashSet<String>();
             for (MediaItem mi : results) {
-            	System.out.println("Fetched media item: "+mi.getId()+" : "+mi.getSolrScore());
+                System.out.println("Fetched media item: " + mi.getId() + " : " + mi.getSolrScore());
                 if (!urls.contains(mi.getUrl())) {
-                    
+
                     mediaItems.add(mi);
-                   
+
                     urls.add(mi.getUrl());
                 }
 
@@ -892,9 +901,9 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, String orderBy, int size) {
-    	boolean first = true;
-    	
+    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries,  String type, List<String> filters, List<String> facets, String orderBy, int size) {
+        boolean first = true;
+
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
@@ -902,9 +911,9 @@ public class DyscoDAOImpl implements DyscoDAO {
         if (queries.isEmpty()) {
             return response;
         }
-       
-    	//Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
+
+        //Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
 //        for (eu.socialsensor.framework.common.domain.Query query : queries) {
 //        	if(query.getScore() != null){
 //        		if(query.getScore() > 0.5){
@@ -925,9 +934,9 @@ public class DyscoDAOImpl implements DyscoDAO {
 //            		allQueriesToOne += " OR ("+query.getName()+")";
 //        	}
 //        }
-        
+
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
-        
+
         //Set filters in case they exist exist
         for (String filter : filters) {
             queryForRequest += " AND " + filter;
@@ -937,25 +946,29 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         Logger.getRootLogger().info("Solr Query: " + queryForRequest);
-      
+
         solrQuery.setRows(size);
         //solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
             solrQuery.setSortField("score", ORDER.desc);
-        }     
+        }
+
+        for (String facet : facets) {
+            solrQuery.addFacetField(facet);
+        }
 
         response = solrMediaItemHandler.findItems(solrQuery);
         if (response != null) {
             List<MediaItem> results = response.getResults();
             Set<String> urls = new HashSet<String>();
             for (MediaItem mi : results) {
-            	
+
                 if (!urls.contains(mi.getUrl())) {
-                   
+
                     mediaItems.add(mi);
-                   
+
                     urls.add(mi.getUrl());
                 }
 
@@ -965,100 +978,102 @@ public class DyscoDAOImpl implements DyscoDAO {
 
             }
         }
-      
+
         response.setResults(mediaItems);
         return response;
     }
-    
-    
-    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries,List<String> twitterMentions,
-    	List<String> twitterUsers,List<String>wordsToExclude, String type, List<String> filters, String orderBy, int size) {
-    	
-    	boolean first = true;
-    	
-    	String queryForRequest = "";
-    	
+
+    private SearchEngineResponse<MediaItem> collectMediaItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> twitterMentions,
+            List<String> twitterUsers, List<String> wordsToExclude, String type, List<String> filters, List<String> facets, String orderBy, int size) {
+
+        boolean first = true;
+
+        String queryForRequest = "";
+
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
 
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
-        
-        if(queries == null && twitterMentions==null && twitterUsers==null)
-    		return response;
-       
-    	//Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildKeywordSolrQuery(queries,"AND");
-        
+
+        if (queries == null && twitterMentions == null && twitterUsers == null) {
+            return response;
+        }
+
+        //Retrieve multimedia content that is stored in solr
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
+
         //add words to exclude in query
-        if(wordsToExclude != null){
-        	if(!wordsToExclude.isEmpty()){
-            	allQueriesToOne+=" NOT (";
-            	for(String eWord : wordsToExclude){
-            		if(first){
-            			allQueriesToOne += eWord;
-            			first = false;
-            		}
-            		else{
-            			allQueriesToOne += " OR "+eWord;
-            		}
-            	}
-            
-            	allQueriesToOne+=")";
+        if (wordsToExclude != null) {
+            if (!wordsToExclude.isEmpty()) {
+                allQueriesToOne += " NOT (";
+                for (String eWord : wordsToExclude) {
+                    if (first) {
+                        allQueriesToOne += eWord;
+                        first = false;
+                    } else {
+                        allQueriesToOne += " OR " + eWord;
+                    }
+                }
+
+                allQueriesToOne += ")";
             }
         }
 
         first = true;
-        
+
         String mentions = "";
         //set Twitter mentions
-        if(twitterMentions != null){
-	       
-	        for(String tMention : twitterMentions){
-	        	if(first){
-	        		mentions+= tMention;
-	        		first = false;
-	        	}
-	        	else
-	        		mentions += " OR "+tMention;
-	        }
-	       
+        if (twitterMentions != null) {
+
+            for (String tMention : twitterMentions) {
+                if (first) {
+                    mentions += tMention;
+                    first = false;
+                } else {
+                    mentions += " OR " + tMention;
+                }
+            }
+
         }
-        	
-        if(!mentions.isEmpty()){
-        	if(allQueriesToOne.isEmpty())
-        		allQueriesToOne += mentions;
-        	else
-        		allQueriesToOne += " OR "+mentions;
+
+        if (!mentions.isEmpty()) {
+            if (allQueriesToOne.isEmpty()) {
+                allQueriesToOne += mentions;
+            } else {
+                allQueriesToOne += " OR " + mentions;
+            }
         }
-        	
-    	 if(allQueriesToOne != null && !allQueriesToOne.isEmpty())
-         	queryForRequest +="((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
-        
-    	 first = true;
+
+        if (allQueriesToOne != null && !allQueriesToOne.isEmpty()) {
+            queryForRequest += "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
+        }
+
+        first = true;
         //set Twitter users
-        if(twitterUsers != null){
-        	String users = "";
-            for(String tUser : twitterUsers){
-            	
-            	if(first){
-            		users+= tUser;
-            		first = false;
-            	}
-            	else
-            		users += " OR "+tUser;
+        if (twitterUsers != null) {
+            String users = "";
+            for (String tUser : twitterUsers) {
+
+                if (first) {
+                    users += tUser;
+                    first = false;
+                } else {
+                    users += " OR " + tUser;
+                }
             }
-          
-            if(!users.isEmpty() && users.length()>0){
-            	if(queryForRequest.isEmpty())
-            		queryForRequest += " author: ("+users+")";
-            	else
-            		queryForRequest += "OR author: ("+users+")";
+
+            if (!users.isEmpty() && users.length() > 0) {
+                if (queryForRequest.isEmpty()) {
+                    queryForRequest += " author: (" + users + ")";
+                } else {
+                    queryForRequest += "OR author: (" + users + ")";
+                }
             }
         }
-        
-        	
-        if(queryForRequest.isEmpty())
-        	return response;
-        
+
+        if (queryForRequest.isEmpty()) {
+            return response;
+        }
+
         //Set filters in case they exist exist
         for (String filter : filters) {
             queryForRequest += " AND " + filter;
@@ -1068,25 +1083,30 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         Logger.getRootLogger().info("Solr Query: " + queryForRequest);
-      
+
         solrQuery.setRows(size);
-        //solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
+
+        for (String facet : facets) {
+            solrQuery.addFacetField(facet);
+        }
+        
+//solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
         } else {
             solrQuery.setSortField("score", ORDER.desc);
-        }     
+        }
 
         response = solrMediaItemHandler.findItems(solrQuery);
         if (response != null) {
             List<MediaItem> results = response.getResults();
             Set<String> urls = new HashSet<String>();
             for (MediaItem mi : results) {
-            	
+
                 if (!urls.contains(mi.getUrl())) {
-                   
+
                     mediaItems.add(mi);
-                   
+
                     urls.add(mi.getUrl());
                 }
 
@@ -1096,148 +1116,152 @@ public class DyscoDAOImpl implements DyscoDAO {
 
             }
         }
-      
+
         response.setResults(mediaItems);
         return response;
     }
-    
-    private String buildKeywordSolrQuery(List<eu.socialsensor.framework.common.domain.Query> queries,String liaison){
-    	Map<String, List<String>> linkedWords = new HashMap<String,List<String>>();
-    	List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
-    	
-    	String solrQuery = null;
-    	
-    	for(eu.socialsensor.framework.common.domain.Query query : queries){
-    		//store these queries for later
-    		if(query.getName().startsWith("\"") && (query.getName().endsWith("\"") || query.getName().endsWith("\" "))){
-    			//System.out.println("entity query : "+query.getName());
-    			if(query.getName().endsWith("\" ")){
-    				query.setName(query.getName().substring(0, query.getName().length()-1));
-    			}
-    			swingQueries.add(new eu.socialsensor.framework.common.domain.Query(query.getName(),query.getScore()));
-    		
-    		}
-    		else{
-    			List<String> entities = new ArrayList<String>();
-    			String restQuery = query.getName();
-    			int start = 0,end=0;
-    			//System.out.println("query : "+query.getName());
-    			
-    			while(start != -1 && end != -1){
-    				start = restQuery.indexOf("\"");
-    				//System.out.println("start:"+start);
-    				if(start == -1)
-    					break;
-        			String temp = restQuery.substring(start+1);
-        			//System.out.println("temp:"+temp);
-        			
-        			end = temp.indexOf("\"")+start+1;
-        			
-        			//System.out.println("end:"+(end));
-        			if(end == -1)
-    					break;
-        			end+=1;
-        			String entity = restQuery.substring(start, end);
-        			//System.out.println("entity:"+entity);
-        			restQuery = restQuery.replace(entity, "").trim();
-        			entities.add(entity);
-    			}
-    			restQuery = restQuery.replaceAll(" +", " ");
-    			restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
-    			
-    			//System.out.println("rest query: "+restQuery);
-    			for(String entity : entities){
-    				String queryToLink = restQuery;
-    				if(!linkedWords.containsKey(entity)){
-    					List<String> alreadyIn = new ArrayList<String>();
-    					
-						if(query.getScore()!=null)
-							queryToLink+="^"+query.getScore();
-					
-        					alreadyIn.add(queryToLink);
-        					linkedWords.put(entity, alreadyIn);
-    					
-    				}
-    				else{
-    					List<String> alreadyIn = linkedWords.get(entity);
-    					if(query.getScore()!=null)
-    						queryToLink+="^"+query.getScore();
-    					if(!alreadyIn.contains(queryToLink)){
-    						alreadyIn.add(queryToLink);
-    						linkedWords.put(entity, alreadyIn);
-    					}
-    				}
-    			}
-    			
-    			if(entities.isEmpty()){
-    				if(solrQuery == null){
-    					if(query.getScore() != null)
-    						solrQuery = "("+restQuery+")^"+query.getScore();
-    					else
-    						solrQuery = "("+restQuery+")";
-    				}	
-        			else{
-        				if(!solrQuery.contains(restQuery)){
-        					if(query.getScore()!=null)
-        						solrQuery += " "+liaison+" ("+restQuery+")^"+query.getScore();
-        					else
-        						solrQuery += " "+liaison+" ("+restQuery+")";
-        				}
-        					
-        			}
-    			}
 
-    		}
-    		
-    	}
-    	
-    	
-    	for(Map.Entry<String, List<String>> entry : linkedWords.entrySet()){
-    		if(!entry.getValue().isEmpty()){
-    			String resQuery = entry.getKey()+" AND (";
-        		boolean first = true;
-        		for(String lWord : entry.getValue()){
-        			if(first){
-        				resQuery +=lWord;
-        				first = false;
-        			}
-        			else{
-        				resQuery +=" OR "+lWord;
-        			}
-        		}
-        		
-        		resQuery +=")";
-        		
-        		if(solrQuery == null)
-    				solrQuery = "("+resQuery+")";
-    			else{
-    				if(!solrQuery.contains(resQuery))
-    					solrQuery += " "+liaison+" ("+resQuery+")";
-    			}
-    		}	
-    	}
-    	
-    	for(eu.socialsensor.framework.common.domain.Query sQuery : swingQueries){
-    		if(solrQuery == null){
-    			if(sQuery.getScore()!=null)
-    				solrQuery = "("+sQuery.getName()+")^"+sQuery.getScore();
-    			else
-    				solrQuery = "("+sQuery.getName()+")";
-    		}	
-			else{
-				if(!solrQuery.contains(sQuery.getName())){
-					if(sQuery.getScore()!=null)
-						solrQuery += " "+liaison+" ("+sQuery.getName()+")^"+sQuery.getScore();
-					else
-						solrQuery += " "+liaison+" ("+sQuery.getName()+")";
-				}
-					
-			}
-				
-    	}
-    	if(solrQuery == null) 
-    		solrQuery ="";
-    	return solrQuery;
+    private String buildKeywordSolrQuery(List<eu.socialsensor.framework.common.domain.Query> queries, String liaison) {
+        Map<String, List<String>> linkedWords = new HashMap<String, List<String>>();
+        List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
+
+        String solrQuery = null;
+
+        for (eu.socialsensor.framework.common.domain.Query query : queries) {
+            //store these queries for later
+            if (query.getName().startsWith("\"") && (query.getName().endsWith("\"") || query.getName().endsWith("\" "))) {
+                //System.out.println("entity query : "+query.getName());
+                if (query.getName().endsWith("\" ")) {
+                    query.setName(query.getName().substring(0, query.getName().length() - 1));
+                }
+                swingQueries.add(new eu.socialsensor.framework.common.domain.Query(query.getName(), query.getScore()));
+
+            } else {
+                List<String> entities = new ArrayList<String>();
+                String restQuery = query.getName();
+                int start = 0, end = 0;
+                //System.out.println("query : "+query.getName());
+
+                while (start != -1 && end != -1) {
+                    start = restQuery.indexOf("\"");
+                    //System.out.println("start:"+start);
+                    if (start == -1) {
+                        break;
+                    }
+                    String temp = restQuery.substring(start + 1);
+                    //System.out.println("temp:"+temp);
+
+                    end = temp.indexOf("\"") + start + 1;
+
+                    //System.out.println("end:"+(end));
+                    if (end == -1) {
+                        break;
+                    }
+                    end += 1;
+                    String entity = restQuery.substring(start, end);
+                    //System.out.println("entity:"+entity);
+                    restQuery = restQuery.replace(entity, "").trim();
+                    entities.add(entity);
+                }
+                restQuery = restQuery.replaceAll(" +", " ");
+                restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
+
+                //System.out.println("rest query: "+restQuery);
+                for (String entity : entities) {
+                    String queryToLink = restQuery;
+                    if (!linkedWords.containsKey(entity)) {
+                        List<String> alreadyIn = new ArrayList<String>();
+
+                        if (query.getScore() != null) {
+                            queryToLink += "^" + query.getScore();
+                        }
+
+                        alreadyIn.add(queryToLink);
+                        linkedWords.put(entity, alreadyIn);
+
+                    } else {
+                        List<String> alreadyIn = linkedWords.get(entity);
+                        if (query.getScore() != null) {
+                            queryToLink += "^" + query.getScore();
+                        }
+                        if (!alreadyIn.contains(queryToLink)) {
+                            alreadyIn.add(queryToLink);
+                            linkedWords.put(entity, alreadyIn);
+                        }
+                    }
+                }
+
+                if (entities.isEmpty()) {
+                    if (solrQuery == null) {
+                        if (query.getScore() != null) {
+                            solrQuery = "(" + restQuery + ")^" + query.getScore();
+                        } else {
+                            solrQuery = "(" + restQuery + ")";
+                        }
+                    } else {
+                        if (!solrQuery.contains(restQuery)) {
+                            if (query.getScore() != null) {
+                                solrQuery += " " + liaison + " (" + restQuery + ")^" + query.getScore();
+                            } else {
+                                solrQuery += " " + liaison + " (" + restQuery + ")";
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+
+        for (Map.Entry<String, List<String>> entry : linkedWords.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                String resQuery = entry.getKey() + " AND (";
+                boolean first = true;
+                for (String lWord : entry.getValue()) {
+                    if (first) {
+                        resQuery += lWord;
+                        first = false;
+                    } else {
+                        resQuery += " OR " + lWord;
+                    }
+                }
+
+                resQuery += ")";
+
+                if (solrQuery == null) {
+                    solrQuery = "(" + resQuery + ")";
+                } else {
+                    if (!solrQuery.contains(resQuery)) {
+                        solrQuery += " " + liaison + " (" + resQuery + ")";
+                    }
+                }
+            }
+        }
+
+        for (eu.socialsensor.framework.common.domain.Query sQuery : swingQueries) {
+            if (solrQuery == null) {
+                if (sQuery.getScore() != null) {
+                    solrQuery = "(" + sQuery.getName() + ")^" + sQuery.getScore();
+                } else {
+                    solrQuery = "(" + sQuery.getName() + ")";
+                }
+            } else {
+                if (!solrQuery.contains(sQuery.getName())) {
+                    if (sQuery.getScore() != null) {
+                        solrQuery += " " + liaison + " (" + sQuery.getName() + ")^" + sQuery.getScore();
+                    } else {
+                        solrQuery += " " + liaison + " (" + sQuery.getName() + ")";
+                    }
+                }
+
+            }
+
+        }
+        if (solrQuery == null) {
+            solrQuery = "";
+        }
+        return solrQuery;
     }
 
     public List<MediaItem> requestThumbnails(Dysco dysco, int size) {
@@ -1245,7 +1269,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) throws Exception {
-    	
-    	
+
     }
 }

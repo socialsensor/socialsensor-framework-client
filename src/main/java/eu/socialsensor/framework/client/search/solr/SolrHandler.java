@@ -217,9 +217,6 @@ public class SolrHandler implements SearchEngineHandler {
     public Dysco findDysco(String id) {
 
         Dysco dysco = solrDyscoHandler.findDyscoLight(id);
-        SearchEngineResponse<Item> items = solrItemHandler
-                .findAllDyscoItems(id);
-        dysco.setItems(items.getResults());
         return dysco;
     }
 
