@@ -269,8 +269,8 @@ public class SolrHandler implements SearchEngineHandler {
     public boolean deleteDysco(String dyscoId) {
 
         solrDyscoHandler.removeDysco(dyscoId);
-        Query query = new Query("dyscoId:" + dyscoId);
-        return solrItemHandler.deleteItems(query);
+//        Query query = new Query("dyscoId:" + dyscoId);
+        return true;
 
     }
 
