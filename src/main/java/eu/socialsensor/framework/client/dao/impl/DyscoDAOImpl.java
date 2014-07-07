@@ -593,6 +593,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         //Set facets if necessary
         for (String facet : facets) {
             solrQuery.addFacetField(facet);
+            solrQuery.setFacetLimit(6);
+
         }
 
         if (orderBy != null) {
@@ -675,6 +677,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         //Set facets if necessary
         for (String facet : facets) {
             solrQuery.addFacetField(facet);
+            solrQuery.setFacetLimit(6);
+
         }
 
         if (orderBy != null) {
@@ -808,6 +812,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         //Set facets if necessary
         for (String facet : facets) {
             solrQuery.addFacetField(facet);
+            solrQuery.setFacetLimit(6);
         }
 
         if (orderBy != null) {
@@ -865,6 +870,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         for (String facet : facets) {
             solrQuery.addFacetField(facet);
+            solrQuery.setFacetLimit(6);
+
         }
 
         Logger.getRootLogger().info("orderBy: " + orderBy);
@@ -901,7 +908,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries,  String type, List<String> filters, List<String> facets, String orderBy, int size) {
+    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, List<String> facets, String orderBy, int size) {
         boolean first = true;
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
@@ -957,6 +964,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         for (String facet : facets) {
             solrQuery.addFacetField(facet);
+            solrQuery.setFacetLimit(6);
+
         }
 
         response = solrMediaItemHandler.findItems(solrQuery);
@@ -1088,8 +1097,10 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         for (String facet : facets) {
             solrQuery.addFacetField(facet);
+            solrQuery.setFacetLimit(6);
+
         }
-        
+
 //solrQuery.addFilterQuery("publicationTime:["+86400000+" TO *]");
         if (orderBy != null) {
             solrQuery.setSortField(orderBy, ORDER.desc);
@@ -1269,6 +1280,19 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     public static void main(String[] args) throws Exception {
+
+        DyscoDAOImpl dyscoDAO = new DyscoDAOImpl("socialmdb1.atc.gr",
+                "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
+                "http://socialsensor.atc.gr/solr/dyscos",
+                "http://socialsensor.atc.gr/solr/items",
+                "http://socialsensor.atc.gr/solr/MediaItems",
+                "http://socialsensor.atc.gr/solr/WebPages",
+                "http://160.40.51.18:8080/VisualIndexService",
+                "Prototype");
+
+        List<MediaItem> items = dyscoDAO.getMediaItemHistory("GooglePlus#100088864621549101541.5985242434624676514", 10);
+
+        System.out.println("something");
 
     }
 }
