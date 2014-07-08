@@ -109,6 +109,12 @@ public class SolrDysco {
     @Field(value = "nearLocations")
     private List<String> nearLocations;
 
+    @Field(value = "new")
+    private String status;
+
+    @Field(value = "group")
+    private String group;
+
     public SolrDysco() {
         id = UUID.randomUUID().toString();
     }
@@ -151,8 +157,9 @@ public class SolrDysco {
             //logger.info("query name: "+query.getName());
             //logger.info("query score: "+query.getScore().toString());
             solrQueriesString.add(query.getName());
-            if(query.getScore() != null)
-            	solrQueriesScore.add(query.getScore().toString());
+            if (query.getScore() != null) {
+                solrQueriesScore.add(query.getScore().toString());
+            }
         }
 
         trending = dysco.getTrending();
@@ -165,6 +172,9 @@ public class SolrDysco {
 
         rankerScore = dysco.getRankerScore();
 
+        group = dysco.getGroup();
+        status = dysco.getStatus();
+
         if (dysco.getLinks() != null) {
             links = new ArrayList<String>();
             for (Entry<String, Double> e : dysco.getLinks().entrySet()) {
@@ -175,13 +185,15 @@ public class SolrDysco {
     }
 
     public SolrDysco(CustomDysco customDysco) {
-    	
-    	id = customDysco.getId();
+
+        id = customDysco.getId();
         creationDate = customDysco.getCreationDate();
         title = customDysco.getTitle();
         score = customDysco.getScore();
         dyscoType = customDysco.getDyscoType().toString();
-        
+        group = customDysco.getGroup();
+        status = customDysco.getStatus();
+
         for (Map.Entry<String, Double> entry : customDysco.getKeywords().entrySet()) {
             keywords.add(entry.getKey());
         }
@@ -189,18 +201,16 @@ public class SolrDysco {
         for (Map.Entry<String, Double> entry : customDysco.getHashtags().entrySet()) {
             hashtags.add(entry.getKey());
         }
-        
-     
+
         for (Query query : customDysco.getSolrQueries()) {
             solrQueriesString.add(query.getName());
-            if(query.getScore() != null){
-            	Double defaultScore = 10.0;
-        		solrQueriesScore.add(defaultScore.toString());
+            if (query.getScore() != null) {
+                Double defaultScore = 10.0;
+                solrQueriesScore.add(defaultScore.toString());
             }
-            	
+
         }
 
-        
         this.twitterUsers = customDysco.getTwitterUsers();
         this.mentionedUsers = customDysco.getMentionedUsers();
         this.listsOfUsers = customDysco.getListsOfUsers();
@@ -218,15 +228,20 @@ public class SolrDysco {
                 nearLocations.add(l.getLatitude() + "," + l.getLongitude() + "," + l.getRadius());
             }
         }
+
     }
 
     public Dysco toDysco() {
 
-        Dysco dysco = new Dysco(id,creationDate);
+        Dysco dysco = new Dysco(id, creationDate);
+        
+        
+        dysco.setGroup(group);
+        dysco.setStatus(status);
 
         dysco.setTitle(title);
         dysco.setScore(score);
-        
+
         dysco.setContributors(contributors);
 
         if (keywords != null) {
@@ -246,9 +261,10 @@ public class SolrDysco {
         for (int i = 0; i < solrQueriesString.size(); i++) {
             Query query = new Query();
             query.setName(solrQueriesString.get(i));
-            if(solrQueriesScore!=null){
-            	if(i<solrQueriesScore.size())
-            		query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+            if (solrQueriesScore != null) {
+                if (i < solrQueriesScore.size()) {
+                    query.setScore(Double.parseDouble(solrQueriesScore.get(i)));
+                }
             }
 
             queries.add(query);
@@ -271,26 +287,24 @@ public class SolrDysco {
             dysco.setLinks(_links);
         }
 
-
         if (dyscoType.equals("CUSTOM")) {
 
             dysco.setDyscoType(DyscoType.CUSTOM);
-            
+
             CustomDysco customDysco = new CustomDysco(dysco);
-       
+
             customDysco.setTwitterUsers(twitterUsers);
             customDysco.setMentionedUsers(mentionedUsers);
             customDysco.setListsOfUsers(listsOfUsers);
-            
+
             //to be rectified
             //customDysco.setOtherSocialNetworks(otherSocialNetworks);
             //customDysco.setNearLocations(nearLocations);
-            
             return customDysco;
-            
+
         } else {
             dysco.setDyscoType(DyscoType.TRENDING);
-            
+
             if (persons != null) {
                 for (String person : persons) {
                     Entity dyscoEntity = new Entity(person, 0.0, Type.PERSON);
@@ -309,21 +323,21 @@ public class SolrDysco {
                     dysco.addEntity(dyscoEntity);
                 }
             }
-            
+
             dysco.setListId(listId);
 
             //new fields
             dysco.setItemsCount(itemsCount);
             dysco.setRankerScore(rankerScore);
         }
-        
+
         return dysco;
 
     }
 
     public CustomDysco toCustomDysco() {
 
-        CustomDysco dysco = new CustomDysco(id,creationDate,DyscoType.CUSTOM);
+        CustomDysco dysco = new CustomDysco(id, creationDate, DyscoType.CUSTOM);
 
         dysco.setTitle(title);
         dysco.setScore(score);
@@ -744,6 +758,22 @@ public class SolrDysco {
 
     public void setNearLocations(List<String> nearLocations) {
         this.nearLocations = nearLocations;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 
 }
