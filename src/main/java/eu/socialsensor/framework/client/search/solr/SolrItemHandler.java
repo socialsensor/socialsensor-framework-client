@@ -103,13 +103,14 @@ public class SolrItemHandler {
         return INSTANCE;
     }
 
-    public List<String> getTopHashtags() {
+    public List<String> getTopHashtags(int size) {
 
         List<String> hashtags = new ArrayList<String>();
 
         SolrQuery solrQuery = new SolrQuery("*:*");
         solrQuery.addFacetField("tags");
         solrQuery.setRows(1);
+        solrQuery.setFacetLimit(size);
 
         SearchEngineResponse<Item> response = search(solrQuery);
 
@@ -683,7 +684,8 @@ public class SolrItemHandler {
 
         SolrItemHandler handler =  SolrItemHandler.getInstance("http://socialsensor.atc.gr/solr/items");
 
-        List<String> hashtags = handler.getTopHashtags();
+        List<String> hashtags = handler.getTopHashtags(100);
+        System.out.println("count: " + hashtags.size());
 
         for (String hashtag : hashtags) {
             Logger.getRootLogger().info("hashtag: " + hashtag);
