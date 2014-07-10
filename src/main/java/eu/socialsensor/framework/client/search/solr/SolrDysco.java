@@ -215,12 +215,7 @@ public class SolrDysco {
         this.mentionedUsers = customDysco.getMentionedUsers();
         this.listsOfUsers = customDysco.getListsOfUsers();
 
-        if (customDysco.getOtherSocialNetworks() != null) {
-            otherSocialNetworks = new ArrayList<String>();
-            for (Entry<String, String> e : customDysco.getOtherSocialNetworks().entrySet()) {
-                otherSocialNetworks.add(e.getValue() + "#" + e.getKey());
-            }
-        }
+        otherSocialNetworks = customDysco.getOtherSocialNetworks();
 
         if (customDysco.getNearLocations() != null) {
             nearLocations = new ArrayList<String>();
@@ -234,8 +229,7 @@ public class SolrDysco {
     public Dysco toDysco() {
 
         Dysco dysco = new Dysco(id, creationDate);
-        
-        
+
         dysco.setGroup(group);
         dysco.setStatus(status);
 
@@ -380,18 +374,7 @@ public class SolrDysco {
         dysco.setMentionedUsers(mentionedUsers);
         dysco.setListsOfUsers(listsOfUsers);
 
-        if (otherSocialNetworks != null) {
-            Map<String, String> _otherSocialNetworks = new HashMap<String, String>();
-            for (String s : otherSocialNetworks) {
-                String[] parts = s.split("#");
-                if (parts.length != 2) {
-                    continue;
-                }
-
-                _otherSocialNetworks.put(parts[1], parts[0]);
-            }
-            dysco.setOtherSocialNetworks(_otherSocialNetworks);
-        }
+        dysco.setOtherSocialNetworks(otherSocialNetworks);
 
         if (nearLocations != null) {
             List<Location> _nearLocations = new ArrayList<Location>();
