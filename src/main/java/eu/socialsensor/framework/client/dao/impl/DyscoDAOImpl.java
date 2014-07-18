@@ -23,9 +23,12 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -413,8 +417,17 @@ public class DyscoDAOImpl implements DyscoDAO {
         boolean first = true;
         String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
 
-        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")))";
-
+        String sinceDateStr = "*";
+        try {
+        	Date sinceDate = new Date(System.currentTimeMillis() - 24 * 3600 * 1000);
+        	DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        	sinceDateStr = df.format(sinceDate);
+        }
+        catch(Exception e) {
+        	Logger.getRootLogger().error(e);
+        }
+        String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (text:(" + allQueriesToOne + ")) AND (date : [" + sinceDateStr + " TO * ]) )";
+      
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         solrQuery.setRows(size);
         solrQuery.addSortField("score", ORDER.desc);
@@ -470,7 +483,16 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> expandedUrls = new HashSet<String>();
         Set<String> titles = new HashSet<String>();
 
-        String queryForRequest = "(title : (" + query + ")) OR (text:(" + query + "))";
+        String sinceDateStr = "*";
+        try {
+        	Date sinceDate = new Date(System.currentTimeMillis() - 24 * 3600 * 1000);
+        	DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        	sinceDateStr = df.format(sinceDate);
+        }
+        catch(Exception e) {
+        	Logger.getRootLogger().error(e);
+        }
+        String queryForRequest = "((title : (" + query + ")) OR (text:(" + query + ")) AND (date : [" + sinceDateStr + " TO * ]) )";
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         solrQuery.setRows(size);
@@ -568,10 +590,14 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SearchEngineResponse<Item> response = new SearchEngineResponse<Item>();
 
-        if (query.equals("")) {
+        if (query==null || query.equals("")) {
             return response;
         }
 
+        // Join query parts with AND 
+        String[] queryParts = query.split(" ");
+        query = StringUtils.join(queryParts, " AND ");
+        
         //Retrieve multimedia content that is stored in solr
         if (!query.contains("title") && !query.contains("description")) {
             query = "((title : " + query + ") OR (description:" + query + "))";
@@ -1281,7 +1307,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) throws Exception {
 
-        DyscoDAOImpl dyscoDAO = new DyscoDAOImpl("socialmdb1.atc.gr",
+        DyscoDAOImpl dyscoDAO = new DyscoDAOImpl("Socialsensordb.atc.gr",
                 "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
                 "http://socialsensor.atc.gr/solr/dyscos",
                 "http://socialsensor.atc.gr/solr/items",
@@ -1290,9 +1316,13 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "http://160.40.51.18:8080/VisualIndexService",
                 "Prototype");
 
-        List<MediaItem> items = dyscoDAO.getMediaItemHistory("GooglePlus#100088864621549101541.5985242434624676514", 10);
+        //List<MediaItem> items = dyscoDAO.getMediaItemHistory("GooglePlus#100088864621549101541.5985242434624676514", 10);
 
-        System.out.println("something");
-
+        List<WebPage> headlines = dyscoDAO.findHealines("obama", 10);
+        
+        for(WebPage wp : headlines) {
+        	System.out.println(wp.getDate());
+        }
+        
     }
 }
