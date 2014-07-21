@@ -73,10 +73,8 @@ public class SolrItem {
 
         //this is a map
         mediaIds = new ArrayList<String>();
-        if (item.getMediaItems() != null) {
-            for (MediaItem mediaItem : item.getMediaItems()) {
-                mediaIds.add(mediaItem.getUrl() + "%%" + mediaItem.getId());
-            }
+        if (item.getMediaIds() != null) {
+        	mediaIds.addAll(item.getMediaIds());
         }
 
         //the following derive from alethiometer
@@ -88,6 +86,7 @@ public class SolrItem {
 //            alethiometerScore = -1;
 //            alethiometerUserScore = -1;
 //        }
+        
         alethiometerScore = item.getAlethiometerScore();
         alethiometerUserScore = item.getAlethiometerUserScore();
         alethiometerUserStatus = item.getAlethiometerUserStatus();
@@ -171,15 +170,6 @@ public class SolrItem {
             item.setLinks(_links);
         }
 
-        if (mediaLinks != null) {
-            for (String mediaLink : mediaLinks) {
-                String[] mediaLinksPair = mediaLink.split("%%");
-                if (mediaLinksPair.length == 2) {
-                    // TODO update item with media ids
-                }
-            }
-        }
-
         item.setPublicationTime(publicationTime);
 
         item.setComments(comments);
@@ -189,20 +179,9 @@ public class SolrItem {
         } else {
             item.setLocation(new Location(location));
         }
-        //this is a Map<URL, String>
+        
         if (mediaIds != null) {
-            List<MediaItem> _mediaItems = new ArrayList<MediaItem>();
-            for (String mediaId : mediaIds) {
-                String[] mediaIdPair = mediaId.split("%%");
-                if (mediaIdPair.length == 2) {
-                    URL url = new URL(mediaIdPair[0]);
-                    MediaItem mediaItem = new MediaItem(url);
-                    mediaItem.setId(mediaIdPair[1]);
-
-                    _mediaItems.add(mediaItem);
-                }
-            }
-            item.setMediaItems(_mediaItems);
+            item.setMediaIds(mediaIds);
         }
 
         item.setAlethiometerScore(alethiometerScore);
