@@ -202,6 +202,21 @@ public class SolrMediaItemHandler {
          }
     }
 
+    public List<MediaItem> findLatestItems(String query, int n) {
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	solrQuery.addSortField("publicationTime", SolrQuery.ORDER.desc);
+    	solrQuery.setRows(n);
+    	
+    	 SearchEngineResponse<MediaItem> response = search(solrQuery);
+    	 
+         List<MediaItem> items = response.getResults();
+         return items;
+     
+    }
+    
+    public List<MediaItem> findLatestItems(int n) {
+    	return findLatestItems("*:*", n);
+    }
     
     public SearchEngineResponse<MediaItem> findItems(SolrQuery query) {
         return search(query);
