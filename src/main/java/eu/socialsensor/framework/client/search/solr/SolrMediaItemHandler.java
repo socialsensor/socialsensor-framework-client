@@ -501,9 +501,7 @@ public class SolrMediaItemHandler {
         SearchEngineResponse<MediaItem> response = new SearchEngineResponse<MediaItem>();
         QueryResponse rsp;
         
-        query.setFacet(true);
-        query.addFacetField("concepts");
-        query.addFacetField("location");
+
         query.setFields("* score");
         try {
             rsp = server.query(query);

@@ -92,16 +92,19 @@ public class SolrItem {
         alethiometerUserStatus = item.getAlethiometerUserStatus();
         userRole = item.getUserRole();
         original = item.isOriginal();
-
+        
+        category = item.getCategory().name();
+        
         StreamUser user = item.getStreamUser();
         if (user != null) {
             authorFullName = user.getName();
             authorScreenName = user.getUsername();
             avatarImage = user.getImageUrl();
             avatarImageSmall = user.getProfileImage();
-            if (user.getCategory() != null) {
-                category = user.getCategory().name();
-            }
+           
+//            if (user.getCategory() != null) {
+//                category = user.getCategory().name();
+//            }
 
             Long followers = user.getFollowers();
             if (followers != null) {
