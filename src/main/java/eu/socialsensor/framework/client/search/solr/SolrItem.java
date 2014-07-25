@@ -39,6 +39,7 @@ public class SolrItem {
         StreamUser streamUser = item.getStreamUser();
         if (streamUser != null) {
             author = streamUser.getUsername();
+            //author = streamUser.getId();
         }
 
         links = new ArrayList<String>();
@@ -93,7 +94,9 @@ public class SolrItem {
         userRole = item.getUserRole();
         original = item.isOriginal();
         
-        category = item.getCategory().name();
+        Category cat = item.getCategory();
+        if(cat != null)
+        	category = cat.name();
         
         StreamUser user = item.getStreamUser();
         if (user != null) {
