@@ -221,8 +221,7 @@ public class SolrHandler implements SearchEngineHandler {
     }
 
     @Override
-    public SearchEngineResponse<Dysco> findDyscosLight(String query,
-            String timeframe, int count) {
+    public SearchEngineResponse<Dysco> findDyscosLight(String query, String timeframe, int count) {
 
         query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
 
@@ -238,8 +237,7 @@ public class SolrHandler implements SearchEngineHandler {
         return solrDyscoHandler.findDyscosLight(solrQuery);
     }
 
-    public SearchEngineResponse<Dysco> findDyscosLight(String query,
-            String timeframe, String listId, int count) {
+    public SearchEngineResponse<Dysco> findDyscosLight(String query, String timeframe, String listId, int count) {
 
         query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
 
@@ -259,6 +257,31 @@ public class SolrHandler implements SearchEngineHandler {
         return solrDyscoHandler.findDyscosLight(solrQuery);
     }
 
+    public SearchEngineResponse<Dysco> findDyscosLight(String query, String timeframe, String listId, int count, double a) {
+
+        query = query + " AND (creationDate:[NOW-" + timeframe + " TO NOW])";
+
+        if (!listId.equals("*")) {
+            query = query + " AND (listId:" + listId + ")";
+        }
+      
+        SolrQuery solrQuery = new SolrQuery(query);
+
+        System.out.println("solrQuery for Dysco: " + solrQuery);
+
+        solrQuery.setRows(count);
+        solrQuery.setFacet(true);
+        solrQuery.setFacetLimit(5);
+
+        String sortBy = "sum(product(normalizedDyscoScore," + a + "),product(normalizedRankerScore," + (1-a) + "))";
+        System.out.println("SortBy: " + sortBy);
+        solrQuery.addSortField(sortBy, ORDER.desc);
+        
+        solrQuery.addFacetField("persons");
+        solrQuery.addFacetField("organizations");
+        return solrDyscoHandler.findDyscosLight(solrQuery);
+    }
+    
     @Override
     public Dysco findDyscoLight(String id) {
         Dysco dysco = solrDyscoHandler.findDyscoLight(id);
