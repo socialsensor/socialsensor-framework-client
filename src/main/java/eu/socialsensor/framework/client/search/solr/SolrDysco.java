@@ -1,5 +1,7 @@
 package eu.socialsensor.framework.client.search.solr;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.Query;
 import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
@@ -7,7 +9,7 @@ import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
 import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,18 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.beans.Field;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 /**
  *
  * @author etzoannos - e.tzoannos@atc.gr
  */
-public class SolrDysco {
+public class SolrDysco implements Serializable {
 
     public final Logger logger = Logger.getLogger(SolrDysco.class);
 
@@ -115,6 +113,15 @@ public class SolrDysco {
     @Field(value = "group")
     private String group;
 
+    @Field(value = "storyType")
+    private String storyType;
+
+    @Field(value = "mainMediaUrl")
+    private String mainMediaUrl;
+
+    @Field(value = "author")
+    private String author;
+
     public SolrDysco() {
         id = UUID.randomUUID().toString();
     }
@@ -172,6 +179,10 @@ public class SolrDysco {
 
         rankerScore = dysco.getRankerScore();
 
+        mainMediaUrl = dysco.getMainMediaUrl();
+        storyType = dysco.getStoryType();
+        author = dysco.getAuthor();
+
         group = dysco.getGroup();
         status = dysco.getStatus();
 
@@ -193,6 +204,10 @@ public class SolrDysco {
         dyscoType = customDysco.getDyscoType().toString();
         group = customDysco.getGroup();
         status = customDysco.getStatus();
+
+        mainMediaUrl = customDysco.getMainMediaUrl();
+        storyType = customDysco.getStoryType();
+        author = customDysco.getAuthor();
 
         for (Map.Entry<String, Double> entry : customDysco.getKeywords().entrySet()) {
             keywords.add(entry.getKey());
@@ -237,6 +252,10 @@ public class SolrDysco {
         dysco.setScore(score);
 
         dysco.setContributors(contributors);
+        
+        dysco.setAuthor(author);
+        dysco.setMainMediaUrl(mainMediaUrl);
+        dysco.setStoryType(storyType);
 
         if (keywords != null) {
             for (String keyword : keywords) {
@@ -503,6 +522,30 @@ public class SolrDysco {
      */
     public void setLocations(List<String> locations) {
         this.locations = locations;
+    }
+
+    public String getStoryType() {
+        return storyType;
+    }
+
+    public void setStoryType(String storyType) {
+        this.storyType = storyType;
+    }
+
+    public String getMainMediaUrl() {
+        return mainMediaUrl;
+    }
+
+    public void setMainMediaUrl(String mainMediaUrl) {
+        this.mainMediaUrl = mainMediaUrl;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     /**

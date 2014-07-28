@@ -186,7 +186,7 @@ public class SolrItem {
         if (mediaIds != null) {
             item.setMediaIds(mediaIds);
         }
-
+        
         item.setAlethiometerScore(alethiometerScore);
         item.setAlethiometerUserScore(alethiometerUserScore);
         item.setUserRole(userRole);

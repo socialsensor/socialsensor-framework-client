@@ -5,6 +5,7 @@ import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.PlatformUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
+import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
  *
  * @author stzoannos
  */
-public class PlatformUserDAOImpl implements PlatformUserDAO {
+public class PlatformUserDAOImpl implements PlatformUserDAO, Serializable {
 
     List<String> indexes = new ArrayList<String>();
     private static String db = "Streams";
