@@ -91,6 +91,12 @@ public class SolrDysco implements Serializable {
     @Field(value = "rankerScore")
     private double rankerScore = 0.0d;
 
+    @Field(value = "normalizedRankerScore")
+    private double normalizedRankerScore = 0.0d;
+    
+    @Field(value = "normalizedDyscoScore")
+    private double normalizedDyscoScore = 0.0d;
+    
     //Custom Dysco fields
     @Field(value = "twitterUsers")
     private List<String> twitterUsers;
@@ -179,6 +185,9 @@ public class SolrDysco implements Serializable {
 
         rankerScore = dysco.getRankerScore();
 
+        normalizedDyscoScore = dysco.getNormalizedDyscoScore();
+        normalizedRankerScore = dysco.getNormalizedRankerScore();
+        
         mainMediaUrl = dysco.getMainMediaUrl();
         storyType = dysco.getStoryType();
         author = dysco.getAuthor();
@@ -342,6 +351,9 @@ public class SolrDysco implements Serializable {
             //new fields
             dysco.setItemsCount(itemsCount);
             dysco.setRankerScore(rankerScore);
+            
+            dysco.setNormalizedRankerScore(normalizedRankerScore);
+            dysco.setNormalizedDyscoScore(normalizedDyscoScore);
         }
 
         return dysco;
@@ -485,6 +497,24 @@ public class SolrDysco implements Serializable {
         this.score = score;
     }
 
+    /**
+     * Returns the normalized score of the dysco
+     *
+     * @return Float
+     */
+    public Double getNormalizedDyscoScore() {
+        return normalizedDyscoScore;
+    }
+
+    /**
+     * Sets the score of the dysco
+     *
+     * @param score
+     */
+    public void setNormalizedDyscoScore(Double normalizedDyscoScore) {
+        this.normalizedDyscoScore = normalizedDyscoScore;
+    }
+    
     /**
      * Returns the list of names of the Entities that are Persons inside the
      * dysco
@@ -666,6 +696,14 @@ public class SolrDysco implements Serializable {
         this.rankerScore = rankerScore;
     }
 
+    public double getNormalizedRankerScore() {
+        return normalizedRankerScore;
+    }
+
+    public void setNormalizedRankerScore(double normalizedRankerScore) {
+        this.normalizedRankerScore = normalizedRankerScore;
+    }
+    
     /**
      * Returns the trending value that shows dysco's trending evolution (can be
      * 0,1,2)
