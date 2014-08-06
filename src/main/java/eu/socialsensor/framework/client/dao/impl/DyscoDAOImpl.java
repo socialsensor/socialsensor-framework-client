@@ -6,7 +6,6 @@ import eu.socialsensor.framework.client.dao.WebPageDAO;
 import eu.socialsensor.framework.client.search.Query;
 import eu.socialsensor.framework.client.search.SearchEngineHandler;
 import eu.socialsensor.framework.client.search.SearchEngineResponse;
-import eu.socialsensor.framework.client.search.solr.SolrDyscoHandler;
 import eu.socialsensor.framework.client.search.solr.SolrHandler;
 import eu.socialsensor.framework.client.search.solr.SolrItemHandler;
 import eu.socialsensor.framework.client.search.solr.SolrMediaItemHandler;
@@ -34,6 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -273,7 +273,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             }
 
         }
-        List totalUrlsToSearch = new ArrayList<String>(totalItemsUrls);
+        List<String> totalUrlsToSearch = new ArrayList<String>(totalItemsUrls);
 
         return totalUrlsToSearch;
 
@@ -326,13 +326,12 @@ public class DyscoDAOImpl implements DyscoDAO {
 
             return collectItemsOnlyByQueries(queries, filters, facets, orderBy, params, size);
         } else {
+
             CustomDysco customDysco = (CustomDysco) dysco;
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
 
             List<String> twitterMentions = customDysco.getMentionedUsers();
-
             List<String> twitterUsers = customDysco.getTwitterUsers();
-
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
             return collectItems(queries, twitterMentions, twitterUsers, wordsToExclude, filters, facets, orderBy, params, size);
@@ -371,31 +370,28 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     @Override
     public SearchEngineResponse<MediaItem> findImages(String query, List<String> filters, List<String> facets, String orderBy, int size) {
-
         return collectMediaItemsOnlyByQuery(query, "image", filters, facets, orderBy, size);
-
     }
 
     @Override
     public SearchEngineResponse<MediaItem> findImages(Dysco dysco, List<String> filters, List<String> facets, String orderBy, int size) {
 
+    	SearchEngineResponse<MediaItem> mediaItems;
         if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
             List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-
-            return collectMediaItemsOnlyByQueries(queries, "image", filters, facets, orderBy, size);
+            mediaItems = collectMediaItemsOnlyByQueries(queries, "image", filters, facets, orderBy, size);
         } else {
             CustomDysco customDysco = (CustomDysco) dysco;
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
 
             List<String> twitterMentions = customDysco.getMentionedUsers();
-
             List<String> twitterUsers = customDysco.getTwitterUsers();
-
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
-            return collectMediaItems(queries, twitterMentions, twitterUsers, wordsToExclude, "image", filters, facets, orderBy, size);
+            mediaItems = collectMediaItems(queries, twitterMentions, twitterUsers, wordsToExclude, "image", filters, facets, orderBy, size);
         }
 
+        return mediaItems;
     }
 
     @Override
@@ -414,7 +410,6 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> expandedUrls = new HashSet<String>();
         Set<String> titles = new HashSet<String>();
 
-        boolean first = true;
         String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
 
         String sinceDateStr = "*";
@@ -653,7 +648,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     }
 
     private SearchEngineResponse<Item> collectItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
-        boolean first = true;
 
         List<Item> items = new ArrayList<Item>();
 
@@ -665,26 +659,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
-//        for (eu.socialsensor.framework.common.domain.Query query : queries) {
-//        	if(query.getScore() != null){
-//        		if(query.getScore() > 0.5){
-//        			if(first){
-//	            		allQueriesToOne += "("+query.getName()+")";
-//	            		first = false;
-//	            	}
-//	            	else
-//	            		allQueriesToOne += " OR ("+query.getName()+")";
-//	        	} 
-//        	}
-//        	else{
-//        		if(first){
-//            		allQueriesToOne += "("+query.getName()+")";
-//            		first = false;
-//            	}
-//            	else
-//            		allQueriesToOne += " OR ("+query.getName()+")";
-//        	}
-//        }
+
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
 
         //Set source filters in case they exist exist
@@ -749,7 +724,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
 
         //add words to exclude in query
         if (wordsToExclude != null) {
@@ -934,8 +909,8 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, String type, List<String> filters, List<String> facets, String orderBy, int size) {
-        boolean first = true;
+    private SearchEngineResponse<MediaItem> collectMediaItemsOnlyByQueries(List<eu.socialsensor.framework.common.domain.Query> queries, 
+    		String type, List<String> filters, List<String> facets, String orderBy, int size) {
 
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
 
@@ -947,27 +922,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
-//        for (eu.socialsensor.framework.common.domain.Query query : queries) {
-//        	if(query.getScore() != null){
-//        		if(query.getScore() > 0.5){
-//        			if(first){
-//	            		allQueriesToOne += "("+query.getName()+")";
-//	            		first = false;
-//	            	}
-//	            	else
-//	            		allQueriesToOne += " OR ("+query.getName()+")";
-//	        	} 
-//        	}
-//        	else{
-//        		if(first){
-//            		allQueriesToOne += "("+query.getName()+")";
-//            		first = false;
-//            	}
-//            	else
-//            		allQueriesToOne += " OR ("+query.getName()+")";
-//        	}
-//        }
-
         String queryForRequest = "((title : (" + allQueriesToOne + ")) OR (description:(" + allQueriesToOne + ")))";
 
         //Set filters in case they exist exist
@@ -999,18 +953,13 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<MediaItem> results = response.getResults();
             Set<String> urls = new HashSet<String>();
             for (MediaItem mi : results) {
-
                 if (!urls.contains(mi.getUrl())) {
-
                     mediaItems.add(mi);
-
                     urls.add(mi.getUrl());
                 }
-
                 if ((mediaItems.size() >= size)) {
                     break;
                 }
-
             }
         }
 
@@ -1307,7 +1256,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) throws Exception {
 
-        DyscoDAOImpl dyscoDAO = new DyscoDAOImpl("Socialsensordb.atc.gr",
+        DyscoDAOImpl dao = new DyscoDAOImpl("Socialsensordb.atc.gr",
                 "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
                 "http://socialsensor.atc.gr/solr/dyscos",
                 "http://socialsensor.atc.gr/solr/items",
@@ -1316,13 +1265,19 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "http://160.40.51.18:8080/VisualIndexService",
                 "Prototype");
 
-        //List<MediaItem> items = dyscoDAO.getMediaItemHistory("GooglePlus#100088864621549101541.5985242434624676514", 10);
-
-        List<WebPage> headlines = dyscoDAO.findHealines("obama", 10);
         
-        for(WebPage wp : headlines) {
-        	System.out.println(wp.getDate());
-        }
+        Dysco dysco = dao.findDysco("c8141eef-b262-4106-a46a-d0418d615213");
+        System.out.println(dysco.toJSONString());
         
+        
+        List<String> filters = new ArrayList<String>();
+		List<String> facets = new ArrayList<String>();
+		String orderBy = "publicationTime";
+		Map<String, String> params = new HashMap<String, String>();
+        
+		filters.add("publicationTime:[" +(System.currentTimeMillis()-5*60000)+ " TO *]");
+		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
+		
+		System.out.println(items.getNumFound());
     }
 }
