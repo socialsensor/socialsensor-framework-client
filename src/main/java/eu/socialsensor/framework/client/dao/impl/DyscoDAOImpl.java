@@ -788,7 +788,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 if (queryForRequest.isEmpty()) {
                     queryForRequest += "author: (" + users + ")";
                 } else {
-                    queryForRequest += "OR author: (" + users + ")";
+                    queryForRequest += "OR (author: (" + users + "))";
                 }
             }
         }
@@ -797,6 +797,8 @@ public class DyscoDAOImpl implements DyscoDAO {
             return response;
         }
 
+        queryForRequest = "(" + queryForRequest + ")";
+        
         //Set source filters in case they exist exist
         for (String filter : filters) {
             queryForRequest += " AND " + filter;
@@ -1049,7 +1051,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 if (queryForRequest.isEmpty()) {
                     queryForRequest += " author: (" + users + ")";
                 } else {
-                    queryForRequest += "OR author: (" + users + ")";
+                    queryForRequest += "OR (author: (" + users + "))";
                 }
             }
         }
@@ -1058,6 +1060,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             return response;
         }
 
+        queryForRequest = "(" + queryForRequest + ")";
         //Set filters in case they exist exist
         for (String filter : filters) {
             queryForRequest += " AND " + filter;
@@ -1099,7 +1102,6 @@ public class DyscoDAOImpl implements DyscoDAO {
                 if ((mediaItems.size() >= size)) {
                     break;
                 }
-
             }
         }
 
@@ -1275,7 +1277,10 @@ public class DyscoDAOImpl implements DyscoDAO {
 		String orderBy = "publicationTime";
 		Map<String, String> params = new HashMap<String, String>();
         
-		filters.add("publicationTime:[" +(System.currentTimeMillis()-5*60000)+ " TO *]");
+		long now = System.currentTimeMillis();
+		long window = 30L * 60L * 1000L;
+		
+		filters.add("publicationTime:[" + (now - window) + " TO " + now + "]");
 		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
 		
 		System.out.println(items.getNumFound());
