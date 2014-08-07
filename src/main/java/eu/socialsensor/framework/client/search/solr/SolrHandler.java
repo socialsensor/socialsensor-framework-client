@@ -127,6 +127,18 @@ public class SolrHandler implements SearchEngineHandler {
         return solrItemHandler.findItems(query);
     }
 
+    public SearchEngineResponse<Item> findNMostRetweetedVerifiedItems(int size, String filterQuery) {
+        SolrQuery query = new SolrQuery("category:official");
+        if ((filterQuery != null) && (!"".equals(filterQuery))) {
+            query.addFilterQuery(filterQuery);
+        }
+
+        query.setRows(size);
+        query.addSortField("retweetsCount", ORDER.desc);
+
+        return solrItemHandler.findItems(query);
+    }
+
     @Override
     public long findItemsLastHourSize() {
 
@@ -264,7 +276,7 @@ public class SolrHandler implements SearchEngineHandler {
         if (!listId.equals("*")) {
             query = query + " AND (listId:" + listId + ")";
         }
-      
+
         SolrQuery solrQuery = new SolrQuery(query);
 
         System.out.println("solrQuery for Dysco: " + solrQuery);
@@ -273,15 +285,15 @@ public class SolrHandler implements SearchEngineHandler {
         solrQuery.setFacet(true);
         solrQuery.setFacetLimit(5);
 
-        String sortBy = "sum(product(normalizedDyscoScore," + a + "),product(normalizedRankerScore," + (1-a) + "))";
+        String sortBy = "sum(product(normalizedDyscoScore," + a + "),product(normalizedRankerScore," + (1 - a) + "))";
         System.out.println("SortBy: " + sortBy);
         solrQuery.addSortField(sortBy, ORDER.desc);
-        
+
         solrQuery.addFacetField("persons");
         solrQuery.addFacetField("organizations");
         return solrDyscoHandler.findDyscosLight(solrQuery);
     }
-    
+
     @Override
     public Dysco findDyscoLight(String id) {
         Dysco dysco = solrDyscoHandler.findDyscoLight(id);
