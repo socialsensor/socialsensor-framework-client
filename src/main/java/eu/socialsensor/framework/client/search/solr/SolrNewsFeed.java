@@ -16,6 +16,7 @@ public class SolrNewsFeed {
         description = item.getDescription();
         publicationTime = item.getPublicationTime();
         source = item.getUrl();
+        lists = item.getList();
 	}
 	
 	public Item toItem(){
@@ -26,6 +27,7 @@ public class SolrNewsFeed {
 		item.setDescription(description);
 		item.setPublicationTime(publicationTime);
 		item.setUrl(source);
+		item.setList(lists);
 		
 		return item;
 	}
@@ -40,7 +42,8 @@ public class SolrNewsFeed {
     private String description;
     @Field(value = "publicationTime")
     private long publicationTime;
-    
+    @Field(value = "lists")
+    private String[] lists;
     
     public String getId() {
         return id;
