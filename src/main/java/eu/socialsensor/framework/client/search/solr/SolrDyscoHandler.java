@@ -276,6 +276,39 @@ public class SolrDyscoHandler {
         return response;
     }
 
+    public SearchEngineResponse<Dysco> findDyscosInTimeframe(String startDate, String endDate) {
+    	SearchEngineResponse<Dysco> response = new SearchEngineResponse<Dysco>();
+    	
+    	QueryResponse rsp;
+    	
+    	String dateQuery = "listId:3 AND creationDate:["+startDate+" TO " + endDate + "]";
+    	System.out.println("Query : "+dateQuery);
+    	
+    	SolrQuery query = new SolrQuery(dateQuery);
+    	query.setSortField("creationDate", ORDER.asc);
+    	query.setRows(200);
+    	 try {
+             rsp = server.query(query);
+         } catch (SolrServerException e) {
+             Logger.getRootLogger().info(e.getMessage());
+             return null;
+         }
+    	
+    	 
+    	 List<SolrDysco> resultList = rsp.getBeans(SolrDysco.class);
+         if (resultList != null) {
+            // Logger.getRootLogger().info("got: " + resultList.size() + " dyscos from Solr");
+         }
+
+         List<Dysco> dyscos = new ArrayList<Dysco>();
+         for (SolrDysco dysco : resultList) {
+             dyscos.add(dysco.toDysco());
+         }
+
+         response.setResults(dyscos);
+        return response;
+    }
+    
     public SearchEngineResponse<Dysco> findDyscosLight(SolrQuery query) {
 
         SearchEngineResponse<Dysco> response = new SearchEngineResponse<Dysco>();
