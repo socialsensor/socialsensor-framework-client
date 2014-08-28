@@ -96,8 +96,13 @@ public class StreamUserDAOImpl implements StreamUserDAO {
         	
         	if(update) {
         		DBObject change = new BasicDBObject("$inc", incs);
-        		//Logger.getLogger(StreamUserDAOImpl.class).info("id: " + user.getId() + " =>   " + change.toString());
-            	mongoHandler.update("id", user.getId(), change);
+        		BasicDBObject sets = new BasicDBObject("imageUrl", user.getImageUrl());
+        		sets.put("profileImage", user.getProfileImage());
+        		if(user.getName() != null)
+        			sets.put("name", user.getName());
+        		change.put("$set", sets);
+        		
+        		mongoHandler.update("id", user.getId(), change);
         	}
         }
     }
