@@ -329,7 +329,12 @@ public class SolrDyscoHandler {
 
         List<Dysco> dyscos = new ArrayList<Dysco>();
         for (SolrDysco dysco : resultList) {
-            dyscos.add(dysco.toDysco());
+        	if(dysco.getDyscoType().equals("TRENDING")) {
+        		dyscos.add(dysco.toDysco());
+        	}
+        	else {
+        		dyscos.add(dysco.toCustomDysco());
+        	}
         }
 
         response.setResults(dyscos);
