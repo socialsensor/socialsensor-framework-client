@@ -1,6 +1,5 @@
 package eu.socialsensor.framework.client.dao.impl;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +9,12 @@ import org.apache.log4j.Logger;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.mongodb.MongoException;
 
 import eu.socialsensor.framework.client.dao.StreamUserDAO;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import eu.socialsensor.framework.client.mongo.MongoHandler.MongoIterator;
 import eu.socialsensor.framework.client.mongo.Selector;
 import eu.socialsensor.framework.client.mongo.UpdateItem;
-import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
@@ -94,13 +91,18 @@ public class StreamUserDAOImpl implements StreamUserDAO {
         		incs.put("items", user.getItems());
         	}
         	
+    		BasicDBObject sets = new BasicDBObject();
+    		if(user.getImageUrl() != null)
+    			sets.put("imageUrl", user.getImageUrl());
+    		if(user.getProfileImage() != null)
+    			sets.put("profileImage", user.getProfileImage());
+    		if(user.getName() != null) 
+    			sets.put("name", user.getName());
+    		
         	if(update) {
         		DBObject change = new BasicDBObject("$inc", incs);
-        		BasicDBObject sets = new BasicDBObject("imageUrl", user.getImageUrl());
-        		sets.put("profileImage", user.getProfileImage());
-        		if(user.getName() != null)
-        			sets.put("name", user.getName());
-        		change.put("$set", sets);
+        		if(!sets.isEmpty())
+        			change.put("$set", sets);
         		
         		mongoHandler.update("id", user.getId(), change);
         	}
@@ -163,7 +165,7 @@ public class StreamUserDAOImpl implements StreamUserDAO {
 
         StreamUserDAO dao = null;
 		try {
-			dao = new StreamUserDAOImpl("social1.atc.gr", "Streams", "StreamUsers");
+			dao = new StreamUserDAOImpl("xxx.xxx.xxx.xxx", "Streams", "StreamUsers");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
