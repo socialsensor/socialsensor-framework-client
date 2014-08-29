@@ -20,6 +20,7 @@ import eu.socialsensor.framework.common.domain.dimension.Dimension;
 import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
+import eu.socialsensor.framework.common.util.Util;
 
 import java.net.URL;
 import java.text.DateFormat;
@@ -327,6 +328,22 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<String> twitterUsers = customDysco.getTwitterUsers();
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
+            List<String> otherSocialNetworks = customDysco.getOtherSocialNetworks();
+            if(otherSocialNetworks != null && !otherSocialNetworks.isEmpty()) {
+            	if(twitterUsers == null)
+            		twitterUsers = new ArrayList<String>();
+            	for(String url : otherSocialNetworks) {
+            		try {
+						Map<String, String> parts = Util.findNetworkSource(url);
+						for(String username : parts.keySet()) {
+							twitterUsers.add(username);
+            			}
+            		} catch (Exception e) {
+						
+					}
+            	}
+            }
+            
             return collectItems(queries, twitterMentions, twitterUsers, wordsToExclude, filters, facets, orderBy, params, size);
         }
 
@@ -351,11 +368,25 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
 
             List<String> twitterMentions = customDysco.getMentionedUsers();
-
             List<String> twitterUsers = customDysco.getTwitterUsers();
-
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
+            List<String> otherSocialNetworks = customDysco.getOtherSocialNetworks();
+            if(otherSocialNetworks != null && !otherSocialNetworks.isEmpty()) {
+            	if(twitterUsers == null)
+            		twitterUsers = new ArrayList<String>();
+            	for(String url : otherSocialNetworks) {
+            		try {
+						Map<String, String> parts = Util.findNetworkSource(url);
+						for(String username : parts.keySet()) {
+							twitterUsers.add(username);
+            			}
+            		} catch (Exception e) {
+						
+					}
+            	}
+            }
+            
             return collectMediaItems(queries, twitterMentions, twitterUsers, wordsToExclude, "video", filters, facets, orderBy, size);
         }
 
@@ -381,6 +412,22 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<String> twitterUsers = customDysco.getTwitterUsers();
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
+            List<String> otherSocialNetworks = customDysco.getOtherSocialNetworks();
+            if(otherSocialNetworks != null && !otherSocialNetworks.isEmpty()) {
+            	if(twitterUsers == null)
+            		twitterUsers = new ArrayList<String>();
+            	for(String url : otherSocialNetworks) {
+            		try {
+						Map<String, String> parts = Util.findNetworkSource(url);
+						for(String username : parts.keySet()) {
+							twitterUsers.add(username);
+            			}
+            		} catch (Exception e) {
+						
+					}
+            	}
+            }
+            
             mediaItems = collectMediaItems(queries, twitterMentions, twitterUsers, wordsToExclude, "image", filters, facets, orderBy, size);
         }
 
