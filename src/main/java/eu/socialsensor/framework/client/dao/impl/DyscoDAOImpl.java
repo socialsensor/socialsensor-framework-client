@@ -20,6 +20,7 @@ import eu.socialsensor.framework.common.domain.dimension.Dimension;
 import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
+import eu.socialsensor.framework.common.domain.dysco.Entity;
 import eu.socialsensor.framework.common.util.Util;
 
 import java.net.URL;
@@ -316,9 +317,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     public SearchEngineResponse<Item> findItems(Dysco dysco, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
 
         if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
-            List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+            postProcess(dysco);
+    		List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
 
-            return collectItemsByQueries(queries, filters, facets, orderBy, params, size);
+    		return collectItemsByQueries(queries, filters, facets, orderBy, params, size);
         } else {
 
             CustomDysco customDysco = (CustomDysco) dysco;
@@ -1086,9 +1088,14 @@ public class DyscoDAOImpl implements DyscoDAO {
                 if (query.getName().endsWith("\" ")) {
                     query.setName(query.getName().substring(0, query.getName().length() - 1));
                 }
-                swingQueries.add(new eu.socialsensor.framework.common.domain.Query(query.getName(), query.getScore()));
-
-            } else {
+                
+                String[] queryParts = query.getName().split("\\s");
+                if(queryParts != null) {
+                	String name = StringUtils.join(queryParts, " AND ");
+                	swingQueries.add(new eu.socialsensor.framework.common.domain.Query(name, query.getScore()));
+                }
+            } 
+            else {
                 List<String> entities = new ArrayList<String>();
                 String restQuery = query.getName();
                 int start = 0, end = 0;
@@ -1220,12 +1227,6 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     public static void main(String[] args) throws Exception {
 
-    	String query = "(\"bernard  malamud\")";
-    	query = query.replaceAll("[\"()]", "");
-    	String[] parts = query.split("\\s+");
-    	
-    	System.out.println(StringUtils.join(parts, " AND "));
-    	
         DyscoDAOImpl dao = new DyscoDAOImpl("Socialsensordb.atc.gr",
                 "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
                 "http://socialsensor.atc.gr/solr/dyscos",
@@ -1234,26 +1235,52 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "http://socialsensor.atc.gr/solr/WebPages",
                 "http://160.40.51.18:8080/VisualIndexService",
                 "Prototype");
-
-        
-        //Dysco dysco = dao.findDysco("c8141eef-b262-4106-a46a-d0418d615213");
-        //System.out.println(dysco.toJSONString());
         
         
-        Dysco dysco = dao.findDysco("0a5f37b3-a85d-419f-abd2-9191c80b3bb4");
-        System.out.println(dysco.toJSONString());
-        
+        Dysco dysco = dao.findDysco("5e8b2cb7-4558-4efa-be6e-6672ce41c684");
+		
         List<String> filters = new ArrayList<String>();
 		List<String> facets = new ArrayList<String>();
 		String orderBy = "publicationTime";
 		Map<String, String> params = new HashMap<String, String>();
         
 		long now = System.currentTimeMillis();
-		long window = 30L * 60L * 1000L;
+		long window = 60L * 60L * 1000L;
 		
 		filters.add("publicationTime:[" + (now - window) + " TO " + now + "]");
 		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
 		
 		System.out.println(items.getNumFound());
+    }
+    
+    private void postProcess(Dysco dysco) {
+    	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+    	
+    	List<Entity> entities = dysco.getEntities();
+    	if(entities != null && entities.size()>1) {
+    		String qStr = "";
+    		for(Entity e : entities) {
+    			qStr += "\"" + e.getName() + "\" ";
+    		}
+    		
+    		eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+    		q.setName(qStr);
+    		q.setScore(dysco.getScore());
+    		
+    		queries.add(q);
+    	}
+    	
+    	Map<String, Double> hashtags = dysco.getHashtags();
+    	List<eu.socialsensor.framework.common.domain.Query> tbRemoved = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
+    	for(eu.socialsensor.framework.common.domain.Query query : queries) {
+    		for(String hashtag : hashtags.keySet()) {
+    			String name = query.getName();
+    			if(name.equalsIgnoreCase(hashtag.replace("#", "")))
+    				tbRemoved.add(query);
+    		}
+    	}
+    	for(eu.socialsensor.framework.common.domain.Query query : tbRemoved) {
+    		queries.remove(query);
+    	}
     }
 }
