@@ -1264,8 +1264,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     		
     		for(Entity entity : entities) {
     			if(entity.getType().equals(Type.LOCATION)) {
-    				tbRemoved.add(query);
-    				break;
+    				if(entity.getName().equalsIgnoreCase(query.getName())) {
+    					tbRemoved.add(query);
+    					break;
+    				}
     			}
     		}
     	}
@@ -1287,7 +1289,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("0038eafd-4998-498a-90a2-07ea69682dcc");
+        Dysco dysco = dao.findDysco("d232d892-710b-48fc-916a-a6b56df49b60");
         System.out.println(dysco.toJSONString());
        
         List<String> filters = new ArrayList<String>();
