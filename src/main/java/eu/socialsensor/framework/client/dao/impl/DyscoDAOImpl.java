@@ -21,6 +21,7 @@ import eu.socialsensor.framework.common.domain.dysco.CustomDysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco;
 import eu.socialsensor.framework.common.domain.dysco.Dysco.DyscoType;
 import eu.socialsensor.framework.common.domain.dysco.Entity;
+import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
 import eu.socialsensor.framework.common.util.Util;
 
 import java.net.URL;
@@ -1252,8 +1253,20 @@ public class DyscoDAOImpl implements DyscoDAO {
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
     		for(String hashtag : hashtags.keySet()) {
     			String name = query.getName();
-    			if(name.equalsIgnoreCase(hashtag.replace("#", "")))
+    			if(name.equalsIgnoreCase(hashtag.replace("#", ""))) {
     				tbRemoved.add(query);
+    				break;
+    			}
+    		}
+    		
+    		if(tbRemoved.contains(query))
+    			continue;
+    		
+    		for(Entity entity : entities) {
+    			if(entity.getType().equals(Type.LOCATION)) {
+    				tbRemoved.add(query);
+    				break;
+    			}
     		}
     	}
     	
@@ -1274,7 +1287,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("47e31c17-de3d-4da0-ac2e-9cfa66178837");
+        Dysco dysco = dao.findDysco("0038eafd-4998-498a-90a2-07ea69682dcc");
         System.out.println(dysco.toJSONString());
        
         List<String> filters = new ArrayList<String>();
