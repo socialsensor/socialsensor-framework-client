@@ -362,7 +362,8 @@ public class DyscoDAOImpl implements DyscoDAO {
     public SearchEngineResponse<MediaItem> findVideos(Dysco dysco, List<String> filters, List<String> facets, String orderBy, int size) {
 
         if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
-            List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+        	postProcess(dysco);
+        	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
 
             return collectMediaItemsByQueries(queries, "video", filters, facets, orderBy, size);
         } else {
@@ -404,8 +405,10 @@ public class DyscoDAOImpl implements DyscoDAO {
 
     	SearchEngineResponse<MediaItem> mediaItems;
         if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
-            List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
-            mediaItems = collectMediaItemsByQueries(queries, "image", filters, facets, orderBy, size);
+        	postProcess(dysco);
+        	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
+            
+        	mediaItems = collectMediaItemsByQueries(queries, "image", filters, facets, orderBy, size);
         } else {
             CustomDysco customDysco = (CustomDysco) dysco;
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
@@ -440,8 +443,10 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<WebPage> findHealines(Dysco dysco, int size) {
 
         Logger.getRootLogger().info("============ Web Pages Retrieval =============");
-
+        
         List<WebPage> webPages = new ArrayList<WebPage>();
+        
+        postProcess(dysco);
         List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
         if (queries == null || queries.isEmpty()) {
             return webPages;
@@ -938,10 +943,9 @@ public class DyscoDAOImpl implements DyscoDAO {
         Logger.getRootLogger().info("Solr Query: " + queryForRequest);
 
         solrQuery.setRows(size);
+        solrQuery.addSortField("score", ORDER.desc);
         if (orderBy != null) {
-            solrQuery.setSortField(orderBy, ORDER.desc);
-        } else {
-            solrQuery.setSortField("score", ORDER.desc);
+            solrQuery.addSortField(orderBy, ORDER.desc);
         }
 
         for (String facet : facets) {
@@ -1242,6 +1246,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		queries.add(q);
     	}
     	
+    	// Remove Single Hashtags / Entities
     	Map<String, Double> hashtags = dysco.getHashtags();
     	List<eu.socialsensor.framework.common.domain.Query> tbRemoved = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
@@ -1251,6 +1256,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     				tbRemoved.add(query);
     		}
     	}
+    	
     	for(eu.socialsensor.framework.common.domain.Query query : tbRemoved) {
     		queries.remove(query);
     	}
@@ -1268,16 +1274,16 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("23b426b2-3436-45d1-abdc-848eb45cd4ab");
+        Dysco dysco = dao.findDysco("47e31c17-de3d-4da0-ac2e-9cfa66178837");
         System.out.println(dysco.toJSONString());
-        
+       
         List<String> filters = new ArrayList<String>();
 		List<String> facets = new ArrayList<String>();
 		String orderBy = "publicationTime";
 		Map<String, String> params = new HashMap<String, String>();
         
 		long now = System.currentTimeMillis();
-		long window = 60L * 60L * 1000L;
+		long window = 24 * 60L * 60L * 1000L;
 		
 		filters.add("publicationTime:[" + (now - window) + " TO " + now + "]");
 		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
