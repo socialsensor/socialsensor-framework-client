@@ -696,9 +696,8 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
-
         String queryForRequest = "(title : (" + allQueriesToOne + ") OR description:(" + allQueriesToOne + "))";
-
+        
         //Set source filters in case they exist exist
         for (String filter : filters) {
             queryForRequest += " AND " + filter;
@@ -706,6 +705,7 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         SolrQuery solrQuery = new SolrQuery(queryForRequest);
         solrQuery.setRows(size);
+
 
         for (Map.Entry<String, String> param : params.entrySet()) {
             solrQuery.add(param.getKey(), param.getValue());
@@ -718,12 +718,11 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         }
 
+        solrQuery.addSortField("score", ORDER.desc);
         if (orderBy != null) {
-            solrQuery.setSortField(orderBy, ORDER.desc);
-        } else {
-            solrQuery.setSortField("score", ORDER.desc);
+            solrQuery.addSortField(orderBy, ORDER.desc);
         }
-
+        
         Logger.getRootLogger().info("Solr Query: " + queryForRequest);
 
         response = solrItemHandler.findItems(solrQuery);
@@ -1089,9 +1088,10 @@ public class DyscoDAOImpl implements DyscoDAO {
                     query.setName(query.getName().substring(0, query.getName().length() - 1));
                 }
                 
-                String[] queryParts = query.getName().split("\\s");
+                // Handle combined entities
+                String[] queryParts = query.getName().split("\"\\s\"");
                 if(queryParts != null) {
-                	String name = StringUtils.join(queryParts, " AND ");
+                	String name = StringUtils.join(queryParts, "\" AND \"");
                 	swingQueries.add(new eu.socialsensor.framework.common.domain.Query(name, query.getScore()));
                 }
             } 
@@ -1224,34 +1224,6 @@ public class DyscoDAOImpl implements DyscoDAO {
     public List<MediaItem> requestThumbnails(Dysco dysco, int size) {
         return null;
     }
-
-    public static void main(String[] args) throws Exception {
-
-        DyscoDAOImpl dao = new DyscoDAOImpl("Socialsensordb.atc.gr",
-                "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
-                "http://socialsensor.atc.gr/solr/dyscos",
-                "http://socialsensor.atc.gr/solr/items",
-                "http://socialsensor.atc.gr/solr/MediaItems",
-                "http://socialsensor.atc.gr/solr/WebPages",
-                "http://160.40.51.18:8080/VisualIndexService",
-                "Prototype");
-        
-        
-        Dysco dysco = dao.findDysco("5e8b2cb7-4558-4efa-be6e-6672ce41c684");
-		
-        List<String> filters = new ArrayList<String>();
-		List<String> facets = new ArrayList<String>();
-		String orderBy = "publicationTime";
-		Map<String, String> params = new HashMap<String, String>();
-        
-		long now = System.currentTimeMillis();
-		long window = 60L * 60L * 1000L;
-		
-		filters.add("publicationTime:[" + (now - window) + " TO " + now + "]");
-		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
-		
-		System.out.println(items.getNumFound());
-    }
     
     private void postProcess(Dysco dysco) {
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
@@ -1282,5 +1254,43 @@ public class DyscoDAOImpl implements DyscoDAO {
     	for(eu.socialsensor.framework.common.domain.Query query : tbRemoved) {
     		queries.remove(query);
     	}
+    }
+    
+    public static void main(String[] args) throws Exception {
+
+        DyscoDAOImpl dao = new DyscoDAOImpl("Socialsensordb.atc.gr",
+                "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
+                "http://socialsensor.atc.gr/solr/dyscos",
+                "http://socialsensor.atc.gr/solr/items",
+                "http://socialsensor.atc.gr/solr/MediaItems",
+                "http://socialsensor.atc.gr/solr/WebPages",
+                "http://160.40.51.18:8080/VisualIndexService",
+                "Prototype");
+        
+        
+        Dysco dysco = dao.findDysco("23b426b2-3436-45d1-abdc-848eb45cd4ab");
+        System.out.println(dysco.toJSONString());
+        
+        List<String> filters = new ArrayList<String>();
+		List<String> facets = new ArrayList<String>();
+		String orderBy = "publicationTime";
+		Map<String, String> params = new HashMap<String, String>();
+        
+		long now = System.currentTimeMillis();
+		long window = 60L * 60L * 1000L;
+		
+		filters.add("publicationTime:[" + (now - window) + " TO " + now + "]");
+		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
+		
+		System.out.println(items.getNumFound());
+		for(Item item : items.getResults()) {
+			System.out.println("=======================================");
+			System.out.println(item.getTitle().replaceAll("\n", " "));
+			System.out.println(item.getDescription());
+			System.out.println(item.getText());
+			System.out.println(StringUtils.join(item.getTags(), " "));
+			System.out.println(item.getStreamId());
+			System.out.println(item.getShares());
+		}
     }
 }
