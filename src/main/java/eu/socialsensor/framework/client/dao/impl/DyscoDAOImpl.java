@@ -458,7 +458,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         Set<String> expandedUrls = new HashSet<String>();
         Set<String> titles = new HashSet<String>();
 
-        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
 
         String sinceDateStr = "*";
         try {
@@ -930,7 +930,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         }
 
         //Retrieve multimedia content that is stored in solr
-        String allQueriesToOne = buildKeywordSolrQuery(queries, "AND");
+        String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
         String queryForRequest = "(title : (" + allQueriesToOne + ") OR description:(" + allQueriesToOne + "))";
 
         //Set filters in case they exist exist
@@ -1077,7 +1077,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private String buildKeywordSolrQuery(List<eu.socialsensor.framework.common.domain.Query> queries, String liaison) {
+    public String buildKeywordSolrQuery(List<eu.socialsensor.framework.common.domain.Query> queries, String liaison) {
         
     	Map<String, List<String>> linkedWords = new HashMap<String, List<String>>();
         List<eu.socialsensor.framework.common.domain.Query> swingQueries = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
@@ -1137,7 +1137,8 @@ public class DyscoDAOImpl implements DyscoDAO {
                         List<String> alreadyIn = new ArrayList<String>();
 
                         if (query.getScore() != null) {
-                            queryToLink += "^" + query.getScore();
+                            //queryToLink += "^" + query.getScore();    
+                            queryToLink = "("+queryToLink+")^" + query.getScore();
                         }
 
                         alreadyIn.add(queryToLink);
@@ -1146,7 +1147,8 @@ public class DyscoDAOImpl implements DyscoDAO {
                     } else {
                         List<String> alreadyIn = linkedWords.get(entity);
                         if (query.getScore() != null) {
-                            queryToLink += "^" + query.getScore();
+                            //queryToLink += "^" + query.getScore();
+                            queryToLink = "("+queryToLink+")^" + query.getScore();
                         }
                         if (!alreadyIn.contains(queryToLink)) {
                             alreadyIn.add(queryToLink);
@@ -1230,7 +1232,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return null;
     }
     
-    private void postProcess(Dysco dysco) {
+    public void postProcess(Dysco dysco) {
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	
     	List<Entity> entities = dysco.getEntities();
@@ -1289,7 +1291,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("d232d892-710b-48fc-916a-a6b56df49b60");
+        Dysco dysco = dao.findDysco("66cf7f20-b5c0-485e-8658-fc5807b39249");
         System.out.println(dysco.toJSONString());
        
         List<String> filters = new ArrayList<String>();
@@ -1307,11 +1309,13 @@ public class DyscoDAOImpl implements DyscoDAO {
 		for(Item item : items.getResults()) {
 			System.out.println("=======================================");
 			System.out.println(item.getTitle().replaceAll("\n", " "));
-			System.out.println(item.getDescription());
-			System.out.println(item.getText());
-			System.out.println(StringUtils.join(item.getTags(), " "));
-			System.out.println(item.getStreamId());
-			System.out.println(item.getShares());
+		}
+		
+		SearchEngineResponse<MediaItem> mItems = dao.findImages(dysco, filters, facets, orderBy, 10);
+		System.out.println(mItems.getNumFound());
+		for(MediaItem item : mItems.getResults()) {
+			System.out.println("=======================================");
+			System.out.println(item.getTitle().replaceAll("\n", " "));
 		}
     }
 }
