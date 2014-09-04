@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  *
  */
 public class MongoHandler {
-	
+
     DBCollection collection;
     private DBObject sortField = new BasicDBObject("_id", -1);
     private DBObject publicationTimeField = new BasicDBObject("publicationTime", -1);
@@ -40,11 +40,11 @@ public class MongoHandler {
 
     private static MongoClientOptions options = MongoClientOptions.builder()
             .writeConcern(WriteConcern.UNACKNOWLEDGED).build();
-    
+
     public MongoHandler(String host, String dbName, String collectionName, List<String> indexes) throws Exception {
         this(host, dbName);
         collection = db.getCollection(collectionName);
-      
+
         if (indexes != null) {
             for (String index : indexes) {
                 collection.ensureIndex(index);
@@ -57,24 +57,24 @@ public class MongoHandler {
         db = databases.get(connectionKey);
         if (db == null) {
             MongoClient mongo = connections.get(hostname);
-            
+
             if (mongo == null) {
                 mongo = new MongoClient(hostname, options);
                 connections.put(hostname, mongo);
             }
             db = mongo.getDB(dbName);
             databases.put(connectionKey, db);
-            
+
             /*
-            try{
-            	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
+             try{
+             mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
             
-            }
-            catch(Exception e){
-            	System.out.println("Mongo DB at " + hostname +" is closed");
-            	throw e;
-            }
-            */
+             }
+             catch(Exception e){
+             System.out.println("Mongo DB at " + hostname +" is closed");
+             throw e;
+             }
+             */
         }
     }
 
@@ -89,7 +89,7 @@ public class MongoHandler {
      * @param password
      * @throws Exception
      */
-    public MongoHandler(String hostname, String dbName, String collectionName, List<String> indexes, String username, char[] password) throws Exception{
+    public MongoHandler(String hostname, String dbName, String collectionName, List<String> indexes, String username, char[] password) throws Exception {
         String connectionKey = hostname + "#" + dbName;
         db = databases.get(connectionKey);
 
@@ -103,8 +103,8 @@ public class MongoHandler {
             db = mongo.getDB(dbName);
             if (db.authenticate(username, password)) {
                 databases.put(connectionKey, db);
-            }else{
-                throw new RuntimeException("Could not login to "+dbName+" database with user "+username);
+            } else {
+                throw new RuntimeException("Could not login to " + dbName + " database with user " + username);
             }
         }
         collection = db.getCollection(collectionName);
@@ -115,14 +115,15 @@ public class MongoHandler {
             }
         }
     }
-    
+
     public boolean checkConnection(String hostname) {
-    	
-    	MongoClient mongo = connections.get(hostname);
-    	
-    	if(mongo == null)
-    		return false;
-    	
+
+        MongoClient mongo = connections.get(hostname);
+
+        if (mongo == null) {
+            return false;
+        }
+
 //    	 try{
 //         	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
 //         
@@ -132,22 +133,28 @@ public class MongoHandler {
 //         	return false;
 //         }
 //    	 
-         return true;
+        return true;
     }
 
-    public void sortBy(String field, int order) throws MongoException{
+    public void sortBy(String field, int order) throws MongoException {
         this.sortField = new BasicDBObject(field, order);
     }
 
-    public void insert(JSONable jsonObject, String collName) throws MongoException{
+    public void insert(JSONable jsonObject, String collName) throws MongoException {
         String json = jsonObject.toJSONString();
         DBObject object = (DBObject) JSON.parse(json);
         DBCollection coll = db.getCollection(collName);
         coll.insert(object);
     }
 
-    public void insert(JSONable jsonObject) throws MongoException{
+    public void insert(JSONable jsonObject) throws MongoException {
         String json = jsonObject.toJSONString();
+        DBObject object = (DBObject) JSON.parse(json);
+        collection.insert(object);
+    }
+
+    public void insertJson(String json) {
+
         DBObject object = (DBObject) JSON.parse(json);
         collection.insert(object);
     }
@@ -156,7 +163,7 @@ public class MongoHandler {
         collection.insert(new BasicDBObject(map));
     }
 
-    public boolean exists(String fieldName, String fieldValue) throws MongoException{
+    public boolean exists(String fieldName, String fieldValue) throws MongoException {
         BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
         DBObject result = collection.findOne(query, new BasicDBObject("_id", 1));
         if (result == null) {
@@ -181,21 +188,22 @@ public class MongoHandler {
     public Object findOneField(String fieldName, String fieldValue, String retField) throws MongoException {
         BasicDBObject query = new BasicDBObject(fieldName, fieldValue);
         BasicDBObject field = new BasicDBObject(retField, 1);
-        
+
         DBObject result = collection.findOne(query, field);
-        if(result == null)
-        	return null;
-        
+        if (result == null) {
+            return null;
+        }
+
         return result.get(retField);
     }
-    
-    public String findOne(Selector query) throws MongoException{
+
+    public String findOne(Selector query) throws MongoException {
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBObject result = collection.findOne(object);
         return JSON.serialize(result);
     }
 
-    public int findCount(Pattern fieldValue) throws MongoException{
+    public int findCount(Pattern fieldValue) throws MongoException {
         BasicDBObject query = new BasicDBObject("title", fieldValue);
         long count = collection.count(query);
         return (int) count;
@@ -207,7 +215,7 @@ public class MongoHandler {
         return (int) count;
     }
 
-    public List<String> findMany(int n) throws MongoException{
+    public List<String> findMany(int n) throws MongoException {
 
         DBCursor cursor = collection.find(new BasicDBObject()).sort(sortField);
         List<String> jsonResults = new ArrayList<String>();
@@ -224,16 +232,13 @@ public class MongoHandler {
         }
         return jsonResults;
     }
-    
-    
 
-    public List<String> findManyWithOrDeprecated(String field, List<String> values, int n) throws MongoException{
+    public List<String> findManyWithOrDeprecated(String field, List<String> values, int n) throws MongoException {
         String prefix = "{$or:[";
 
         String jsonString = "";
         int count = 1;
         for (String value : values) {
-
 
             jsonString = jsonString + "{\"" + field + "\":\"" + value + "\"}";
             if (count != values.size()) {
@@ -263,7 +268,7 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public List<String> findManyWithOr(String field, List<String> values, int n) throws MongoException{
+    public List<String> findManyWithOr(String field, List<String> values, int n) throws MongoException {
         String prefix = "{" + field + ": {$in:[";
 
         String jsonString = "";
@@ -300,7 +305,7 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public List<String> findManyWithOr(String fieldName, String fieldValue, String orField, List<String> values, int n) throws MongoException{
+    public List<String> findManyWithOr(String fieldName, String fieldValue, String orField, List<String> values, int n) throws MongoException {
         String prefix = "{\"" + fieldName + "\":\"" + fieldValue + "\"" + ",\"" + orField + "\": {$in:[";
 
         String jsonString = "";
@@ -337,7 +342,7 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public List<String> findMany(DBObject query, int n) throws MongoException{
+    public List<String> findMany(DBObject query, int n) throws MongoException {
 
         DBCursor cursor = collection.find(query).sort(sortField);
         List<String> jsonResults = new ArrayList<String>();
@@ -355,8 +360,8 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public List<String> findMany(Selector query, int n) throws MongoException{
-        
+    public List<String> findMany(Selector query, int n) throws MongoException {
+
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBCursor cursor = collection.find(object).sort(sortField);
 
@@ -375,9 +380,9 @@ public class MongoHandler {
         }
         return jsonResults;
     }
-    
-    public List<String> findManyNoSorting(Selector query, int n) throws MongoException{
-        
+
+    public List<String> findManyNoSorting(Selector query, int n) throws MongoException {
+
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBCursor cursor = collection.find(object);
 
@@ -397,7 +402,7 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public List<String> findManySortedByPublicationTime(Selector query, int n) throws MongoException{
+    public List<String> findManySortedByPublicationTime(Selector query, int n) throws MongoException {
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBCursor cursor = collection.find(object).sort(publicationTimeField);
 
@@ -417,7 +422,7 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public List<String> findMany(String fieldName, Object fieldValue, int n) throws MongoException{
+    public List<String> findMany(String fieldName, Object fieldValue, int n) throws MongoException {
 
         DBObject query = new BasicDBObject(fieldName, fieldValue);
         DBCursor cursor = collection.find(query).sort(sortField);
@@ -437,18 +442,18 @@ public class MongoHandler {
         return jsonResults;
     }
 
-    public void clean() throws MongoException{
+    public void clean() throws MongoException {
         collection.drop();
     }
 
-    public void close() throws MongoException{
+    public void close() throws MongoException {
         Mongo mongo = db.getMongo();
         if (mongo != null) {
             mongo.close();
         }
     }
 
-    public boolean delete(Map<?, ?> m) throws MongoException{
+    public boolean delete(Map<?, ?> m) throws MongoException {
         DBObject ro = new BasicDBObject(m);
         WriteResult result = collection.remove(ro);
         if (result.getN() > 0) {
@@ -457,7 +462,7 @@ public class MongoHandler {
         return false;
     }
 
-    public boolean delete(String fieldName, String fieldValue) throws MongoException{
+    public boolean delete(String fieldName, String fieldValue) throws MongoException {
         DBObject ro = new BasicDBObject(fieldName, fieldValue);
         WriteResult result = collection.remove(ro);
         if (result.getN() > 0) {
@@ -466,7 +471,7 @@ public class MongoHandler {
         return false;
     }
 
-    public boolean delete(String fieldName, String fieldValue, String collName) throws MongoException{
+    public boolean delete(String fieldName, String fieldValue, String collName) throws MongoException {
         DBCollection coll = db.getCollection(collName);
         DBObject ro = new BasicDBObject(fieldName, fieldValue);
         WriteResult result = coll.remove(ro);
@@ -475,31 +480,31 @@ public class MongoHandler {
         }
         return false;
     }
-    
-    public boolean delete(){
-    	db.dropDatabase();
-    	
-    	return true;
+
+    public boolean delete() {
+        db.dropDatabase();
+
+        return true;
     }
 
-    public void update(String fieldName, String fieldValue, JSONable jsonObject) throws MongoException{
+    public void update(String fieldName, String fieldValue, JSONable jsonObject) throws MongoException {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);
         DBObject update = (DBObject) JSON.parse(jsonObject.toJSONString());
         collection.update(q, update, false, false);
     }
 
-    public void update(String fieldName, String fieldValue, Map<String, Object> map) throws MongoException{
+    public void update(String fieldName, String fieldValue, Map<String, Object> map) throws MongoException {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);
         DBObject update = new BasicDBObject(map);
         collection.update(q, update, false, false);
     }
 
-    public void update(String fieldName, String fieldValue, DBObject changes) throws MongoException{
+    public void update(String fieldName, String fieldValue, DBObject changes) throws MongoException {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);
         collection.update(q, changes);
     }
 
-    public void updateOld(String fieldName, String fieldValue, JSONable jsonObject) throws MongoException{
+    public void updateOld(String fieldName, String fieldValue, JSONable jsonObject) throws MongoException {
         BasicDBObject q = new BasicDBObject(fieldName, fieldValue);
         DBObject update = (DBObject) JSON.parse(jsonObject.toJSONString());
         BasicDBObject newDocument = new BasicDBObject();
@@ -507,55 +512,52 @@ public class MongoHandler {
         collection.update(q, newDocument, false, true);
     }
 
-
     public MongoIterator getIterator(DBObject query) {
         DBCursor cursor = collection.find(query);
-        
+
         MongoIterator iterator = new MongoIterator(cursor);
         return iterator;
     }
-    
+
     public MongoIterator getIterator(Selector query) {
         DBObject object = (DBObject) JSON.parse(query.toJSONString());
         DBCursor cursor = collection.find(object);
-        
+
         MongoIterator iterator = new MongoIterator(cursor);
         return iterator;
     }
-    
+
     public class MongoIterator implements Iterator<String> {
-    	
-    	private DBCursor cursor;
 
-		private MongoIterator (DBCursor cursor) {
-    		this.cursor = cursor;
-    	}
-    	
-		
-    	public String next() {
-    		DBObject next = cursor.next();
-    		return next.toString();
-    	}
-    	
-    	public boolean hasNext() {
-    		return cursor.hasNext();
-    	}
+        private DBCursor cursor;
 
-		@Override
-		public void remove() {
-			cursor.next();
-		}
+        private MongoIterator(DBCursor cursor) {
+            this.cursor = cursor;
+        }
+
+        public String next() {
+            DBObject next = cursor.next();
+            return next.toString();
+        }
+
+        public boolean hasNext() {
+            return cursor.hasNext();
+        }
+
+        @Override
+        public void remove() {
+            cursor.next();
+        }
     }
-    
+
     public static void main(String[] args) throws Exception {
 
-    	MongoHandler handler = new MongoHandler("xxx.xxx.xxx", "Streams" , "Items", null);
-    	MongoIterator it = handler.getIterator(new BasicDBObject());
-    	
-    	while(it.hasNext()) {
-    		System.out.println(it.next());
-    	}
+        MongoHandler handler = new MongoHandler("xxx.xxx.xxx", "Streams", "Items", null);
+        MongoIterator it = handler.getIterator(new BasicDBObject());
+
+        while (it.hasNext()) {
+            System.out.println(it.next());
+        }
     }
-    
-    
+
 }
