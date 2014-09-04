@@ -26,7 +26,12 @@ import org.apache.solr.client.solrj.beans.Field;
  */
 public class SolrDysco implements Serializable {
 
-    public final Logger logger = Logger.getLogger(SolrDysco.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5212027040002311878L;
+
+	public final Logger logger = Logger.getLogger(SolrDysco.class);
 
     //The id of the dysco
     @Field(value = "id")

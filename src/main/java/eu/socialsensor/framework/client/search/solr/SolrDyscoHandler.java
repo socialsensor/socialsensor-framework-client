@@ -281,7 +281,7 @@ public class SolrDyscoHandler {
     	
     	QueryResponse rsp;
     	
-    	String dateQuery = "listId:3 AND creationDate:["+startDate+" TO " + endDate + "]";
+    	String dateQuery = "creationDate:["+startDate+" TO " + endDate + "]";
     	System.out.println("Query : "+dateQuery);
     	
     	SolrQuery query = new SolrQuery(dateQuery);
