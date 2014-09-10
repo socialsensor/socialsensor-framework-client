@@ -724,9 +724,10 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         }
 
-        solrQuery.addSortField("score", ORDER.desc);
         if (orderBy != null) {
-            solrQuery.addSortField(orderBy, ORDER.desc);
+            solrQuery.setSortField(orderBy, ORDER.desc);
+        } else {
+            solrQuery.setSortField("score", ORDER.desc);
         }
         
         Logger.getRootLogger().info("Solr Query: " + queryForRequest);
