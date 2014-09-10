@@ -56,6 +56,7 @@ public class SolrMediaItem {
     		}
     	}
     	type = (String) solrDocument.getFieldValue("type");
+    	clusterId = (String) solrDocument.getFieldValue("clusterId");
     	
     	solrScore = (Float) solrDocument.getFieldValue("score");
     }
@@ -104,6 +105,7 @@ public class SolrMediaItem {
         }
 
         type = mediaItem.getType();
+        clusterId = mediaItem.getClusterId();
     }
 
     public MediaItem toMediaItem() throws MalformedURLException {
@@ -130,7 +132,8 @@ public class SolrMediaItem {
             mediaItem.setLocation(new Location(latitude, longitude, location));
         }
         mediaItem.setType(type);
-
+        mediaItem.setClusterId(clusterId);
+        
         mediaItem.setSolrScore(solrScore);
         
         List<Concept> conceptsList = new ArrayList<Concept>();
@@ -148,9 +151,11 @@ public class SolrMediaItem {
             }
         }
         mediaItem.setConcepts(conceptsList);
-
+        
         return mediaItem;
     }
+    
+    
     @Field(value = "id")
     private String id;
     @Field(value = "url")
@@ -183,6 +188,9 @@ public class SolrMediaItem {
     private String[] concepts;
     @Field(value = "type")
     private String type;
+    @Field(value = "clusterId")
+    private String clusterId;
+    
     
     private float solrScore = 0f;
     
@@ -313,5 +321,13 @@ public class SolrMediaItem {
     
     public Float getSolrScore(){
     	return this.solrScore;
+    }
+    
+    public void setClusterId(String clusterId){
+    	this.clusterId = clusterId;
+    }
+    
+    public String getClusterId(){
+    	return this.clusterId;
     }
 }
