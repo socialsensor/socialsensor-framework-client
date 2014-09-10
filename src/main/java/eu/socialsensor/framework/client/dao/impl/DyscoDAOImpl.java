@@ -1275,6 +1275,27 @@ public class DyscoDAOImpl implements DyscoDAO {
     		queries.add(q);
     	}
     	
+    	// Remove Single Keywords
+    	Map<String, Double> keywords = dysco.getKeywords();
+    	List<eu.socialsensor.framework.common.domain.Query> tbr = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
+    	for(eu.socialsensor.framework.common.domain.Query query : queries) {
+    		if(tbr.contains(query))
+    			continue;
+    		
+    		for(String keyword : keywords.keySet()) {
+    			String name = query.getName();
+    			if(name.equalsIgnoreCase(keyword)) {
+    				if(keyword.split("\\s+").length <= 1) {
+    					tbr.add(query);
+        				break;
+        			}
+    			}
+    		}
+    	}
+    	for(eu.socialsensor.framework.common.domain.Query query : tbr) {
+    		queries.remove(query);
+    	}
+    	
     	// Remove Single Hashtags / Entities
     	Map<String, Double> hashtags = dysco.getHashtags();
     	List<eu.socialsensor.framework.common.domain.Query> tbRemoved = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
@@ -1303,6 +1324,28 @@ public class DyscoDAOImpl implements DyscoDAO {
     	for(eu.socialsensor.framework.common.domain.Query query : tbRemoved) {
     		queries.remove(query);
     	}
+		
+    	if(queries.isEmpty()) {
+    		if(tbRemoved.size() <= 1) {
+    			queries.addAll(tbRemoved);
+    		}
+    		else {
+    			for(int i=0; i<tbRemoved.size(); i++) {
+    				for(int j=i+1; j<tbRemoved.size(); j++) {
+    					eu.socialsensor.framework.common.domain.Query q1 = tbRemoved.get(i);
+    					eu.socialsensor.framework.common.domain.Query q2 = tbRemoved.get(j);
+    					
+    					eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+    					q.setName(q1.getName() + " " + q2.getName());
+    					q.setScore(q1.getScore() + q2.getScore());
+    					q.setType(q1.getType());
+    					
+    					queries.add(q);
+        			}
+    			}
+    		}
+    	}
+    	
     }
     
     public static void main(String[] args) throws Exception {
@@ -1317,7 +1360,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("66cf7f20-b5c0-485e-8658-fc5807b39249");
+        Dysco dysco = dao.findDysco("61464ce6-5182-459f-a53f-8d92e18bd753");
         System.out.println(dysco.toJSONString());
        
         List<String> filters = new ArrayList<String>();
