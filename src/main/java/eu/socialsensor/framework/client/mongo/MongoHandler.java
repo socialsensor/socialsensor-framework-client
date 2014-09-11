@@ -359,6 +359,7 @@ public class MongoHandler {
         }
         return jsonResults;
     }
+    
 
     public List<String> findMany(Selector query, int n) throws MongoException {
 
@@ -421,10 +422,12 @@ public class MongoHandler {
         }
         return jsonResults;
     }
+    
 
     public List<String> findMany(String fieldName, Object fieldValue, int n) throws MongoException {
 
         DBObject query = new BasicDBObject(fieldName, fieldValue);
+        
         DBCursor cursor = collection.find(query).sort(sortField);
         if (n > 0) {
             cursor = cursor.limit(n);
@@ -441,6 +444,8 @@ public class MongoHandler {
         }
         return jsonResults;
     }
+    
+    
 
     public void clean() throws MongoException {
         collection.drop();

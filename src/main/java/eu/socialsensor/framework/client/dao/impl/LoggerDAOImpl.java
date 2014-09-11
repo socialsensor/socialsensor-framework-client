@@ -15,6 +15,7 @@
  */
 package eu.socialsensor.framework.client.dao.impl;
 
+import com.mongodb.BasicDBObject;
 import eu.socialsensor.framework.client.mongo.MongoHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +31,60 @@ public class LoggerDAOImpl {
     private static String collection = "Logs";
     private MongoHandler mongoHandler;
 
-
     public LoggerDAOImpl(String host, String db, String collection) throws Exception {
 
-
         mongoHandler = new MongoHandler(host, db, collection, indexes);
-        
+
     }
-    
+
     public void insertLog(String json) {
-        
+
         mongoHandler.insertJson(json);
     }
+
+    public String findLog(String dyscoId, String msEpochTime, String deviceVendorId, String sortingPosition) {
+
+        BasicDBObject query = new BasicDBObject();
+        if (dyscoId != null) {
+            query.put("dyscoId", dyscoId);
+        }
+        if (msEpochTime != null) {
+            Long epochTime = new Long(msEpochTime);
+            query.put("msEpochTime", new BasicDBObject("$gte", epochTime));
+        }
+        if (deviceVendorId != null) {
+            query.put("deviceVendorId", deviceVendorId);
+        }
+        if (sortingPosition != null) {
+            query.put("sortingPosition", sortingPosition);
+        }
+
+        List<String> results = mongoHandler.findMany(query, 100);
+
+        String response = "[";
+
+        for (int i = 0; i < results.size(); i++) {
+
+            response = response + results.get(i);
+            
+            if (i!=(results.size()-1)) {
+                response = response + ",";
+            }
+       
+        }
+
+        response = response + "]";
+        return response;
+    }
+
+    public static void main(String... args) throws Exception {
+
+        LoggerDAOImpl dao = new LoggerDAOImpl("socialmdb1", "Streams", "Logs");
+
+        String response = dao.findLog(null, null, "1410336928096", null);
+        
+        System.out.println(response);
+
+    }
+
 }
