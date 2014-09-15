@@ -24,6 +24,8 @@ import eu.socialsensor.framework.common.domain.dysco.Entity;
 import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
 import eu.socialsensor.framework.common.util.Util;
 
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -939,7 +941,10 @@ public class DyscoDAOImpl implements DyscoDAO {
 
         //Retrieve multimedia content that is stored in solr
         String allQueriesToOne = buildKeywordSolrQuery(queries, "OR");
-        String queryForRequest = "(title : (" + allQueriesToOne + ") OR description:(" + allQueriesToOne + "))";
+        //String queryForRequest = "(title : (" + allQueriesToOne + ") OR description:(" + allQueriesToOne + "))";
+        
+        String queryForRequest = "(title : (" + allQueriesToOne + ") OR description:(" + allQueriesToOne + ")"
+        		+ " OR tags : (" + allQueriesToOne + "))";
 
         //Set filters in case they exist exist
         for (String filter : filters) {
@@ -1156,6 +1161,10 @@ public class DyscoDAOImpl implements DyscoDAO {
                 restQuery = restQuery.replaceAll(" +", " ");
                 restQuery = restQuery.replace("[^A-Za-z0-9 ]", "");
 
+                // Modify (termA termB) to (termA AND termB)
+                restQuery = restQuery.trim();
+                restQuery = restQuery.replaceAll("\\s+", " AND ");
+                
                 //System.out.println("rest query: "+restQuery);
                 for (String entity : entities) {
                     String queryToLink = restQuery;
@@ -1269,36 +1278,38 @@ public class DyscoDAOImpl implements DyscoDAO {
     		}
     		
     		eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
-    		q.setName(qStr);
-    		q.setScore(dysco.getScore());
+    		q.setName(qStr.trim());
+    		q.setScore(entities.size() * dysco.getScore());
     		
     		queries.add(q);
     	}
     	
+    	List<eu.socialsensor.framework.common.domain.Query> tbRemoved = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
+    	
     	// Remove Single Keywords
     	Map<String, Double> keywords = dysco.getKeywords();
-    	List<eu.socialsensor.framework.common.domain.Query> tbr = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
-    		if(tbr.contains(query))
+    		if(tbRemoved.contains(query))
     			continue;
     		
     		for(String keyword : keywords.keySet()) {
     			String name = query.getName();
     			if(name.equalsIgnoreCase(keyword)) {
     				if(keyword.split("\\s+").length <= 1) {
-    					tbr.add(query);
+    					tbRemoved.add(query);
         				break;
         			}
     			}
     		}
     	}
-    	for(eu.socialsensor.framework.common.domain.Query query : tbr) {
+    	
+    	for(eu.socialsensor.framework.common.domain.Query query : tbRemoved) {
     		queries.remove(query);
     	}
     	
     	// Remove Single Hashtags / Entities
     	Map<String, Double> hashtags = dysco.getHashtags();
-    	List<eu.socialsensor.framework.common.domain.Query> tbRemoved = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
+    	tbRemoved.clear();
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
     		for(String hashtag : hashtags.keySet()) {
     			String name = query.getName();
@@ -1325,6 +1336,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		queries.remove(query);
     	}
 		
+    	/* */
     	if(queries.isEmpty()) {
     		if(tbRemoved.size() <= 1) {
     			queries.addAll(tbRemoved);
@@ -1346,10 +1358,36 @@ public class DyscoDAOImpl implements DyscoDAO {
     		}
     	}
     	
+    	/* */
+    	tbRemoved.clear();
+    	for(eu.socialsensor.framework.common.domain.Query q1 : queries) {
+    		for(eu.socialsensor.framework.common.domain.Query q2 : queries) {
+    			if(q1.equals(q2))
+    				continue;
+    			
+    			if(!q2.getName().matches(".*\\s+.*") && q1.getName().contains(q2.getName())) {
+    				tbRemoved.add(q2);
+    			}
+    			else if(!q1.getName().matches(".*\\s+.*") && q2.getName().contains(q1.getName())) {
+    				tbRemoved.add(q1);
+    			}
+    		}
+    	}
+    	for(eu.socialsensor.framework.common.domain.Query query : tbRemoved) {
+    		System.out.println("Remove: " + query.getName());
+    		queries.remove(query);
+    	}
+    	
+    	if(queries.isEmpty()) {
+    		queries.addAll(tbRemoved);
+    	}
+
     }
     
-    public static void main(String[] args) throws Exception {
-
+    public static void main(String[] args) {
+    	
+    	try {
+    				
         DyscoDAOImpl dao = new DyscoDAOImpl("Socialsensordb.atc.gr",
                 "WebPagesDB", "WebPages", "MediaItemsDB", "MediaItems",
                 "http://socialsensor.atc.gr/solr/dyscos",
@@ -1360,7 +1398,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("61464ce6-5182-459f-a53f-8d92e18bd753");
+        Dysco dysco = dao.findDysco("d872fe50-d88d-4a81-898b-6a91bff2db55");
         System.out.println(dysco.toJSONString());
        
         List<String> filters = new ArrayList<String>();
@@ -1376,15 +1414,19 @@ public class DyscoDAOImpl implements DyscoDAO {
 		
 		System.out.println(items.getNumFound());
 		for(Item item : items.getResults()) {
-			System.out.println("=======================================");
-			System.out.println(item.getTitle().replaceAll("\n", " "));
+			//System.out.println("=======================================");
+			//System.out.println(item.getTitle().replaceAll("\n", " "));
 		}
 		
 		SearchEngineResponse<MediaItem> mItems = dao.findImages(dysco, filters, facets, orderBy, 10);
 		System.out.println(mItems.getNumFound());
 		for(MediaItem item : mItems.getResults()) {
-			System.out.println("=======================================");
-			System.out.println(item.getTitle().replaceAll("\n", " "));
+			//System.out.println("=======================================");
+			//System.out.println(item.getTitle().replaceAll("\n", " "));
 		}
+    	}
+    	catch(Exception e){
+    		System.out.println(e.getLocalizedMessage());
+    	}
     }
 }
