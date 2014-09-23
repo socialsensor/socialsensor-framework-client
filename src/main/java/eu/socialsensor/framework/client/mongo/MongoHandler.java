@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 /**
  *
  * @author etzoannos
@@ -29,18 +31,22 @@ import java.util.regex.Pattern;
  */
 public class MongoHandler {
 
-    DBCollection collection;
-    private DBObject sortField = new BasicDBObject("_id", -1);
-    private DBObject publicationTimeField = new BasicDBObject("publicationTime", -1);
     public static int ASC = 1;
     public static int DESC = -1;
-    private DB db = null;
+    
     private static Map<String, MongoClient> connections = new HashMap<String, MongoClient>();
     private static Map<String, DB> databases = new HashMap<String, DB>();
+    
+    private DBCollection collection;
+    private DBObject sortField = new BasicDBObject("_id", -1);
+    private DBObject publicationTimeField = new BasicDBObject("publicationTime", -1);
+    private DB db = null;
 
     private static MongoClientOptions options = MongoClientOptions.builder()
             .writeConcern(WriteConcern.UNACKNOWLEDGED).build();
 
+    private Logger logger = Logger.getLogger(MongoHandler.class);
+    
     public MongoHandler(String host, String dbName, String collectionName, List<String> indexes) throws Exception {
         this(host, dbName);
         collection = db.getCollection(collectionName);
@@ -64,17 +70,6 @@ public class MongoHandler {
             }
             db = mongo.getDB(dbName);
             databases.put(connectionKey, db);
-
-            /*
-             try{
-             mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
-            
-             }
-             catch(Exception e){
-             System.out.println("Mongo DB at " + hostname +" is closed");
-             throw e;
-             }
-             */
         }
     }
 
@@ -124,15 +119,14 @@ public class MongoHandler {
             return false;
         }
 
-//    	 try{
-//         	mongo.getConnector().getDBPortPool(mongo.getAddress()).get().ensureOpen();
-//         
-//         }
-//         catch(Exception e){
-//         	System.out.println("Mongo DB at "+hostname+" is closed");
-//         	return false;
-//         }
-//    	 
+    	 try {         	
+    		 mongo.getDatabaseNames();
+         }
+         catch(Exception e) {
+         	logger.error("MongoDB at " + hostname + " is closed.");
+         	return false;
+         }
+    	 
         return true;
     }
 

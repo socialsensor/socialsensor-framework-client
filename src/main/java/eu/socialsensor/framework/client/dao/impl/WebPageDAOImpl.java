@@ -8,15 +8,11 @@ import eu.socialsensor.framework.common.domain.JSONable;
 import eu.socialsensor.framework.common.domain.WebPage;
 import eu.socialsensor.framework.common.factories.ItemFactory;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
-import com.mongodb.MongoException;
 
 /**
  *
