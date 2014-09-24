@@ -55,24 +55,19 @@
             <artifactId>socialsensor-framework-common</artifactId>
             <version>0.2.2-SNAPSHOT</version>
         </dependency>
-       
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>3.0.0</version>
-        </dependency>    
-      
+        
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.2.1</version>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-core</artifactId>
             <version>1.1.0</version>
         </dependency>
+        
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
