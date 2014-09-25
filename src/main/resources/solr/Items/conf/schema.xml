@@ -49,6 +49,13 @@
       <field name="_version_" type="long" indexed="true" stored="true" />
       
 
+		<!-- newshound list id -->
+      <field name="lists" type="string" indexed="true" stored="true" multiValued="true" />
+      <!-- popularity fields -->
+      <field name="popularityShares" type="long" indexed="true" stored="true" multiValued="false" />     
+      <field name="popularityLikes" type="long" indexed="true" stored="true" multiValued="false" />
+      <field name="popularityComments" type="long" indexed="true" stored="true" multiValued="false" />
+      
       <dynamicField name="attr_*" type="text_general" indexed="true" stored="true"
       multiValued="true" />
       <dynamicField name="random_*" type="random" />
