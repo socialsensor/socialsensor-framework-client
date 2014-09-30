@@ -59,7 +59,7 @@ public class LoggerDAOImpl {
             query.put("sortingPosition", sortingPosition);
         }
 
-        List<String> results = mongoHandler.findMany(query, 100);
+        List<String> results = mongoHandler.findMany(query, 1000);
 
         String response = "[";
 
