@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -327,6 +328,17 @@ public class DyscoDAOImpl implements DyscoDAO {
             CustomDysco customDysco = (CustomDysco) dysco;
             List<eu.socialsensor.framework.common.domain.Query> queries = customDysco.getSolrQueries();
 
+            Map<String, Double> hashtags = dysco.getHashtags();
+            if(hashtags != null) {
+            	for(Entry<String, Double> hashtag : hashtags.entrySet()) {
+            		eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+            		q.setName(hashtag.getKey());
+            		q.setScore(hashtag.getValue());
+            	
+            		queries.add(q);
+            	}
+            }
+            
             List<String> twitterMentions = customDysco.getMentionedUsers();
             List<String> twitterUsers = customDysco.getTwitterUsers();
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
@@ -347,7 +359,7 @@ public class DyscoDAOImpl implements DyscoDAO {
             	}
             }
             
-            return collectItems(queries, twitterMentions, twitterUsers, wordsToExclude, filters, facets, orderBy, params, size);
+            return collectItems(queries, hashtags, twitterMentions, twitterUsers, wordsToExclude, filters, facets, orderBy, params, size);
         }
 
     }
@@ -375,6 +387,17 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<String> twitterUsers = customDysco.getTwitterUsers();
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
+            Map<String, Double> hashtags = dysco.getHashtags();
+            if(hashtags != null) {
+            	for(Entry<String, Double> hashtag : hashtags.entrySet()) {
+            		eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+            		q.setName(hashtag.getKey());
+            		q.setScore(hashtag.getValue());
+            	
+            		queries.add(q);
+            	}
+            }
+            
             List<String> otherSocialNetworks = customDysco.getOtherSocialNetworks();
             if(otherSocialNetworks != null && !otherSocialNetworks.isEmpty()) {
             	if(twitterUsers == null)
@@ -418,6 +441,17 @@ public class DyscoDAOImpl implements DyscoDAO {
             List<String> twitterUsers = customDysco.getTwitterUsers();
             List<String> wordsToExclude = customDysco.getWordsToAvoid();
 
+            Map<String, Double> hashtags = dysco.getHashtags();
+            if(hashtags != null) {
+            	for(Entry<String, Double> hashtag : hashtags.entrySet()) {
+            		eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+            		q.setName(hashtag.getKey());
+            		q.setScore(hashtag.getValue());
+            	
+            		queries.add(q);
+            	}
+            }
+            
             List<String> otherSocialNetworks = customDysco.getOtherSocialNetworks();
             if(otherSocialNetworks != null && !otherSocialNetworks.isEmpty()) {
             	if(twitterUsers == null) {
@@ -749,7 +783,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         return response;
     }
 
-    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, List<String> mentions,
+    private SearchEngineResponse<Item> collectItems(List<eu.socialsensor.framework.common.domain.Query> queries, Map<String, Double> hashtags, List<String> mentions,
             List<String> users, List<String> wordsToExclude, List<String> filters, List<String> facets, String orderBy, Map<String, String> params, int size) {
 
     	List<Item> items = new ArrayList<Item>();
@@ -1011,7 +1045,7 @@ public class DyscoDAOImpl implements DyscoDAO {
         String query = "";
         
         //Retrieve multimedia content that is stored in solr
-        String textQuery = buildKeywordSolrQuery(queries, "AND");
+        String textQuery = buildKeywordSolrQuery(queries, "OR");
 
         //set mentions
         if (mentions != null && !mentions.isEmpty()) {
@@ -1413,7 +1447,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("9d9eec28-34c3-4470-b437-5598f2f19caf");
+        Dysco dysco = dao.findDysco("7f09ca66-e6e6-4024-9fec-e18c550fcf01");
         System.out.println(dysco.toJSONString());
         
         List<String> filters = new ArrayList<String>();
