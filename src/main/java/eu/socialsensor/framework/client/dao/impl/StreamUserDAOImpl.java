@@ -98,11 +98,14 @@ public class StreamUserDAOImpl implements StreamUserDAO {
     			sets.put("profileImage", user.getProfileImage());
     		if(user.getName() != null) 
     			sets.put("name", user.getName());
+    		if(user.getLastUpdated() != null && user.getLastUpdated() > 0) 
+    			sets.put("lastUpdated", user.getLastUpdated());
     		
         	if(update) {
         		DBObject change = new BasicDBObject("$inc", incs);
-        		if(!sets.isEmpty())
+        		if(!sets.isEmpty()) {
         			change.put("$set", sets);
+        		}
         		
         		mongoHandler.update("id", user.getId(), change);
         	}

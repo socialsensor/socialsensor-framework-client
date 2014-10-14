@@ -256,51 +256,55 @@ public class VisualIndexHandler {
         return similar;
     }
     
-//    public NearestImage[] getSimilarImages(URL url, double threshold) {
-//        NearestImage[] similar = new NearestImage[0];
-//        PostMethod queryMethod = null;
-//        String response = null;
-//        try {
-//
-//            Part[] parts = {
-//                new StringPart("url", url.toString()),
-//                new StringPart("threshold", String.valueOf(threshold))
-//            };
-//
-//            queryMethod = new PostMethod(webServiceHost + "/rest/visual/query_url/" + collectionName);
-//            queryMethod.setRequestEntity(new MultipartRequestEntity(parts, queryMethod.getParams()));
-//            int code = httpClient.executeMethod(queryMethod);
-//            
-//            if (code == 200) {
-//                InputStream inputStream = queryMethod.getResponseBodyAsStream();
-//                StringWriter writer = new StringWriter();
-//                IOUtils.copy(inputStream, writer);
-//                response = writer.toString();
-//                queryMethod.releaseConnection();
-//
-//                similar = parseResponse(response);
-//                
-//            }
-//            else {
-//            	System.out.println(code);
-//            	InputStream inputStream = queryMethod.getResponseBodyAsStream();
-//                StringWriter writer = new StringWriter();
-//                IOUtils.copy(inputStream, writer);
-//                response = writer.toString();
-//                queryMethod.releaseConnection();
-//                System.out.println(response);
-//            }
-//            
-//        } catch (Exception e) {
-//        	e.printStackTrace();
-//            response = null;
-//        } finally {
-//            if (queryMethod != null) {
-//                queryMethod.releaseConnection();
-//            }
-//        }
-//        return similar;
-//    }
+    /**
+     * Get similar images by vector
+     *
+     * @param vector
+     * @param threshold
+     * @return
+     */
+    public JsonResultSet getSimilarImagesAndIndex(String id, double[] vector, double threshold) {
+
+    	JsonResultSet similar = new JsonResultSet();
+
+        byte[] vectorInBytes = new byte[8 * vector.length];
+        ByteBuffer bbuf = ByteBuffer.wrap(vectorInBytes);
+        for (double value : vector) {
+            bbuf.putDouble(value);
+        }
+
+        PostMethod queryMethod = null;
+        String response = null;
+        try {
+            ByteArrayPartSource source = new ByteArrayPartSource("bytes", vectorInBytes);
+            Part[] parts = {
+            	new StringPart("id", id),
+                new FilePart("vector", source),
+                new StringPart("threshold", String.valueOf(threshold))
+            };
+
+            queryMethod = new PostMethod(webServiceHost + "/rest/visual/qindex/" + collectionName);
+            queryMethod.setRequestEntity(new MultipartRequestEntity(parts, queryMethod.getParams()));
+            int code = httpClient.executeMethod(queryMethod);
+            if (code == 200) {
+                InputStream inputStream = queryMethod.getResponseBodyAsStream();
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(inputStream, writer);
+                response = writer.toString();
+                queryMethod.releaseConnection();
+
+                similar = parseResponse(response);
+            }
+        } catch (Exception e) {
+        	_logger.error("Exception for vector of length " + vector.length, e);
+            response = null;
+        } finally {
+            if (queryMethod != null) {
+                queryMethod.releaseConnection();
+            }
+        }
+        return similar;
+    }
     
     /**
      * Get similar images by vector
@@ -398,6 +402,46 @@ public class VisualIndexHandler {
         return success;
     }
 
+    public Double[] getVector(String id) {
+        GetMethod queryMethod = null;
+        String response = null;
+        try {
+
+            queryMethod = new GetMethod(webServiceHost + "/rest/visual/vector/" + collectionName);   
+            queryMethod.setQueryString("id="+id);
+
+            int code = httpClient.executeMethod(queryMethod);
+            
+            if (code == 200) {
+                InputStream inputStream = queryMethod.getResponseBodyAsStream();
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(inputStream, writer);
+                response = writer.toString();
+                queryMethod.releaseConnection();
+
+                Gson gson = new GsonBuilder()
+                	.excludeFieldsWithoutExposeAnnotation()
+                	.create();
+
+                Double[] vector = gson.fromJson(response, Double[].class);
+                
+                return vector;
+            }
+            
+            
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	_logger.error("Exception for id: " + id, e);
+            response = null;
+        } finally {
+            if (queryMethod != null) {
+                queryMethod.releaseConnection();
+            }
+        }
+        
+        return null;
+    }
+    
     public String uploadImage(String id, BufferedImage image, String type) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] imageInByte = null;
