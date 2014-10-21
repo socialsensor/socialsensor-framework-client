@@ -653,9 +653,9 @@ public class DyscoDAOImpl implements DyscoDAO {
         Collections.sort(mediaItems, new Comparator<MediaItem>() {
             public int compare(MediaItem mi1, MediaItem mi2) {
                 if (mi1.getPublicationTime() < mi2.getPublicationTime()) {
-                    return -1;
-                } else {
                     return 1;
+                } else {
+                    return -1;
                 }
             }
         });
