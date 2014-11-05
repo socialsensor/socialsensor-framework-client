@@ -1207,8 +1207,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 // Modify (termA termB) to (termA AND termB)
                 restQuery = restQuery.trim();
                 restQuery = restQuery.replaceAll("\\s+", " AND ");
-                
-                //System.out.println("rest query: "+restQuery);
+
                 for (String entity : entities) {
                     String queryToLink = restQuery;
                     if (!linkedWords.containsKey(entity)) {
@@ -1318,24 +1317,42 @@ public class DyscoDAOImpl implements DyscoDAO {
     public void postProcess(Dysco dysco) {
     	List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
     	
-    	List<Entity> entities = dysco.getEntities();
-    	if(entities != null && entities.size()>1) {
-    		String qStr = "";
-    		for(Entity e : entities) {
-    			qStr += "\"" + e.getName() + "\" ";
+    	Map<String, Double> keywords = dysco.getKeywords();
+    	
+    	List<Entity> entities = dysco.getEntities();    	
+    	if(entities != null && entities.size()>1) {    		
+    		for(int i=0; i<entities.size(); i++) {
+    			for(int j=i+1; j<entities.size(); j++) {
+        			Entity e1 = entities.get(i);
+        			Entity e2 = entities.get(j);
+        			
+        			String qStr = "\"" + e1.getName().trim() + "\" \"" + e2.getName().trim() + "\"";
+        			
+        			if(e1.getType().equals(Type.LOCATION) && e2.getType().equals(Type.LOCATION)) {
+        				if(keywords.size() > 0) {
+        					for(String k : keywords.keySet()) {
+        						eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+                				q.setName(qStr.trim() + " " + k.trim());
+                				q.setScore(2 * dysco.getScore());
+                			
+                				queries.add(q);
+        					}
+        				}
+        				continue;
+        			}
+        			
+        			eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
+        			q.setName(qStr.trim());
+        			q.setScore(2 * dysco.getScore());
+        			
+        			queries.add(q);
+        		}
     		}
-    		
-    		eu.socialsensor.framework.common.domain.Query q = new eu.socialsensor.framework.common.domain.Query();
-    		q.setName(qStr.trim());
-    		q.setScore(entities.size() * dysco.getScore());
-    		
-    		queries.add(q);
     	}
     	
     	List<eu.socialsensor.framework.common.domain.Query> tbRemoved = new ArrayList<eu.socialsensor.framework.common.domain.Query>();
     	
     	// Remove Single Keywords
-    	Map<String, Double> keywords = dysco.getKeywords();
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
     		if(tbRemoved.contains(query))
     			continue;
@@ -1355,7 +1372,7 @@ public class DyscoDAOImpl implements DyscoDAO {
     		queries.remove(query);
     	}
     	
-    	// Remove Single Hashtags / Entities
+    	// Remove Single Hashtags / Location Entities
     	Map<String, Double> hashtags = dysco.getHashtags();
     	tbRemoved.clear();
     	for(eu.socialsensor.framework.common.domain.Query query : queries) {
@@ -1447,7 +1464,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("7f09ca66-e6e6-4024-9fec-e18c550fcf01");
+        Dysco dysco = dao.findDysco("a501e99f-68e4-47f4-b7f2-511ff6036039");
         System.out.println(dysco.toJSONString());
         
         List<String> filters = new ArrayList<String>();

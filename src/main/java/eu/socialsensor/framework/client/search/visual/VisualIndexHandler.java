@@ -12,6 +12,12 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.google.gson.*;
+
+import eu.socialsensor.framework.client.dao.MediaItemDAO;
+import eu.socialsensor.framework.client.dao.impl.MediaItemDAOImpl;
+import eu.socialsensor.framework.client.search.visual.JsonResultSet.JsonResult;
+import eu.socialsensor.framework.common.domain.MediaItem;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -24,11 +30,6 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-
-import eu.socialsensor.framework.client.dao.MediaItemDAO;
-import eu.socialsensor.framework.client.dao.impl.MediaItemDAOImpl;
-import eu.socialsensor.framework.client.search.visual.JsonResultSet.JsonResult;
-import eu.socialsensor.framework.common.domain.MediaItem;
 
 /**
  * Client for Visual Indexer.
@@ -405,6 +406,7 @@ public class VisualIndexHandler {
     public Double[] getVector(String id) {
         GetMethod queryMethod = null;
         String response = null;
+        Double[] vector = null;
         try {
 
             queryMethod = new GetMethod(webServiceHost + "/rest/visual/vector/" + collectionName);   
@@ -417,15 +419,13 @@ public class VisualIndexHandler {
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(inputStream, writer);
                 response = writer.toString();
-                queryMethod.releaseConnection();
 
                 Gson gson = new GsonBuilder()
                 	.excludeFieldsWithoutExposeAnnotation()
                 	.create();
 
-                Double[] vector = gson.fromJson(response, Double[].class);
-                
-                return vector;
+                vector = gson.fromJson(response, Double[].class);
+
             }
             
             
@@ -439,7 +439,7 @@ public class VisualIndexHandler {
             }
         }
         
-        return null;
+        return vector;
     }
     
     public String uploadImage(String id, BufferedImage image, String type) {
