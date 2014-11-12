@@ -461,9 +461,11 @@ public class SolrItemHandler {
         System.out.println("query:  " + query.toString());
         try {
             rsp = server.query(query);
-        } catch (SolrServerException e) {
+        } catch (Exception e) {
             logger.info(e.getMessage());
-            return null;
+            response.setNumFound(0);
+            response.setResults(new ArrayList<Item>());
+            return response;
         }
 
         Long t2 = System.currentTimeMillis();

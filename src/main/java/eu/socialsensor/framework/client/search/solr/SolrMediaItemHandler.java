@@ -520,10 +520,12 @@ public class SolrMediaItemHandler {
         query.setFields("* score");
         try {
             rsp = server.query(query);
-        } catch (SolrServerException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             Logger.getRootLogger().info(e.getMessage());
-            return null;
+            response.setNumFound(0);
+            response.setResults(new ArrayList<MediaItem>());
+            return response;
         }
 
         

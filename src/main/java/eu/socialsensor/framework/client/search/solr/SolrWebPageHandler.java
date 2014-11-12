@@ -349,13 +349,18 @@ public class SolrWebPageHandler {
         } catch (SolrServerException e) {
         	e.printStackTrace();
             Logger.getRootLogger().info(e.getMessage());
-            return null;
+            
+            response.setNumFound(0);
+            response.setResults(new ArrayList<WebPage>());
+            
+            return response;
         }
 
 
         List<SolrWebPage> solrWebPages = rsp.getBeans(SolrWebPage.class);
   
-
+        response.setNumFound(solrWebPages.size());
+        
         List<WebPage> webPages = new ArrayList<WebPage>();
         for (SolrWebPage solrWebPage : solrWebPages) {
             try {
