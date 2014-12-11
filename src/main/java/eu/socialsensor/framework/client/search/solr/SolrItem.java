@@ -1,14 +1,14 @@
 package eu.socialsensor.framework.client.search.solr;
 
 import com.google.gson.Gson;
-
 import eu.socialsensor.framework.common.domain.Item;
 import eu.socialsensor.framework.common.domain.Location;
 import eu.socialsensor.framework.common.domain.MediaItem;
 import eu.socialsensor.framework.common.domain.StreamUser;
 import eu.socialsensor.framework.common.domain.StreamUser.Category;
+import eu.socialsensor.framework.common.domain.dysco.Entity;
+import eu.socialsensor.framework.common.domain.dysco.Entity.Type;
 import eu.socialsensor.framework.common.factories.ItemFactory;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.solr.client.solrj.beans.Field;
 
 /**
@@ -72,10 +71,30 @@ public class SolrItem {
         positiveVotes = item.getPositiveVotes();
         negativeVotes = item.getNegativeVotes();
 
+        List<Entity> entities = item.getEntities();
+
+        List<String> locationEntities = new ArrayList<String>();
+        List<String> organizationEntities = new ArrayList<String>();
+        List<String> personEntities = new ArrayList<String>();
+
+        if (entities != null) {
+
+            for (Entity entity : entities) {
+                if (entity.getType() == Type.LOCATION) {
+                    locationEntities.add(entity.getName());
+                } else if (entity.getType() == Type.PERSON) {
+                    personEntities.add(entity.getName());
+                } else if (entity.getType() == Type.ORGANIZATION) {
+                    organizationEntities.add(entity.getName());
+                }
+            }
+
+        }
+
         //this is a map
         mediaIds = new ArrayList<String>();
         if (item.getMediaIds() != null) {
-        	mediaIds.addAll(item.getMediaIds());
+            mediaIds.addAll(item.getMediaIds());
         }
 
         //the following derive from alethiometer
@@ -87,28 +106,27 @@ public class SolrItem {
 //            alethiometerScore = -1;
 //            alethiometerUserScore = -1;
 //        }
-        
         alethiometerScore = item.getAlethiometerScore();
         alethiometerUserScore = item.getAlethiometerUserScore();
         alethiometerUserStatus = item.getAlethiometerUserStatus();
         userRole = item.getUserRole();
         original = item.isOriginal();
-        
+
         Category cat = item.getCategory();
-        if(cat != null)
-        	category = cat.name();
-        
+        if (cat != null) {
+            category = cat.name();
+        }
+
         StreamUser user = item.getStreamUser();
         if (user != null) {
             authorFullName = user.getName();
             authorScreenName = user.getUsername();
             avatarImage = user.getImageUrl();
             avatarImageSmall = user.getProfileImage();
-           
+
 //            if (user.getCategory() != null) {
 //                category = user.getCategory().name();
 //            }
-
             Long followers = user.getFollowers();
             if (followers != null) {
                 followersCount = followers.intValue();
@@ -185,11 +203,11 @@ public class SolrItem {
         } else {
             item.setLocation(new Location(location));
         }
-        
+
         if (mediaIds != null) {
             item.setMediaIds(mediaIds);
         }
-        
+
         item.setAlethiometerScore(alethiometerScore);
         item.setAlethiometerUserScore(alethiometerUserScore);
         item.setUserRole(userRole);
@@ -306,6 +324,36 @@ public class SolrItem {
     private Long popularityComments = 0L;
     @Field(value = "popularity")
     private Long popularity = 0L;
+    @Field(value = "locationEntities")
+    private List<String> locationEntities;
+    @Field(value = "personEntities")
+    private List<String> personEntities;
+    @Field(value = "organizationEntities")
+    private List<String> organizationEntities;
+
+    public List<String> getLocationEntities() {
+        return locationEntities;
+    }
+
+    public void setLocationEntities(List<String> locationEntities) {
+        this.locationEntities = locationEntities;
+    }
+
+    public List<String> getPersonEntities() {
+        return personEntities;
+    }
+
+    public void setPersonEntities(List<String> personEntities) {
+        this.personEntities = personEntities;
+    }
+
+    public List<String> getOrganizationEntities() {
+        return organizationEntities;
+    }
+
+    public void setOrganizationEntities(List<String> organizationEntities) {
+        this.organizationEntities = organizationEntities;
+    }
 
     public Long getPopularityLikes() {
         return popularityLikes;
