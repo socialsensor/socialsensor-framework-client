@@ -525,6 +525,7 @@ public class SolrMediaItemHandler {
             Logger.getRootLogger().info(e.getMessage());
             response.setNumFound(0);
             response.setResults(new ArrayList<MediaItem>());
+            response.setFacets(new ArrayList<Facet>());
             return response;
         }
 

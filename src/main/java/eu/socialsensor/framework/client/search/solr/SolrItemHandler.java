@@ -465,6 +465,7 @@ public class SolrItemHandler {
             logger.info(e.getMessage());
             response.setNumFound(0);
             response.setResults(new ArrayList<Item>());
+            response.setFacets(new ArrayList<Facet>());
             return response;
         }
 
