@@ -321,11 +321,11 @@ public class SolrItem {
     @Field(value = "popularity")
     private Long popularity = 0L;
     @Field(value = "locationEntities")
-    private List<String> locationEntities;
+    private List<String> locationEntities = new ArrayList<String>();
     @Field(value = "personEntities")
-    private List<String> personEntities;
+    private List<String> personEntities = new ArrayList<String>(); ;
     @Field(value = "organizationEntities")
-    private List<String> organizationEntities;
+    private List<String> organizationEntities = new ArrayList<String>();;
 
     public List<String> getLocationEntities() {
         return locationEntities;
