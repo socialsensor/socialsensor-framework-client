@@ -73,10 +73,6 @@ public class SolrItem {
 
         List<Entity> entities = item.getEntities();
 
-        List<String> locationEntities = new ArrayList<String>();
-        List<String> organizationEntities = new ArrayList<String>();
-        List<String> personEntities = new ArrayList<String>();
-
         if (entities != null) {
 
             for (Entity entity : entities) {
