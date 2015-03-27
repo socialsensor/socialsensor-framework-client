@@ -483,7 +483,10 @@ public class DyscoDAOImpl implements DyscoDAO {
         
         List<WebPage> webPages = new ArrayList<WebPage>();
         
-        postProcess(dysco);
+        if (dysco.getDyscoType().equals(DyscoType.TRENDING)) {
+        	postProcess(dysco);
+        }
+        
         List<eu.socialsensor.framework.common.domain.Query> queries = dysco.getSolrQueries();
         if (queries == null || queries.isEmpty()) {
             return webPages;
@@ -1464,7 +1467,7 @@ public class DyscoDAOImpl implements DyscoDAO {
                 "Prototype");
         
         
-        Dysco dysco = dao.findDysco("a501e99f-68e4-47f4-b7f2-511ff6036039");
+        Dysco dysco = dao.findDysco("32b31323-c22c-4f0f-9274-ec3cda7b8269");
         System.out.println(dysco.toJSONString());
         
         List<String> filters = new ArrayList<String>();
@@ -1476,22 +1479,22 @@ public class DyscoDAOImpl implements DyscoDAO {
 		long window = 24 * 60L * 60L * 1000L;
 		
 		filters.add("publicationTime:[" + (now - window) + " TO " + now + "]");
-		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 10);
+		SearchEngineResponse<Item> items = dao.findItems(dysco, filters, facets, orderBy, params, 100);
 		
-		System.out.println(items.getNumFound());
+		System.out.println("Items found: " + items.getNumFound());
 		//for(Item item : items.getResults()) {
 			//System.out.println("=======================================");
 			//System.out.println(item.getTitle().replaceAll("\n", " "));
 		//}
 		
 		SearchEngineResponse<MediaItem> mItems = dao.findImages(dysco, filters, facets, orderBy, 10);
-		System.out.println(mItems.getNumFound());
+		System.out.println("Media Items: " + mItems.getNumFound());
 		//for(MediaItem item : mItems.getResults()) {
 			//System.out.println("=======================================");
 			//System.out.println(item.getTitle().replaceAll("\n", " "));
 		//}
     	}
-    	catch(Exception e){
+    	catch(Exception e) {
     		System.out.println(e.getLocalizedMessage());
     	}
     }
